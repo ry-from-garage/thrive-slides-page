@@ -169,9 +169,9 @@
     padding: 40px 24px;
     gap: 0;
   }
-  .p1-kpi-card:nth-child(1) { left: 72px; }
-  .p1-kpi-card:nth-child(2) { left: calc(72px + (1136px - 48px) / 3 + 24px); }
-  .p1-kpi-card:nth-child(3) { left: calc(72px + 2 * ((1136px - 48px) / 3 + 24px)); }
+  .p1-kpi-card--a { left: 72px; }
+  .p1-kpi-card--b { left: calc(72px + (1136px - 48px) / 3 + 24px); }
+  .p1-kpi-card--c { left: calc(72px + 2 * ((1136px - 48px) / 3 + 24px)); }
 
   .kpi-metric-label {
     font-family: var(--font-stack);
@@ -647,21 +647,21 @@
       <div class="action-title">第2四半期は3指標すべてで過去最高を記録し、上場基準に到達した</div>
     </div>
     <!-- KPI Cards -->
-    <div class="p1-kpi-card">
+    <div class="p1-kpi-card p1-kpi-card--a">
       <div class="kpi-metric-label">月間アクティブユーザー</div>
       <div class="kpi-big-number">1.2M</div>
       <div class="kpi-unit">MAU</div>
       <div class="kpi-supplement">前四半期比 +38%</div>
       <div class="kpi-badge up">▲ 前年同期比 +112%</div>
     </div>
-    <div class="p1-kpi-card">
+    <div class="p1-kpi-card p1-kpi-card--b">
       <div class="kpi-metric-label">年間経常収益</div>
       <div class="kpi-big-number accent">¥8.4B</div>
       <div class="kpi-unit" style="color: var(--accent)">ARR</div>
       <div class="kpi-supplement">前四半期比 +52%</div>
       <div class="kpi-badge up">▲ 目標対比 108%</div>
     </div>
-    <div class="p1-kpi-card">
+    <div class="p1-kpi-card p1-kpi-card--c">
       <div class="kpi-metric-label">ネット収益維持率</div>
       <div class="kpi-big-number">142%</div>
       <div class="kpi-unit">NRR</div>

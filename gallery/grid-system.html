@@ -109,16 +109,18 @@
     top: var(--safe-top);
     left: var(--safe-left);
     right: var(--safe-right);
-    height: 80px;
+    height: 96px;
     display: flex;
     align-items: center;
-    font-size: 52px;
+    font-size: 40px;
     font-weight: 900;
-    line-height: 1;
+    line-height: 1.15;
     letter-spacing: -0.02em;
     color: var(--color-text);
-    white-space: nowrap;
+    white-space: normal;
     overflow: hidden;
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
   .action-title::after {
     content: '';
@@ -368,6 +370,7 @@
   }
 
   #zpat .top-left {
+    position: absolute;
     border: 1px solid #2A2A2A;
     display: flex;
     align-items: center;

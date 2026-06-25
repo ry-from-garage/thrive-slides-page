@@ -289,13 +289,26 @@
         </div>
         <div class="s-rule" style="top:140px; width:1136px;"></div>
 
-        <!-- col width helpers (12col, gutter24, origin72)
-             col1-3: 72 → 266px wide (3col)
-             col4-9: 362px wide (6col center band)
-             col4:   72+266+24=362 → width=72.67px (1col)
-             col5-8: 362+72+24=458 → width=4col=362.67px
-             col9:   458+362+24=844 → width=72.67
-             col10-12: 844+24+24=… let's just use absolute px -->
+        <!--
+          Grid reference (12col, gutter=24px, origin x=72):
+          col1-3:   x=72,  w=266  (right edge=338)
+          col4:     x=362, w=73   (right edge=435)
+          col5-8:   x=458, w=362  (right edge=820)  ← center_rivalry
+          col9:     x=844, w=73   (right edge=917)   ← NOTE: spec col9 is gap
+          col10-12: x=844, w=364  (right edge=1208)  ← force_right at x=844
+
+          Vertical layout (per spec):
+          force_top:     y=144, h=104  (bottom=248)
+          center/left/right row: y=256, h=216  (bottom=472)
+          arrow_bottom region:   y=480, h=32   (bottom=512)
+          force_bottom:  y=520, h=112  (bottom=632)
+
+          Arrow endpoints (all directed toward center box):
+          top    → down:  x-center=639, y from 248 to 256 (gap=8px)
+          left   → right: y-center=364, x from 338 to 458 (gap=120px)
+          right  → left:  y-center=364, x from 844 to 820 (gap=24px)
+          bottom → up:    x-center=639, y from 520 to 472 (gap=48px)
+        -->
 
         <!-- force_top: col4-9  x=362 y=144 w=580 h=104 -->
         <div class="fill-light" style="position:absolute;left:362px;top:144px;width:580px;height:104px;padding:10px 16px;border-radius:2px;">
@@ -307,12 +320,6 @@
           </ul>
         </div>
 
-        <!-- arrow top: SVG connector col4-9 y=248→256 -->
-        <svg style="position:absolute;left:627px;top:248px;" width="20" height="20">
-          <line x1="10" y1="0" x2="10" y2="12" stroke="#5A6675" stroke-width="1.5"/>
-          <polygon points="5,10 15,10 10,18" fill="#5A6675"/>
-        </svg>
-
         <!-- force_left: col1-3  x=72 y=256 w=266 h=216 -->
         <div class="fill-light" style="position:absolute;left:72px;top:256px;width:266px;height:216px;padding:12px 14px;border-radius:2px;">
           <div class="cell-h" style="font-size:13px;">売り手の交渉力<br>（Bargaining Power of Suppliers）</div>
@@ -322,12 +329,6 @@
             <li>金融API提供銀行は複数あり切替コスト低</li>
           </ul>
         </div>
-
-        <!-- arrow left: col4 x=338→362 y=256+108=364 -->
-        <svg style="position:absolute;left:338px;top:350px;" width="32" height="20">
-          <line x1="0" y1="10" x2="20" y2="10" stroke="#5A6675" stroke-width="1.5"/>
-          <polygon points="18,5 18,15 26,10" fill="#5A6675"/>
-        </svg>
 
         <!-- center_rivalry: col5-8  x=458 y=256 w=362 h=216 -->
         <div class="fill-mid" style="position:absolute;left:458px;top:256px;width:362px;height:216px;padding:12px 16px;border-radius:2px;">
@@ -340,12 +341,6 @@
           </ul>
         </div>
 
-        <!-- arrow right: col9 x=820→844 y=364 -->
-        <svg style="position:absolute;left:820px;top:350px;" width="32" height="20">
-          <line x1="8" y1="10" x2="28" y2="10" stroke="#5A6675" stroke-width="1.5"/>
-          <polygon points="6,5 6,15 0,10" fill="#5A6675"/>
-        </svg>
-
         <!-- force_right: col10-12  x=844 y=256 w=364 h=216 -->
         <div class="fill-light" style="position:absolute;left:844px;top:256px;width:364px;height:216px;padding:12px 14px;border-radius:2px;">
           <div class="cell-h" style="font-size:13px;">買い手の交渉力<br>（Bargaining Power of Buyers）</div>
@@ -356,14 +351,8 @@
           </ul>
         </div>
 
-        <!-- arrow bottom: col4-9 x=627 y=472→480 -->
-        <svg style="position:absolute;left:627px;top:468px;" width="20" height="20">
-          <line x1="10" y1="8" x2="10" y2="0" stroke="#5A6675" stroke-width="1.5"/>
-          <polygon points="5,10 15,10 10,2" fill="#5A6675"/>
-        </svg>
-
-        <!-- force_bottom: col4-9  x=362 y=520 w=580 h=112 -->
-        <div class="fill-light" style="position:absolute;left:362px;top:488px;width:580px;height=112px;min-height:112px;padding:10px 16px;border-radius:2px;height:112px;">
+        <!-- force_bottom: col4-9  x=362 y=520 w=580 h=112 (spec: y=520) -->
+        <div class="fill-light" style="position:absolute;left:362px;top:520px;width:580px;height:112px;padding:10px 16px;border-radius:2px;">
           <div class="cell-h">代替品の脅威（Threat of Substitutes）</div>
           <span class="strength-badge badge-mid">中</span>
           <ul class="cell-body">
@@ -371,6 +360,73 @@
             <li>税理士へのアウトソーシング継続が代替選択肢として残存</li>
           </ul>
         </div>
+
+        <!--
+          Arrows SVG overlay — single element covering the arrow regions.
+          All 4 arrows point TOWARD the center box (Industry Rivalry).
+
+          Arrow top:    (639,248) → (639,256)  downward  — 8px gap
+          Arrow left:   (338,364) → (458,364)  rightward — 120px gap
+          Arrow right:  (844,364) → (820,364)  leftward  — 24px gap
+          Arrow bottom: (639,520) → (639,472)  upward    — 48px gap
+
+          SVG origin placed at (72,144) to keep coords simple.
+          In SVG space: subtract (72,144) from each absolute coordinate.
+            top-start:    (567,104)  top-end:    (567,112)
+            left-start:   (266,220)  left-end:   (386,220)
+            right-start:  (772,220)  right-end:  (748,220)
+            bottom-start: (567,376)  bottom-end: (567,328)
+        -->
+        <svg style="position:absolute;left:72px;top:144px;overflow:visible;pointer-events:none;"
+             width="1136" height="520"
+             xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- arrowhead marker pointing in the +x direction (rightward) -->
+            <marker id="pff-arrow-right" markerWidth="8" markerHeight="8"
+                    refX="7" refY="4" orient="auto">
+              <polygon points="0,0 8,4 0,8" fill="#5A6675"/>
+            </marker>
+            <!-- arrowhead marker pointing in the -x direction (leftward) -->
+            <marker id="pff-arrow-left" markerWidth="8" markerHeight="8"
+                    refX="1" refY="4" orient="auto-start-reverse">
+              <polygon points="0,0 8,4 0,8" fill="#5A6675"/>
+            </marker>
+            <!-- arrowhead marker pointing in the +y direction (downward) -->
+            <marker id="pff-arrow-down" markerWidth="8" markerHeight="8"
+                    refX="4" refY="7" orient="auto">
+              <polygon points="0,0 8,0 4,8" fill="#5A6675"/>
+            </marker>
+            <!-- arrowhead marker pointing in the -y direction (upward) -->
+            <marker id="pff-arrow-up" markerWidth="8" markerHeight="8"
+                    refX="4" refY="1" orient="auto-start-reverse">
+              <polygon points="0,8 8,8 4,0" fill="#5A6675"/>
+            </marker>
+          </defs>
+
+          <!-- Arrow TOP: force_top → center (downward, x=639) -->
+          <!-- abs: (639,248)→(639,256); SVG: (567,104)→(567,112) gap=8px, extend line to leave room for head -->
+          <line x1="567" y1="104" x2="567" y2="110"
+                stroke="#5A6675" stroke-width="1.5"
+                marker-end="url(#pff-arrow-down)"/>
+
+          <!-- Arrow LEFT: force_left → center (rightward, y=364) -->
+          <!-- abs: (338,364)→(458,364); SVG: (266,220)→(386,220) gap=120px -->
+          <line x1="266" y1="220" x2="381" y2="220"
+                stroke="#5A6675" stroke-width="1.5"
+                marker-end="url(#pff-arrow-right)"/>
+
+          <!-- Arrow RIGHT: force_right → center (leftward, y=364) -->
+          <!-- abs: (844,364)→(820,364); SVG: (772,220)→(748,220) gap=24px -->
+          <line x1="772" y1="220" x2="753" y2="220"
+                stroke="#5A6675" stroke-width="1.5"
+                marker-end="url(#pff-arrow-left)"/>
+
+          <!-- Arrow BOTTOM: force_bottom → center (upward, x=639) -->
+          <!-- abs: (639,520)→(639,472); SVG: (567,376)→(567,328) gap=48px -->
+          <line x1="567" y1="376" x2="567" y2="333"
+                stroke="#5A6675" stroke-width="1.5"
+                marker-end="url(#pff-arrow-up)"/>
+        </svg>
 
         <div class="s-source" style="top:643px;">出典: 各社公開IR資料・MM総研「クラウド会計ソフト利用動向調査」2025年3月</div>
         <div class="s-page">02 / 07</div>
