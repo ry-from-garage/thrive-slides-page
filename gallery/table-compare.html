@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📑 テーブル・比較 — theme: corporate-trust（6 パターン）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* ── corporate-trust tokens ── */
+  :root {
+    --primary:    #1565C0;
+    --secondary:  #3B88C3;
+    --background: #F0F4F9;
+    --surface:    #D6E2F0;
+    --accent:     #A84300;
+    --text:       #0D1B2A;
+    --muted:      #4A5568;
+    --positive:   #1A6B3C;
+    --negative:   #B91C1C;
+
+    --font: 'Noto Sans JP', 'Noto Sans', Arial, sans-serif;
+
+    --size-display: 60px;
+    --size-h1: 38px;
+    --size-h2: 22px;
+    --size-body: 17px;
+    --size-caption: 13px;
+
+    /* grid */
+    --canvas-w: 1280px;
+    --canvas-h: 720px;
+    --safe-x: 72px;
+    --safe-y: 56px;
+    --content-w: 1136px; /* 1280 - 72*2 */
+    --gutter: 24px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1a1a2e;
+    font-family: var(--font);
+    color: var(--text);
+    padding: 40px 0;
+  }
+
+  /* ── gallery page header ── */
+  .page-header {
+    text-align: center;
+    color: #f0f4f9;
+    margin-bottom: 48px;
+    padding: 0 40px;
+  }
+  .page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+  .page-header p {
+    font-size: 14px;
+    color: #a0aec0;
+  }
+
+  /* ── slide wrapper ── */
+  .slide-wrap {
+    margin: 0 auto 64px auto;
+    width: var(--canvas-w);
+  }
+  .slide-caption {
+    color: #a0aec0;
+    font-size: 13px;
+    margin-bottom: 10px;
+    font-family: var(--font);
+    padding-left: 4px;
+  }
+  .slide-caption strong {
+    color: #f0f4f9;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  /* ── slide canvas ── */
+  .slide {
+    width: var(--canvas-w);
+    height: var(--canvas-h);
+    background: var(--background);
+    position: relative;
+    overflow: hidden;
+    font-family: var(--font);
+    flex-shrink: 0;
+  }
+
+  /* ── frame: footer hairline ── */
+  .slide::after {
+    content: '';
+    position: absolute;
+    left: var(--safe-x);
+    right: var(--safe-x);
+    bottom: 56px;
+    height: 0.5px;
+    background: var(--muted);
+  }
+
+  /* ── page number ── */
+  .pg-num {
+    position: absolute;
+    right: 72px;
+    bottom: 36px;
+    font-size: var(--size-caption);
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  /* ── action title bar (common) ── */
+  .action-title-bar {
+    position: absolute;
+    left: var(--safe-x);
+    top: var(--safe-y); /* offset 56 */
+    width: var(--content-w);
+    height: 88px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .title-accent-bar {
+    width: 3px;
+    background: var(--primary);
+    align-self: stretch;
+    flex-shrink: 0;
+    margin-right: 12px;
+  }
+  .action-title-text {
+    font-size: var(--size-h1);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.35;
+  }
+  /* hairline rule below title */
+  .title-rule {
+    position: absolute;
+    left: var(--safe-x);
+    top: 144px; /* 56 + 88 = 144 */
+    width: var(--content-w);
+    height: 1.5px;
+    background: var(--primary);
+  }
+
+  /* ── source note ── */
+  .source-note {
+    position: absolute;
+    left: var(--safe-x);
+    top: 640px; /* offset 640 */
+    height: 24px;
+    width: var(--content-w);
+    font-size: var(--size-caption);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+  }
+
+  /* ══════════════════════════════════════════
+     PATTERN 1: comparison-matrix
+     ══════════════════════════════════════════ */
+
+  /* table header row: offset 160, height 48 */
+  .cm-header {
+    position: absolute;
+    left: var(--safe-x);
+    top: 160px;
+    width: var(--content-w);
+    height: 48px;
+    display: flex;
+    align-items: center;
+  }
+  .cm-header-cell {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--size-body);
+    font-weight: 600;
+    color: var(--text);
+    background: var(--surface);
+    border-bottom: 1px solid var(--muted);
+  }
+  .cm-header-cell.empty {
+    background: var(--surface);
+    flex: 1.2;
+  }
+  .cm-header-cell.highlight {
+    background: var(--primary);
+    color: #fff;
+    font-weight: 700;
+  }
+
+  /* table body: offset 216, height 424 */
+  .cm-body {
+    position: absolute;
+    left: var(--safe-x);
+    top: 208px; /* 160+48 */
+    width: var(--content-w);
+    height: 432px; /* up to 640 */
+  }
+  .cm-row {
+    display: flex;
+    height: 72px;
+    border-bottom: 1px solid var(--surface);
+  }
+  .cm-row:nth-child(even) {
+    background: rgba(214, 226, 240, 0.3);
+  }
+  .cm-row-header {
+    flex: 1.2;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: var(--size-body);
+    font-weight: 600;
+    color: var(--text);
+    background: var(--surface);
+    border-right: 1px solid var(--muted);
+  }
+  .cm-cell {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    font-size: 15px;
+    color: var(--text);
+    text-align: center;
+    line-height: 1.4;
+  }
+  .cm-cell.highlight-col {
+    background: rgba(21, 101, 192, 0.07);
+    font-weight: 600;
+    color: var(--primary);
+    border-left: 2px solid var(--primary);
+    border-right: 2px solid var(--primary);
+  }
+  .cm-row:last-child .cm-cell.highlight-col {
+    border-bottom: 2px solid var(--primary);
+  }
+
+  /* ══════════════════════════════════════════
+     PATTERN 2: pricing-plan-cards
+     ══════════════════════════════════════════ */
+
+  /* col 1-4, 5-8, 9-12 each 362.67px + gutters */
+  .ppc-cards {
+    position: absolute;
+    left: var(--safe-x);
+    top: 160px;
+    width: var(--content-w);
+    height: 480px;
+    display: flex;
+    gap: var(--gutter);
+  }
+  .ppc-card {
+    flex: 1;
+    background: var(--surface);
+    border-radius: 4px;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .ppc-card.recommended {
+    background: var(--primary);
+    color: #fff;
+  }
+  .ppc-badge {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 14px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .ppc-plan-name {
+    font-size: var(--size-h2);
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .ppc-card.recommended .ppc-plan-name {
+    color: #fff;
+  }
+  .ppc-price {
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  .ppc-card.recommended .ppc-price {
+    color: #fff;
+  }
+  .ppc-price-unit {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .ppc-card.recommended .ppc-price-unit {
+    color: rgba(255,255,255,0.75);
+  }
+  .ppc-divider {
+    height: 1px;
+    background: rgba(74, 85, 104, 0.25);
+    margin-bottom: 16px;
+  }
+  .ppc-card.recommended .ppc-divider {
+    background: rgba(255,255,255,0.25);
+  }
+  .ppc-feature-list {
+    list-style: none;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ppc-feature-item {
+    font-size: 15px;
+    color: var(--text);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+  }
+  .ppc-card.recommended .ppc-feature-item {
+    color: #fff;
+  }
+  .ppc-check {
+    color: var(--positive);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .ppc-card.recommended .ppc-check {
+    color: rgba(255,255,255,0.9);
+  }
+
+  /* ══════════════════════════════════════════
+     PATTERN 3: pricing-comparison-table
+     ══════════════════════════════════════════ */
+
+  /* lead band: offset 160, height 48 */
+  .pct-lead {
+    position: absolute;
+    left: var(--safe-x);
+    top: 160px;
+    width: var(--content-w);
+    height: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+  }
+  .pct-lead-sub {
+    font-size: var(--size-h2);
+    font-weight: 600;
+    color: var(--primary);
+    line-height: 1.3;
+  }
+  .pct-lead-text {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* table area: offset 216, height 424 */
+  .pct-table-wrap {
+    position: absolute;
+    left: var(--safe-x);
+    top: 216px;
+    width: var(--content-w);
+    height: 424px;
+    overflow: hidden;
+  }
+  .pct-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .pct-table th, .pct-table td {
+    padding: 0 12px;
+    border-bottom: 1px solid var(--surface);
+    font-size: 15px;
+    color: var(--text);
+    height: 48px;
+    line-height: 1.4;
+    vertical-align: middle;
+  }
+  .pct-table thead th {
+    background: var(--surface);
+    font-weight: 600;
+    font-size: var(--size-body);
+    text-align: center;
+  }
+  .pct-table thead th:first-child {
+    text-align: left;
+    background: var(--surface);
+  }
+  .pct-table thead .recommended-col {
+    background: var(--primary);
+    color: #fff;
+  }
+  .pct-table tbody td:first-child {
+    background: rgba(214, 226, 240, 0.5);
+    font-weight: 600;
+    font-size: var(--size-body);
+    color: var(--text);
+  }
+  .pct-table tbody td {
+    text-align: center;
+  }
+  .pct-table tbody td.rec-cell {
+    background: rgba(21, 101, 192, 0.07);
+    color: var(--primary);
+    font-weight: 600;
+    border-left: 2px solid var(--primary);
+    border-right: 2px solid var(--primary);
+  }
+  .pct-table tbody tr:last-child td.rec-cell {
+    border-bottom: 2px solid var(--primary);
+  }
+  .pct-check-pos { color: var(--positive); font-weight: 700; }
+  .pct-check-neg { color: var(--muted); }
+  .pct-plan-header { display: flex; flex-direction: column; align-items: center; }
+  .pct-plan-price { font-size: 22px; font-weight: 700; color: inherit; line-height: 1.2; }
+  .pct-plan-unit { font-size: 12px; font-weight: 400; opacity: 0.8; }
+  .pct-badge-inline {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 3px;
+    margin-bottom: 2px;
+  }
+
+  /* ══════════════════════════════════════════
+     PATTERN 4: status-progress-table
+     ══════════════════════════════════════════ */
+
+  /* table header: offset 160, height 40 */
+  .spt-header {
+    position: absolute;
+    left: var(--safe-x);
+    top: 160px;
+    width: var(--content-w);
+    height: 40px;
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border-bottom: 1.5px solid var(--primary);
+  }
+  .spt-header-cell {
+    font-size: var(--size-body);
+    font-weight: 600;
+    color: var(--text);
+    padding: 0 16px;
+  }
+  .spt-header-cell.name-col { flex: 2.5; }
+  .spt-header-cell.status-col { flex: 1.2; text-align: center; }
+  .spt-header-cell.date-col { flex: 1.5; text-align: right; }
+
+  /* table body: offset 208, height 432 */
+  .spt-body {
+    position: absolute;
+    left: var(--safe-x);
+    top: 200px; /* 160+40 */
+    width: var(--content-w);
+    height: 440px;
+  }
+  .spt-row {
+    display: flex;
+    height: 61px; /* 440/7 ≈ 62.8 → use 61 for 7 rows */
+    align-items: center;
+    border-bottom: 1px solid var(--surface);
+  }
+  .spt-row:nth-child(even) {
+    background: rgba(214, 226, 240, 0.25);
+  }
+  .spt-row.delayed {
+    background: rgba(185, 28, 28, 0.05);
+  }
+  .spt-cell {
+    padding: 0 16px;
+    font-size: var(--size-body);
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .spt-cell.name-col { flex: 2.5; font-weight: 600; }
+  .spt-cell.status-col {
+    flex: 1.2;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .spt-cell.date-col { flex: 1.5; text-align: right; color: var(--muted); font-size: 14px; }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    border-radius: 3px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .status-badge.complete {
+    background: rgba(26, 107, 60, 0.12);
+    color: var(--positive);
+  }
+  .status-badge.in-progress {
+    background: rgba(21, 101, 192, 0.12);
+    color: var(--primary);
+  }
+  .status-badge.delayed {
+    background: rgba(185, 28, 28, 0.12);
+    color: var(--negative);
+  }
+  .status-badge.pending {
+    background: rgba(74, 85, 104, 0.12);
+    color: var(--muted);
+  }
+
+  /* ══════════════════════════════════════════
+     PATTERN 5: before-after-two-col
+     ══════════════════════════════════════════ */
+
+  /* left col: col 1-5, offset 160, height 480 */
+  .ba-left {
+    position: absolute;
+    left: var(--safe-x);
+    top: 160px;
+    width: calc(var(--content-w) * 5/12 - var(--gutter) * 0.5);
+    height: 480px;
+    background: var(--surface);
+    border-radius: 4px;
+    padding: 24px 24px 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  /* arrow zone: col 6-7, 2/12 of content-w */
+  .ba-arrow {
+    position: absolute;
+    left: calc(var(--safe-x) + var(--content-w) * 5/12 + var(--gutter) * 0.5);
+    top: 160px;
+    width: calc(var(--content-w) * 2/12 - var(--gutter));
+    height: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ba-arrow-icon {
+    font-size: 48px;
+    color: var(--primary);
+    opacity: 0.7;
+  }
+  /* right col: col 8-12, 5/12 */
+  .ba-right {
+    position: absolute;
+    right: var(--safe-x);
+    top: 160px;
+    width: calc(var(--content-w) * 5/12 - var(--gutter) * 0.5);
+    height: 480px;
+    background: var(--surface);
+    border-radius: 4px;
+    padding: 24px 24px 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ba-label {
+    font-size: var(--size-h2);
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ba-label-before { color: var(--negative); }
+  .ba-label-after { color: var(--positive); }
+  .ba-label-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 3px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .ba-label-tag.before-tag {
+    background: rgba(185, 28, 28, 0.1);
+    color: var(--negative);
+    border: 1px solid rgba(185, 28, 28, 0.3);
+  }
+  .ba-label-tag.after-tag {
+    background: rgba(26, 107, 60, 0.1);
+    color: var(--positive);
+    border: 1px solid rgba(26, 107, 60, 0.3);
+  }
+  .ba-list {
+    list-style: none;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .ba-item {
+    font-size: var(--size-body);
+    color: var(--text);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.6;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.55);
+    border-radius: 4px;
+  }
+  .ba-marker-before {
+    color: var(--negative);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .ba-marker-after {
+    color: var(--positive);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ══════════════════════════════════════════
+     PATTERN 6: risk-matrix-2x2
+     ══════════════════════════════════════════ */
+
+  /* matrix body: col 1-9, offset 160, height 480 */
+  .rm-matrix {
+    position: absolute;
+    left: var(--safe-x);
+    top: 160px;
+    width: calc(var(--content-w) * 9/12 - var(--gutter) * 0.5);
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+  }
+  .rm-axis-y-label {
+    position: absolute;
+    left: -4px;
+    top: 160px;
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    width: 20px;
+    pointer-events: none;
+  }
+  .rm-matrix-inner {
+    margin-left: 28px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .rm-quadrant-row {
+    display: flex;
+    flex: 1;
+    gap: 6px;
+  }
+  .rm-quadrant-row + .rm-quadrant-row {
+    margin-top: 6px;
+  }
+  .rm-quadrant {
+    flex: 1;
+    border-radius: 4px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+  }
+  .rm-quadrant.q-high-high { background: rgba(185, 28, 28, 0.12); border: 1px solid rgba(185, 28, 28, 0.3); }
+  .rm-quadrant.q-high-low  { background: rgba(168, 67, 0, 0.10); border: 1px solid rgba(168, 67, 0, 0.25); }
+  .rm-quadrant.q-low-high  { background: rgba(21, 101, 192, 0.09); border: 1px solid rgba(21, 101, 192, 0.2); }
+  .rm-quadrant.q-low-low   { background: rgba(214, 226, 240, 0.6); border: 1px solid var(--surface); }
+  .rm-quad-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+  .rm-quadrant.q-high-high .rm-quad-label { color: var(--negative); }
+  .rm-quadrant.q-high-low  .rm-quad-label { color: var(--accent); }
+  .rm-quadrant.q-low-high  .rm-quad-label { color: var(--primary); }
+  .rm-quadrant.q-low-low   .rm-quad-label { color: var(--muted); }
+  .rm-badge-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .rm-badge {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    background: rgba(255,255,255,0.7);
+    border-radius: 3px;
+    padding: 3px 9px;
+    line-height: 1.4;
+    width: fit-content;
+  }
+  .rm-axis-x-label {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    padding-top: 6px;
+  }
+  .rm-axis-arrows {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 2px 28px 0;
+  }
+  .rm-y-arrows {
+    position: absolute;
+    left: 24px;
+    top: 164px;
+    height: 476px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  /* legend panel: col 10-12, offset 160, height 480 */
+  .rm-legend {
+    position: absolute;
+    right: var(--safe-x);
+    top: 160px;
+    width: calc(var(--content-w) * 3/12 - var(--gutter) * 0.5);
+    height: 480px;
+    background: var(--surface);
+    border-radius: 4px;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .rm-legend-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(74,85,104,0.2);
+    padding-bottom: 8px;
+  }
+  .rm-legend-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(74,85,104,0.12);
+  }
+  .rm-legend-item:last-child {
+    border-bottom: none;
+  }
+  .rm-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .rm-legend-dot.d-hh { background: var(--negative); }
+  .rm-legend-dot.d-hl { background: var(--accent); }
+  .rm-legend-dot.d-lh { background: var(--primary); }
+  .rm-legend-dot.d-ll { background: var(--muted); }
+  .rm-legend-text { flex: 1; }
+  .rm-legend-name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .rm-legend-desc { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>📑 テーブル・比較 — theme: corporate-trust（6 パターン）</h1>
+  <p>layout-table-compare.md の全 6 パターンを corporate-trust テーマで描画した検証ギャラリーです。</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PATTERN 1: comparison-matrix
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide-wrap">
+  <div class="slide-caption">
+    <strong>comparison-matrix</strong> — 行=比較軸 × 列=比較対象のマトリクス。推奨列をハイライト表示
+  </div>
+  <div class="slide" role="img" aria-label="comparison-matrix パターン">
+
+    <!-- action title -->
+    <div class="action-title-bar">
+      <div class="title-accent-bar"></div>
+      <span class="action-title-text">クラウド型 SaaS 3社は機能・価格とも自社要件を満たすが、セキュリティ認証でベンダーBが唯一の適合解である</span>
+    </div>
+    <div class="title-rule"></div>
+
+    <!-- table header -->
+    <div class="cm-header">
+      <div class="cm-header-cell empty"></div>
+      <div class="cm-header-cell">ベンダー A</div>
+      <div class="cm-header-cell highlight">ベンダー B<br><span style="font-size:12px;font-weight:400;opacity:0.85">▶ 推奨</span></div>
+      <div class="cm-header-cell">ベンダー C</div>
+      <div class="cm-header-cell">ベンダー D</div>
+    </div>
+
+    <!-- table body -->
+    <div class="cm-body">
+      <div class="cm-row">
+        <div class="cm-row-header">月額費用（100ユーザー）</div>
+        <div class="cm-cell">¥480,000</div>
+        <div class="cm-cell highlight-col">¥390,000</div>
+        <div class="cm-cell">¥520,000</div>
+        <div class="cm-cell">¥440,000</div>
+      </div>
+      <div class="cm-row">
+        <div class="cm-row-header">ISMS/ISO 27001認証</div>
+        <div class="cm-cell" style="color:var(--muted)">▼ 未取得</div>
+        <div class="cm-cell highlight-col" style="color:var(--positive)">▲ 取得済</div>
+        <div class="cm-cell" style="color:var(--muted)">▼ 未取得</div>
+        <div class="cm-cell" style="color:var(--muted)">▼ 申請中</div>
+      </div>
+      <div class="cm-row">
+        <div class="cm-row-header">API連携（REST/GraphQL）</div>
+        <div class="cm-cell">REST のみ</div>
+        <div class="cm-cell highlight-col">両対応</div>
+        <div class="cm-cell">REST のみ</div>
+        <div class="cm-cell">GraphQL のみ</div>
+      </div>
+      <div class="cm-row">
+        <div class="cm-row-header">SLA 可用性保証</div>
+        <div class="cm-cell">99.5%</div>
+        <div class="cm-cell highlight-col" style="font-weight:700">99.99%</div>
+        <div class="cm-cell">99.9%</div>
+        <div class="cm-cell">99.5%</div>
+      </div>
+      <div class="cm-row">
+        <div class="cm-row-header">国内データセンター</div>
+        <div class="cm-cell" style="color:var(--muted)">海外のみ</div>
+        <div class="cm-cell highlight-col" style="color:var(--positive)">▲ 東京/大阪</div>
+        <div class="cm-cell" style="color:var(--muted)">海外のみ</div>
+        <div class="cm-cell">東京のみ</div>
+      </div>
+      <div class="cm-row">
+        <div class="cm-row-header">導入実績（官公庁）</div>
+        <div class="cm-cell">2件</div>
+        <div class="cm-cell highlight-col" style="font-weight:700">14件</div>
+        <div class="cm-cell">0件</div>
+        <div class="cm-cell">3件</div>
+      </div>
+    </div>
+
+    <!-- source note -->
+    <div class="source-note">出典: 各社公開資料・ヒアリング結果, 2026年6月</div>
+
+    <div class="pg-num">01 / 06</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PATTERN 2: pricing-plan-cards
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide-wrap">
+  <div class="slide-caption">
+    <strong>pricing-plan-cards</strong> — 3プランをカード横並び。中央カード（推奨）をハイライト表示
+  </div>
+  <div class="slide" role="img" aria-label="pricing-plan-cards パターン">
+
+    <div class="action-title-bar">
+      <div class="title-accent-bar"></div>
+      <span class="action-title-text">スタンダードプランへの移行で月額コストを38%削減しながら主要機能をすべて維持できる</span>
+    </div>
+    <div class="title-rule"></div>
+
+    <!-- 3 cards -->
+    <div class="ppc-cards">
+      <!-- Card A: Basic -->
+      <div class="ppc-card">
+        <div class="ppc-plan-name">ベーシック</div>
+        <div class="ppc-price">¥9,800</div>
+        <div class="ppc-price-unit">/ 月（最大10ユーザー）</div>
+        <div class="ppc-divider"></div>
+        <ul class="ppc-feature-list">
+          <li class="ppc-feature-item"><span class="ppc-check">▲</span>基本ダッシュボード（5種）</li>
+          <li class="ppc-feature-item"><span class="ppc-check">▲</span>データエクスポート（CSV）</li>
+          <li class="ppc-feature-item"><span class="ppc-check">▲</span>メールサポート（2営業日）</li>
+          <li class="ppc-feature-item" style="color:var(--muted)"><span style="color:var(--muted)">—</span>API連携（対象外）</li>
+          <li class="ppc-feature-item" style="color:var(--muted)"><span style="color:var(--muted)">—</span>SSOシングルサインオン（対象外）</li>
+        </ul>
+      </div>
+
+      <!-- Card B: Standard (Recommended) -->
+      <div class="ppc-card recommended" style="margin-top: 0; position: relative;">
+        <div class="ppc-badge">おすすめ</div>
+        <div class="ppc-plan-name">スタンダード</div>
+        <div class="ppc-price">¥24,800</div>
+        <div class="ppc-price-unit">/ 月（最大50ユーザー）</div>
+        <div class="ppc-divider"></div>
+        <ul class="ppc-feature-list">
+          <li class="ppc-feature-item"><span class="ppc-check">▲</span>全ダッシュボード（20種）</li>
+          <li class="ppc-feature-item"><span class="ppc-check">▲</span>データエクスポート（CSV/Excel/API）</li>
+          <li class="ppc-feature-item"><span class="ppc-check">▲</span>優先サポート（翌営業日）</li>
+          <li class="ppc-feature-item"><span class="ppc-check">▲</span>REST API連携（フルアクセス）</li>
+          <li class="ppc-feature-item"><span class="ppc-check">▲</span>SSOシングルサインオン</li>
+        </ul>
+      </div>
+
+      <!-- Card C: Enterprise -->
+      <div class="ppc-card">
+        <div class="ppc-plan-name">エンタープライズ</div>
+        <div class="ppc-price">¥89,800</div>
+        <div class="ppc-price-unit">/ 月（ユーザー数無制限）</div>
+        <div class="ppc-divider"></div>
+        <ul class="ppc-feature-list">
+          <li class="ppc-feature-item"><span class="ppc-check">▲</span>スタンダードの全機能</li>
+          <li class="ppc-feature-item"><span class="ppc-check">▲</span>専任カスタマーサクセス</li>
+          <li class="ppc-feature-item"><span class="ppc-check">▲</span>SLA 99.99% 保証</li>
+          <li class="ppc-feature-item"><span class="ppc-check">▲</span>カスタム開発・オンプレ対応</li>
+          <li class="ppc-feature-item"><span class="ppc-check">▲</span>ISMS準拠セキュリティ監査</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="source-note">出典: サービス公式料金ページ, 2026年6月現在</div>
+    <div class="pg-num">02 / 06</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PATTERN 3: pricing-comparison-table
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide-wrap">
+  <div class="slide-caption">
+    <strong>pricing-comparison-table</strong> — リード帯 + 格子状テーブル。推奨列を構造的に強調
+  </div>
+  <div class="slide" role="img" aria-label="pricing-comparison-table パターン">
+
+    <div class="action-title-bar">
+      <div class="title-accent-bar"></div>
+      <span class="action-title-text">機能要件・コスト・サポートの全軸でビジネスプランが最適解であり、即時移行を推奨する</span>
+    </div>
+    <div class="title-rule"></div>
+
+    <!-- lead band -->
+    <div class="pct-lead">
+      <div class="pct-lead-sub">3プランの比較——機能と価格の両立を検証</div>
+      <div class="pct-lead-text">現行契約（ライトプラン）と上位2プランを機能8項目で横断比較した結果を示す</div>
+    </div>
+
+    <!-- comparison table -->
+    <div class="pct-table-wrap">
+      <table class="pct-table">
+        <colgroup>
+          <col style="width:32%">
+          <col style="width:22.67%">
+          <col style="width:22.67%">
+          <col style="width:22.67%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th style="text-align:left">比較項目</th>
+            <th>ライト<br><span style="font-size:11px;font-weight:400">¥5,800 / 月</span></th>
+            <th class="recommended-col">
+              <div class="pct-plan-header">
+                <span class="pct-badge-inline">推奨</span>
+                ビジネス<br>
+                <span class="pct-plan-unit">¥18,500 / 月</span>
+              </div>
+            </th>
+            <th>エンタープライズ<br><span style="font-size:11px;font-weight:400">¥52,000 / 月</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align:left">ユーザー数上限</td>
+            <td>5名</td>
+            <td class="rec-cell">30名</td>
+            <td>無制限</td>
+          </tr>
+          <tr>
+            <td style="text-align:left">ダッシュボード種数</td>
+            <td>3種</td>
+            <td class="rec-cell">15種</td>
+            <td>カスタム無制限</td>
+          </tr>
+          <tr>
+            <td style="text-align:left">API連携</td>
+            <td class="pct-check-neg">— 非対応</td>
+            <td class="rec-cell pct-check-pos">▲ REST/GraphQL</td>
+            <td class="pct-check-pos">▲ フルアクセス</td>
+          </tr>
+          <tr>
+            <td style="text-align:left">SSO / SAML対応</td>
+            <td class="pct-check-neg">— 非対応</td>
+            <td class="rec-cell pct-check-pos">▲ 対応</td>
+            <td class="pct-check-pos">▲ 対応 + AD連携</td>
+          </tr>
+          <tr>
+            <td style="text-align:left">データ保持期間</td>
+            <td>6ヶ月</td>
+            <td class="rec-cell">3年</td>
+            <td>無制限</td>
+          </tr>
+          <tr>
+            <td style="text-align:left">サポート対応</td>
+            <td>メール（5営業日）</td>
+            <td class="rec-cell">チャット（翌営業日）</td>
+            <td>専任担当（即時）</td>
+          </tr>
+          <tr>
+            <td style="text-align:left">SLA可用性</td>
+            <td>99.5%</td>
+            <td class="rec-cell" style="font-weight:700;color:var(--primary)">99.95%</td>
+            <td>99.99%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="source-note">出典: サービス仕様書 Rev.3.2, 2026年5月版</div>
+    <div class="pg-num">03 / 06</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PATTERN 4: status-progress-table
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide-wrap">
+  <div class="slide-caption">
+    <strong>status-progress-table</strong> — 施策進捗一覧。ステータス識別子（記号＋色）で状況を表示
+  </div>
+  <div class="slide" role="img" aria-label="status-progress-table パターン">
+
+    <div class="action-title-bar">
+      <div class="title-accent-bar"></div>
+      <span class="action-title-text">Q2施策7件中5件が計画通り進行しており、残り2件の遅延解消が7月末の目標達成に直結する</span>
+    </div>
+    <div class="title-rule"></div>
+
+    <!-- table header -->
+    <div class="spt-header">
+      <div class="spt-header-cell name-col">施策名称</div>
+      <div class="spt-header-cell status-col">ステータス</div>
+      <div class="spt-header-cell date-col">完了日 / 予定日</div>
+    </div>
+
+    <!-- table body -->
+    <div class="spt-body">
+      <div class="spt-row">
+        <div class="spt-cell name-col">顧客セグメント再定義（上位20社向け）</div>
+        <div class="spt-cell status-col"><span class="status-badge complete">✓ 完了</span></div>
+        <div class="spt-cell date-col">2026年4月15日</div>
+      </div>
+      <div class="spt-row">
+        <div class="spt-cell name-col">新規営業提案書テンプレート刷新</div>
+        <div class="spt-cell status-col"><span class="status-badge complete">✓ 完了</span></div>
+        <div class="spt-cell date-col">2026年5月2日</div>
+      </div>
+      <div class="spt-row">
+        <div class="spt-cell name-col">SFA導入・既存データ移行</div>
+        <div class="spt-cell status-col"><span class="status-badge in-progress">● 進行中</span></div>
+        <div class="spt-cell date-col">2026年6月30日予定</div>
+      </div>
+      <div class="spt-row">
+        <div class="spt-cell name-col">パートナー連携契約（3社）締結</div>
+        <div class="spt-cell status-col"><span class="status-badge in-progress">● 進行中</span></div>
+        <div class="spt-cell date-col">2026年7月15日予定</div>
+      </div>
+      <div class="spt-row delayed">
+        <div class="spt-cell name-col">製品デモ環境の再構築・検証</div>
+        <div class="spt-cell status-col"><span class="status-badge delayed">▼ 遅延</span></div>
+        <div class="spt-cell date-col">2026年7月31日（+3週）</div>
+      </div>
+      <div class="spt-row delayed">
+        <div class="spt-cell name-col">社内承認フロー改訂・権限テーブル更新</div>
+        <div class="spt-cell status-col"><span class="status-badge delayed">▼ 遅延</span></div>
+        <div class="spt-cell date-col">2026年8月15日（+2週）</div>
+      </div>
+      <div class="spt-row">
+        <div class="spt-cell name-col">Q3キックオフ資料・目標設定</div>
+        <div class="spt-cell status-col"><span class="status-badge pending">○ 未着手</span></div>
+        <div class="spt-cell date-col">2026年8月1日予定</div>
+      </div>
+    </div>
+
+    <div class="source-note">出典: プロジェクト管理システム（週次更新）, 2026年6月25日時点</div>
+    <div class="pg-num">04 / 06</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PATTERN 5: before-after-two-col
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide-wrap">
+  <div class="slide-caption">
+    <strong>before-after-two-col</strong> — 左右2カラムで現状 vs 改善後を対比。中央矢印で変化の方向を明示
+  </div>
+  <div class="slide" role="img" aria-label="before-after-two-col パターン">
+
+    <div class="action-title-bar">
+      <div class="title-accent-bar"></div>
+      <span class="action-title-text">受発注プロセスのデジタル化により、処理リードタイムを平均12日から2日へ短縮できる</span>
+    </div>
+    <div class="title-rule"></div>
+
+    <!-- left col: BEFORE -->
+    <div class="ba-left">
+      <div class="ba-label">
+        <span class="ba-label-tag before-tag">▼ BEFORE</span>
+        <span style="font-size:var(--size-h2);font-weight:700;color:var(--negative)">現状の課題</span>
+      </div>
+      <ul class="ba-list">
+        <li class="ba-item">
+          <span class="ba-marker-before">▼</span>
+          受注はFAX・電話が主流で、担当者が手作業でExcelに転記するため入力ミスが月平均23件発生している
+        </li>
+        <li class="ba-item">
+          <span class="ba-marker-before">▼</span>
+          在庫確認・仕入発注は各拠点担当が個別で判断しており、本社での一元管理ができていない
+        </li>
+        <li class="ba-item">
+          <span class="ba-marker-before">▼</span>
+          承認フローが紙書類ベースで、決裁者不在時に平均3〜4日の待機が発生し顧客への回答が遅延する
+        </li>
+        <li class="ba-item">
+          <span class="ba-marker-before">▼</span>
+          実績データは月次でしか集計されず、リアルタイムの売上・在庫状況の把握が困難な状態にある
+        </li>
+      </ul>
+    </div>
+
+    <!-- arrow -->
+    <div class="ba-arrow">
+      <span class="ba-arrow-icon">→</span>
+    </div>
+
+    <!-- right col: AFTER -->
+    <div class="ba-right">
+      <div class="ba-label">
+        <span class="ba-label-tag after-tag">▲ AFTER</span>
+        <span style="font-size:var(--size-h2);font-weight:700;color:var(--positive)">改善後の状態</span>
+      </div>
+      <ul class="ba-list">
+        <li class="ba-item">
+          <span class="ba-marker-after">▲</span>
+          受注データはWebポータル・EDIで自動取込され、システムが即時バリデーションするため入力ミスをゼロに近づける
+        </li>
+        <li class="ba-item">
+          <span class="ba-marker-after">▲</span>
+          在庫・発注データをクラウド上に統合し、本社がリアルタイムで全拠点の在庫水準を一元管理できる
+        </li>
+        <li class="ba-item">
+          <span class="ba-marker-after">▲</span>
+          電子承認ワークフローにより決裁者はモバイルから即時対応でき、承認待ちを最大30分以内に短縮できる
+        </li>
+        <li class="ba-item">
+          <span class="ba-marker-after">▲</span>
+          売上・在庫・粗利がダッシュボードでリアルタイム可視化され、翌日の発注計画を当日夕刻に確定できる
+        </li>
+      </ul>
+    </div>
+
+    <div class="source-note">出典: 業務プロセス診断レポート, 2026年4月（社内作成）</div>
+    <div class="pg-num">05 / 06</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PATTERN 6: risk-matrix-2x2
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide-wrap">
+  <div class="slide-caption">
+    <strong>risk-matrix-2x2</strong> — 影響度 × 発生確率の2×2マトリクス。右凡例パネルで象限を補説
+  </div>
+  <div class="slide" role="img" aria-label="risk-matrix-2x2 パターン">
+
+    <div class="action-title-bar">
+      <div class="title-accent-bar"></div>
+      <span class="action-title-text">基幹システム移行に伴う4リスクのうち「データ移行品質劣化」が最優先対応事項であり、即時対策が必要だ</span>
+    </div>
+    <div class="title-rule"></div>
+
+    <!-- Y-axis label -->
+    <div class="rm-axis-y-label">高 ↑ 影響度 ↓ 低</div>
+
+    <!-- matrix body -->
+    <div class="rm-matrix">
+      <div class="rm-matrix-inner">
+        <!-- Row 1: 影響度 高 -->
+        <div class="rm-quadrant-row">
+          <!-- Q1: 高影響×高確率 -->
+          <div class="rm-quadrant q-high-high">
+            <div class="rm-quad-label">🔴 最優先対応</div>
+            <div class="rm-badge-list">
+              <span class="rm-badge">データ移行品質劣化</span>
+              <span class="rm-badge">本番環境接続障害</span>
+            </div>
+          </div>
+          <!-- Q2: 高影響×低確率 -->
+          <div class="rm-quadrant q-high-low">
+            <div class="rm-quad-label">🟠 重点管理</div>
+            <div class="rm-badge-list">
+              <span class="rm-badge">ベンダー撤退リスク</span>
+              <span class="rm-badge">法規制変更対応漏れ</span>
+            </div>
+          </div>
+        </div>
+        <!-- Row 2: 影響度 低 -->
+        <div class="rm-quadrant-row">
+          <!-- Q3: 低影響×高確率 -->
+          <div class="rm-quadrant q-low-high">
+            <div class="rm-quad-label">🔵 対応計画</div>
+            <div class="rm-badge-list">
+              <span class="rm-badge">ユーザートレーニング遅延</span>
+              <span class="rm-badge">旧システム並行稼働延長</span>
+              <span class="rm-badge">ドキュメント不備</span>
+            </div>
+          </div>
+          <!-- Q4: 低影響×低確率 -->
+          <div class="rm-quadrant q-low-low">
+            <div class="rm-quad-label">⚪ 経過観察</div>
+            <div class="rm-badge-list">
+              <span class="rm-badge">外部連携API仕様変更</span>
+            </div>
+          </div>
+        </div>
+        <!-- X-axis -->
+        <div style="padding-top:6px;">
+          <div class="rm-axis-arrows">
+            <span>低確率</span>
+            <span style="letter-spacing:0.08em;font-weight:600;color:var(--muted)">← 発生確率 →</span>
+            <span>高確率</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- legend panel -->
+    <div class="rm-legend">
+      <div class="rm-legend-title">象限凡例</div>
+      <div class="rm-legend-item">
+        <div class="rm-legend-dot d-hh"></div>
+        <div class="rm-legend-text">
+          <div class="rm-legend-name">最優先対応</div>
+          <div class="rm-legend-desc">即時エスカレーション・専任対応チームを設置し週次でモニタリング</div>
+        </div>
+      </div>
+      <div class="rm-legend-item">
+        <div class="rm-legend-dot d-hl"></div>
+        <div class="rm-legend-text">
+          <div class="rm-legend-name">重点管理</div>
+          <div class="rm-legend-desc">コンティンジェンシープランを策定し、月次でリスク状況を見直す</div>
+        </div>
+      </div>
+      <div class="rm-legend-item">
+        <div class="rm-legend-dot d-lh"></div>
+        <div class="rm-legend-text">
+          <div class="rm-legend-name">対応計画</div>
+          <div class="rm-legend-desc">担当者を明確化し、発生時の対応手順を事前に整備しておく</div>
+        </div>
+      </div>
+      <div class="rm-legend-item">
+        <div class="rm-legend-dot d-ll"></div>
+        <div class="rm-legend-text">
+          <div class="rm-legend-name">経過観察</div>
+          <div class="rm-legend-desc">定期的な状況確認のみ。他リスクが変化した場合は再評価する</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="source-note">出典: システム移行リスクアセスメント（PMO作成）, 2026年6月</div>
+    <div class="pg-num">06 / 06</div>
+  </div>
+</div>
+
+</body>
+</html>

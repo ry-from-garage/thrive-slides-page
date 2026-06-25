@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧭 MBAフレームワーク — theme: strategy-consulting（7 パターン）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+<style>
+  /* ── CSS Variables: strategy-consulting theme ── */
+  :root {
+    --primary:    #0A2540;
+    --secondary:  #3C6E91;
+    --background: #FFFFFF;
+    --surface:    #F4F6F8;
+    --accent:     #C8102E;
+    --text:       #1A2332;
+    --muted:      #5A6675;
+    --positive:   #1F7A52;
+    --negative:   #B23A2E;
+
+    --font-serif: 'Noto Serif JP', Georgia, 'Times New Roman', serif;
+    --font-sans:  'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #E8ECF0;
+    font-family: var(--font-sans);
+    color: var(--text);
+    padding: 40px 24px;
+  }
+
+  /* ── Page header ── */
+  .page-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .page-header h1 {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+  .page-header p {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* ── Slide wrapper ── */
+  .slide-section {
+    margin-bottom: 56px;
+  }
+  .slide-caption {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    padding-left: 4px;
+  }
+
+  /* ── Slide canvas: 1280×720, scaled to fit ── */
+  .slide-outer {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .slide-scale-wrap {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 720/1280 */
+  }
+  .slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1280px;
+    height: 720px;
+    background: var(--background);
+    overflow: hidden;
+    transform-origin: top left;
+    /* scale computed via JS below */
+  }
+
+  /* ── Common slide internals ── */
+  .s-title {
+    position: absolute;
+    left: 72px;
+    top: 56px;
+    width: calc(1280px - 72px - 72px);
+    height: 80px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .s-accent-bar {
+    width: 4px;
+    height: 48px;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-right: 12px;
+    border-radius: 0;
+  }
+  .s-title-text {
+    font-family: var(--font-serif);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.2;
+  }
+  .s-rule {
+    position: absolute;
+    left: 72px;
+    height: 2px;
+    background: var(--primary);
+  }
+  .s-source {
+    position: absolute;
+    left: 72px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .s-page {
+    position: absolute;
+    right: 72px;
+    bottom: 20px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* cell fill helpers */
+  .fill-light  { background: var(--surface); }
+  .fill-mid    { background: #D6DDE5; }
+  .fill-none   { background: transparent; border: 1px solid #CDD3DA; }
+  .fill-primary{ background: var(--primary); }
+
+  /* h2 inside cell */
+  .cell-h {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .cell-h.on-dark { color: #FFFFFF; }
+
+  /* body list */
+  .cell-body {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .cell-body.on-dark { color: #E0E8F0; }
+  .cell-body li {
+    list-style: none;
+    padding-left: 10px;
+    position: relative;
+    margin-bottom: 3px;
+  }
+  .cell-body li::before {
+    content: "·";
+    position: absolute;
+    left: 0;
+    color: var(--secondary);
+    font-weight: 700;
+  }
+  .strength-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 2px;
+    margin-bottom: 5px;
+  }
+  .badge-high   { background:#FADBD8; color:#B23A2E; }
+  .badge-mid    { background:#FEF9C3; color:#856404; }
+  .badge-low    { background:#D5F5E3; color:#1F7A52; }
+
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>🧭 MBAフレームワーク — theme: strategy-consulting（7 パターン）</h1>
+  <p>verification gallery · gitignored artifact · 1280×720px slides · strategy-consulting theme</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PATTERN 1: swot-2x2
+═══════════════════════════════════════════════════ -->
+<div class="slide-section">
+  <p class="slide-caption">swot-2x2 — SWOT 分析</p>
+  <div class="slide-outer">
+    <div class="slide-scale-wrap">
+      <div class="slide" id="slide-swot">
+
+        <!-- action title -->
+        <div class="s-title">
+          <div class="s-accent-bar"></div>
+          <div class="s-title-text">国内食品D2C市場において自社の製造力と顧客データが最大の競争優位となる</div>
+        </div>
+        <div class="s-rule" style="top:148px; width:1136px;"></div>
+
+        <!-- axis header row: y=152, h=32 -->
+        <div style="position:absolute;left:72px;top:152px;width:556px;height:32px;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:13px;font-weight:600;color:var(--secondary);">■ 内部環境</span>
+        </div>
+        <div style="position:absolute;left:628px;top:152px;width:580px;height:32px;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:13px;font-weight:600;color:var(--secondary);">■ 外部環境</span>
+        </div>
+
+        <!-- vertical divider: x=628, y=200, h=440 -->
+        <div style="position:absolute;left:627px;top:200px;width:2px;height:440px;background:var(--muted);opacity:0.35;"></div>
+
+        <!-- Q: Strengths  col1-6  y=200 h=232 -->
+        <div class="fill-light" style="position:absolute;left:72px;top:200px;width:556px;height:232px;padding:16px 20px;border-radius:2px;">
+          <div class="cell-h">強み（Strengths）</div>
+          <ul class="cell-body">
+            <li>自社工場による高品質・低コスト製造体制（原価率38%）</li>
+            <li>累計50万件の購買データと顧客LTV分析基盤</li>
+            <li>サブスク継続率89%・NPS 62の高ロイヤルティ</li>
+            <li>全国7,000店舗への物流ネットワーク</li>
+          </ul>
+        </div>
+
+        <!-- Q: Opportunities  col7-12  y=200 h=232 -->
+        <div style="position:absolute;left:628px;top:200px;width:580px;height:232px;padding:16px 20px;border-radius:2px;border:1px solid #CDD3DA;">
+          <div class="cell-h">機会（Opportunities）</div>
+          <ul class="cell-body">
+            <li>健康意識の高まりで無添加・機能性食品市場が年率12%成長</li>
+            <li>ライフログ連携による個別栄養アドバイスへの需要拡大</li>
+            <li>団塊ジュニア世代の「食の健康投資」予算増加</li>
+            <li>EC物流コスト低減：宅配再配達問題の規制強化</li>
+          </ul>
+        </div>
+
+        <!-- row divider y=440 h=8 -->
+        <div style="position:absolute;left:72px;top:440px;width:1136px;height:2px;background:var(--muted);opacity:0.4;"></div>
+
+        <!-- Q: Weaknesses  col1-6  y=456 h=184 -->
+        <div class="fill-light" style="position:absolute;left:72px;top:456px;width:556px;height:184px;padding:16px 20px;border-radius:2px;">
+          <div class="cell-h">弱み（Weaknesses）</div>
+          <ul class="cell-body">
+            <li>新規顧客獲得コスト（CAC）が直近2年で1.8倍に上昇</li>
+            <li>商品ラインナップが健康・美容に偏重し男性ターゲット薄弱</li>
+            <li>物流担当者の採用難・配送リードタイム長期化</li>
+          </ul>
+        </div>
+
+        <!-- Q: Threats  col7-12  y=456 h=184 -->
+        <div style="position:absolute;left:628px;top:456px;width:580px;height:184px;padding:16px 20px;border-radius:2px;border:1px solid #CDD3DA;">
+          <div class="cell-h">脅威（Threats）</div>
+          <ul class="cell-body">
+            <li>大手食品メーカーのD2C参入・価格競争激化</li>
+            <li>食品表示規制の厳格化（機能性表示食品ガイドライン改正）</li>
+            <li>原材料価格高騰（輸入穀物・物流費）で粗利圧迫</li>
+          </ul>
+        </div>
+
+        <!-- source bar y=640 -->
+        <div class="s-source" style="top:643px;">出典: 自社内部データ・農林水産省「食品産業動態調査」2025年版</div>
+        <div class="s-page" style="bottom:20px;">01 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PATTERN 2: porter-five-forces
+═══════════════════════════════════════════════════ -->
+<div class="slide-section">
+  <p class="slide-caption">porter-five-forces — 5フォース分析</p>
+  <div class="slide-outer">
+    <div class="slide-scale-wrap">
+      <div class="slide" id="slide-porter">
+
+        <div class="s-title">
+          <div class="s-accent-bar"></div>
+          <div class="s-title-text">国内クラウド会計市場は新規参入と買い手交渉力が高く、超過利潤の維持は困難である</div>
+        </div>
+        <div class="s-rule" style="top:140px; width:1136px;"></div>
+
+        <!-- col width helpers (12col, gutter24, origin72)
+             col1-3: 72 → 266px wide (3col)
+             col4-9: 362px wide (6col center band)
+             col4:   72+266+24=362 → width=72.67px (1col)
+             col5-8: 362+72+24=458 → width=4col=362.67px
+             col9:   458+362+24=844 → width=72.67
+             col10-12: 844+24+24=… let's just use absolute px -->
+
+        <!-- force_top: col4-9  x=362 y=144 w=580 h=104 -->
+        <div class="fill-light" style="position:absolute;left:362px;top:144px;width:580px;height:104px;padding:10px 16px;border-radius:2px;">
+          <div class="cell-h">新規参入の脅威（Threat of New Entrants）</div>
+          <span class="strength-badge badge-mid">中</span>
+          <ul class="cell-body">
+            <li>AWSなど大手クラウドベンダーの会計SaaS参入可能性</li>
+            <li>初期開発コスト低下でスタートアップの参入障壁が低下</li>
+          </ul>
+        </div>
+
+        <!-- arrow top: SVG connector col4-9 y=248→256 -->
+        <svg style="position:absolute;left:627px;top:248px;" width="20" height="20">
+          <line x1="10" y1="0" x2="10" y2="12" stroke="#5A6675" stroke-width="1.5"/>
+          <polygon points="5,10 15,10 10,18" fill="#5A6675"/>
+        </svg>
+
+        <!-- force_left: col1-3  x=72 y=256 w=266 h=216 -->
+        <div class="fill-light" style="position:absolute;left:72px;top:256px;width:266px;height:216px;padding:12px 14px;border-radius:2px;">
+          <div class="cell-h" style="font-size:13px;">売り手の交渉力<br>（Bargaining Power of Suppliers）</div>
+          <span class="strength-badge badge-low">低</span>
+          <ul class="cell-body">
+            <li>クラウドインフラ（AWS/GCP）はコモディティ化</li>
+            <li>金融API提供銀行は複数あり切替コスト低</li>
+          </ul>
+        </div>
+
+        <!-- arrow left: col4 x=338→362 y=256+108=364 -->
+        <svg style="position:absolute;left:338px;top:350px;" width="32" height="20">
+          <line x1="0" y1="10" x2="20" y2="10" stroke="#5A6675" stroke-width="1.5"/>
+          <polygon points="18,5 18,15 26,10" fill="#5A6675"/>
+        </svg>
+
+        <!-- center_rivalry: col5-8  x=458 y=256 w=362 h=216 -->
+        <div class="fill-mid" style="position:absolute;left:458px;top:256px;width:362px;height:216px;padding:12px 16px;border-radius:2px;">
+          <div class="cell-h">業界内競合（Industry Rivalry）</div>
+          <span class="strength-badge badge-high">高</span>
+          <ul class="cell-body">
+            <li>freee / マネーフォワード / 弥生の三つ巴</li>
+            <li>価格競争が激化：月額980円〜の低価格プラン乱立</li>
+            <li>機能同質化により差別化が困難</li>
+          </ul>
+        </div>
+
+        <!-- arrow right: col9 x=820→844 y=364 -->
+        <svg style="position:absolute;left:820px;top:350px;" width="32" height="20">
+          <line x1="8" y1="10" x2="28" y2="10" stroke="#5A6675" stroke-width="1.5"/>
+          <polygon points="6,5 6,15 0,10" fill="#5A6675"/>
+        </svg>
+
+        <!-- force_right: col10-12  x=844 y=256 w=364 h=216 -->
+        <div class="fill-light" style="position:absolute;left:844px;top:256px;width:364px;height:216px;padding:12px 14px;border-radius:2px;">
+          <div class="cell-h" style="font-size:13px;">買い手の交渉力<br>（Bargaining Power of Buyers）</div>
+          <span class="strength-badge badge-high">高</span>
+          <ul class="cell-body">
+            <li>SMB（中小企業）は無料・低価格ツールに敏感</li>
+            <li>乗換コストが低くチャーンリスク大</li>
+          </ul>
+        </div>
+
+        <!-- arrow bottom: col4-9 x=627 y=472→480 -->
+        <svg style="position:absolute;left:627px;top:468px;" width="20" height="20">
+          <line x1="10" y1="8" x2="10" y2="0" stroke="#5A6675" stroke-width="1.5"/>
+          <polygon points="5,10 15,10 10,2" fill="#5A6675"/>
+        </svg>
+
+        <!-- force_bottom: col4-9  x=362 y=520 w=580 h=112 -->
+        <div class="fill-light" style="position:absolute;left:362px;top:488px;width:580px;height=112px;min-height:112px;padding:10px 16px;border-radius:2px;height:112px;">
+          <div class="cell-h">代替品の脅威（Threat of Substitutes）</div>
+          <span class="strength-badge badge-mid">中</span>
+          <ul class="cell-body">
+            <li>Excel/スプレッドシートによる自家処理（特に零細企業）</li>
+            <li>税理士へのアウトソーシング継続が代替選択肢として残存</li>
+          </ul>
+        </div>
+
+        <div class="s-source" style="top:643px;">出典: 各社公開IR資料・MM総研「クラウド会計ソフト利用動向調査」2025年3月</div>
+        <div class="s-page">02 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PATTERN 3: business-model-canvas
+═══════════════════════════════════════════════════ -->
+<div class="slide-section">
+  <p class="slide-caption">business-model-canvas — ビジネスモデルキャンバス</p>
+  <div class="slide-outer">
+    <div class="slide-scale-wrap">
+      <div class="slide" id="slide-bmc">
+
+        <div class="s-title">
+          <div class="s-accent-bar"></div>
+          <div class="s-title-text">サブスクリプション×データ活用で顧客LTVを最大化するモバイル決済プラットフォームモデル</div>
+        </div>
+        <div class="s-rule" style="top:140px; width:1136px;"></div>
+
+        <!--
+          Grid col widths (px, origin x=72):
+          col1-2  (2col): 169px  → x=72,   w=169
+          col3-4  (2col): 169px  → x=265,  w=169
+          col5-8  (4col): 363px  → x=458,  w=363
+          col9-10 (2col): 169px  → x=845,  w=169
+          col11-12(2col): 169px  → x=1038, w=170
+          Gaps between blocks = 24px gutter
+        -->
+
+        <!-- KP: col1-2  y=144 h=368 -->
+        <div class="fill-light" style="position:absolute;left:72px;top:144px;width:169px;height:368px;padding:10px 12px;border-radius:2px;">
+          <div class="cell-h" style="font-size:12px;">主要パートナー<br>（KP）</div>
+          <ul class="cell-body" style="font-size:11px;">
+            <li>主要銀行・カード会社</li>
+            <li>EC・POS連携先</li>
+            <li>セキュリティベンダー</li>
+          </ul>
+        </div>
+
+        <!-- KA: col3-4  y=144 h=176 -->
+        <div class="fill-light" style="position:absolute;left:265px;top:144px;width=169px;width:169px;height:176px;padding:10px 12px;border-radius:2px;">
+          <div class="cell-h" style="font-size:12px;">主要活動（KA）</div>
+          <ul class="cell-body" style="font-size:11px;">
+            <li>決済処理インフラ開発</li>
+            <li>加盟店営業・拡大</li>
+          </ul>
+        </div>
+
+        <!-- KR: col3-4  y=336 h=176 -->
+        <div class="fill-light" style="position:absolute;left:265px;top:336px;width:169px;height:176px;padding:10px 12px;border-radius:2px;">
+          <div class="cell-h" style="font-size:12px;">主要リソース（KR）</div>
+          <ul class="cell-body" style="font-size:11px;">
+            <li>決済データ基盤</li>
+            <li>セキュリティ認証</li>
+          </ul>
+        </div>
+
+        <!-- VP: col5-8  y=144 h=368  mid fill -->
+        <div class="fill-mid" style="position:absolute;left:458px;top:144px;width:363px;height:368px;padding:12px 16px;border-radius:2px;">
+          <div class="cell-h">価値提案（VP）</div>
+          <p class="cell-body" style="margin-bottom:8px;">スマホ1台で全決済を完結。加盟店0円導入・ユーザー最大2%還元で両面市場を構築する</p>
+          <ul class="cell-body">
+            <li>加盟店：初期費用0円・即日審査</li>
+            <li>ユーザー：QRコード即時払い＋高還元</li>
+            <li>法人：経費精算・立替管理自動化</li>
+            <li>全体：リアルタイム収支ダッシュボード</li>
+          </ul>
+        </div>
+
+        <!-- CR: col9-10  y=144 h=176 -->
+        <div class="fill-light" style="position:absolute;left:845px;top:144px;width:169px;height:176px;padding:10px 12px;border-radius:2px;">
+          <div class="cell-h" style="font-size:12px;">顧客との関係（CR）</div>
+          <ul class="cell-body" style="font-size:11px;">
+            <li>アプリ内サポート</li>
+            <li>パーソナルオファー</li>
+          </ul>
+        </div>
+
+        <!-- CH: col9-10  y=336 h=176 -->
+        <div class="fill-light" style="position:absolute;left:845px;top:336px;width:169px;height:176px;padding:10px 12px;border-radius:2px;">
+          <div class="cell-h" style="font-size:12px;">チャネル（CH）</div>
+          <ul class="cell-body" style="font-size:11px;">
+            <li>AppStore/Google Play</li>
+            <li>加盟店紹介プログラム</li>
+          </ul>
+        </div>
+
+        <!-- CS: col11-12  y=144 h=368 -->
+        <div class="fill-light" style="position:absolute;left:1038px;top:144px;width:170px;height:368px;padding:10px 12px;border-radius:2px;">
+          <div class="cell-h" style="font-size:12px;">顧客セグメント（CS）</div>
+          <ul class="cell-body" style="font-size:11px;">
+            <li>個人ユーザー（20-40代）</li>
+            <li>中小加盟店舗</li>
+            <li>法人・フリーランス</li>
+          </ul>
+        </div>
+
+        <!-- Cost: col1-6  y=528 h=112 -->
+        <div style="position:absolute;left:72px;top:528px;width:556px;height:112px;padding:12px 16px;border-radius:2px;border:1px solid #CDD3DA;">
+          <div class="cell-h">コスト構造（Cost Structure）</div>
+          <ul class="cell-body">
+            <li>決済インフラ運用費（AWS/セキュリティ認証）</li>
+            <li>ユーザー獲得コスト（CAC）・キャンペーン還元費</li>
+            <li>営業・加盟店サポート人件費</li>
+          </ul>
+        </div>
+
+        <!-- Revenue: col7-12  y=528 h=112 -->
+        <div style="position:absolute;left:652px;top:528px;width:556px;height:112px;padding:12px 16px;border-radius:2px;border:1px solid #CDD3DA;">
+          <div class="cell-h">収益の流れ（Revenue Streams）</div>
+          <ul class="cell-body">
+            <li>加盟店手数料（取引額の1.5〜3.0%）</li>
+            <li>法人向けサブスク（月額980〜9,800円）</li>
+            <li>データ分析レポート販売・金融サービス仲介手数料</li>
+          </ul>
+        </div>
+
+        <div class="s-source" style="top:643px;">出典: 自社事業計画書 v2.3 / 2025年6月策定</div>
+        <div class="s-page">03 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PATTERN 4: value-chain
+═══════════════════════════════════════════════════ -->
+<div class="slide-section">
+  <p class="slide-caption">value-chain — バリューチェーン分析</p>
+  <div class="slide-outer">
+    <div class="slide-scale-wrap">
+      <div class="slide" id="slide-vc">
+
+        <div class="s-title">
+          <div class="s-accent-bar"></div>
+          <div class="s-title-text">製造とアフターサービスが競争優位の源泉であり、物流改善が次の利益拡大機会となる</div>
+        </div>
+        <div class="s-rule" style="top:140px; width:1136px;"></div>
+
+        <!--
+          Support bands: col1-11 → x=72, w=1040px (11col: 72.67*11+24*10=799+240=1039≈1040)
+          Margin bar:    col12   → x=1136px, w=72px (but using remaining space)
+          Actually: origin=72, 11col=72.67*11+24*10=1039.37≈1040, so:
+          col1-11: left=72, width=1040
+          col12:   left=72+1040+24=1136, width=72
+          But canvas is 1280, safe right=72, so col12 ends at 1280-72=1208, width=1208-1136=72
+        -->
+
+        <!-- margin_bar: col12  y=144 h=488 -->
+        <div style="position:absolute;left:1136px;top:144px;width:72px;height:488px;background:#D6DDE5;border-radius:2px;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:12px;font-weight:700;color:var(--primary);writing-mode:vertical-rl;text-orientation:mixed;letter-spacing:0.1em;">Margin</span>
+        </div>
+
+        <!-- Support band 1: Firm Infra  y=144 h=64 -->
+        <div class="fill-light" style="position:absolute;left:72px;top:144px;width:1040px;height:64px;padding:0 16px;display:flex;align-items:center;gap:24px;border-radius:2px;">
+          <span style="font-size:12px;font-weight:600;color:var(--primary);min-width:140px;">全社インフラ</span>
+          <span style="font-size:12px;color:var(--text);">財務管理・法務・中期経営計画の策定能力が高い ／ 本社間接コストは業界平均対比5%高</span>
+        </div>
+
+        <!-- Support band 2: HR  y=216 h=64 -->
+        <div class="fill-light" style="position:absolute;left:72px;top:216px;width:1040px;height:64px;padding:0 16px;display:flex;align-items:center;gap:24px;border-radius:2px;border-top:1px solid #CDD3DA;">
+          <span style="font-size:12px;font-weight:600;color:var(--primary);min-width:140px;">人事・労務管理</span>
+          <span style="font-size:12px;color:var(--text);">製造職の定着率94%（業界平均78%）・技術研修制度が強み ／ DX人材採用が課題</span>
+        </div>
+
+        <!-- Support band 3: Tech  y=288 h=64 -->
+        <div class="fill-light" style="position:absolute;left:72px;top:288px;width:1040px;height:64px;padding:0 16px;display:flex;align-items:center;gap:24px;border-radius:2px;border-top:1px solid #CDD3DA;">
+          <span style="font-size:12px;font-weight:600;color:var(--primary);min-width:140px;">技術開発・R&D</span>
+          <span style="font-size:12px;color:var(--text);">特許保有12件・独自配合技術が差別化の根幹 ／ 研究開発費対売上比4.2%（目標6%未達）</span>
+        </div>
+
+        <!-- Support band 4: Procurement  y=360 h=64 -->
+        <div class="fill-light" style="position:absolute;left:72px;top:360px;width:1040px;height:64px;padding:0 16px;display:flex;align-items:center;gap:24px;border-radius:2px;border-top:1px solid #CDD3DA;">
+          <span style="font-size:12px;font-weight:600;color:var(--primary);min-width:140px;">調達活動</span>
+          <span style="font-size:12px;color:var(--text);">主原料の調達先を3社に分散・為替ヘッジ戦略を運用 ／ 一部素材は単一仕入先依存のリスク残存</span>
+        </div>
+
+        <!-- Primary activities: y=440 h=192, col widths:
+             inbound  col1-2:  x=72,  w=169
+             ops      col3-5:  x=265, w=266
+             outbound col6-7:  x=555, w=169
+             mktg     col8-9:  x=748, w=169
+             service  col10-11:x=941, w=169+16=wait... col10-11: 2col = 169px, left=72+8*97...
+             Let's compute: col1=72, col2 ends at 72+169=241, gap24, col3 starts 265
+             col3-5: 3col=266px, ends at 265+266=531, gap24, col6 starts 555
+             col6-7: 2col=169px, ends at 555+169=724, gap24, col8 starts 748
+             col8-9: 2col=169px, ends at 748+169=917, gap24, col10 starts 941
+             col10-11: 2col=169px, ends at 941+169=1110, gap24 → but col12 starts at 1136
+             Use 1110 end, small rounding gap absorbed
+        -->
+
+        <!-- Inbound  col1-2 -->
+        <div style="position:absolute;left:72px;top:440px;width:169px;height:192px;padding:12px 10px;border-radius:2px;border:2px solid var(--surface);background:white;">
+          <div class="cell-h" style="font-size:12px;">① 購買物流</div>
+          <ul class="cell-body" style="font-size:11px;">
+            <li>国内3港経由の複線調達</li>
+            <li>在庫回転率8.2回</li>
+          </ul>
+        </div>
+
+        <!-- Operations  col3-5 -->
+        <div style="position:absolute;left:265px;top:440px;width:266px;height:192px;padding:12px 12px;border-radius:2px;background:var(--primary);">
+          <div class="cell-h on-dark" style="font-size:12px;">② 製造・オペレーション ★</div>
+          <ul class="cell-body on-dark" style="font-size:11px;">
+            <li>自社工場3拠点、設備稼働率92%</li>
+            <li>不良率0.08%（業界最低水準）</li>
+            <li>ISO 22000認証取得済み</li>
+          </ul>
+        </div>
+
+        <!-- Outbound  col6-7 -->
+        <div style="position:absolute;left:555px;top:440px;width:169px;height:192px;padding:12px 10px;border-radius:2px;border:2px solid #C8102E;background:white;">
+          <div class="cell-h" style="font-size:12px;color:var(--accent);">③ 出荷物流 ▲改善</div>
+          <ul class="cell-body" style="font-size:11px;">
+            <li>配送リードタイム平均3.2日→目標2日</li>
+            <li>ラスト1マイルコスト削減余地</li>
+          </ul>
+        </div>
+
+        <!-- Marketing & Sales  col8-9 -->
+        <div style="position:absolute;left:748px;top:440px;width:169px;height:192px;padding:12px 10px;border-radius:2px;border:2px solid var(--surface);background:white;">
+          <div class="cell-h" style="font-size:12px;">④ マーケティング・販売</div>
+          <ul class="cell-body" style="font-size:11px;">
+            <li>D2C：SNS広告ROASは3.8倍</li>
+            <li>EC売上比率60%に拡大中</li>
+          </ul>
+        </div>
+
+        <!-- Service  col10-11 -->
+        <div style="position:absolute;left:941px;top:440px;width:169px;height:192px;padding:12px 10px;border-radius:2px;background:var(--primary);">
+          <div class="cell-h on-dark" style="font-size:12px;">⑤ アフターサービス ★</div>
+          <ul class="cell-body on-dark" style="font-size:11px;">
+            <li>定期購入者向け管理栄養士相談</li>
+            <li>NPS 62・継続率89%</li>
+          </ul>
+        </div>
+
+        <div class="s-source" style="top:643px;">出典: 自社内部オペレーション分析 2025年Q1 ／ ★=競争優位拠点 ▲=改善優先拠点</div>
+        <div class="s-page">04 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PATTERN 5: ansoff-matrix
+═══════════════════════════════════════════════════ -->
+<div class="slide-section">
+  <p class="slide-caption">ansoff-matrix — アンゾフマトリクス</p>
+  <div class="slide-outer">
+    <div class="slide-scale-wrap">
+      <div class="slide" id="slide-ansoff">
+
+        <div class="s-title">
+          <div class="s-accent-bar"></div>
+          <div class="s-title-text">直近2年は市場浸透に集中し、2027年以降に製品開発戦略へ重心を移行する</div>
+        </div>
+        <div class="s-rule" style="top:140px; width:1136px;"></div>
+
+        <!--
+          col1-3: axis label area  x=72, w=266
+          col4-7: left quad         x=362, w=362
+          col8-12: right quad       x=748, w=460
+          col_header row: y=144 h=32
+          upper quads: y=192 h=232
+          row_separator: y=424 h=8
+          lower quads: y=432 h=200
+          risk note: y=640 h=24
+        -->
+
+        <!-- col header: existing product  col4-7 -->
+        <div style="position:absolute;left:362px;top:144px;width:362px;height:32px;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:13px;font-weight:600;color:var(--secondary);">既存製品</span>
+        </div>
+
+        <!-- col header: new product  col8-12 -->
+        <div style="position:absolute;left:748px;top:144px;width:460px;height:32px;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:13px;font-weight:600;color:var(--secondary);">新規製品</span>
+        </div>
+
+        <!-- row header: existing market  col1-3  y=192 h=232 -->
+        <div style="position:absolute;left:72px;top:192px;width:266px;height:232px;display:flex;align-items:center;justify-content:flex-end;padding-right:16px;">
+          <span style="font-size:13px;font-weight:600;color:var(--secondary);">既存市場</span>
+        </div>
+
+        <!-- row header: new market  col1-3  y=432 h=200 -->
+        <div style="position:absolute;left:72px;top:432px;width:266px;height:200px;display:flex;align-items:center;justify-content:flex-end;padding-right:16px;">
+          <span style="font-size:13px;font-weight:600;color:var(--secondary);">新規市場</span>
+        </div>
+
+        <!-- Quadrant: Market Penetration  col4-7 y=192 h=232  LIGHT (current focus) -->
+        <div class="fill-light" style="position:absolute;left:362px;top:192px;width:362px;height:232px;padding:16px 18px;border-radius:2px;border:2px solid var(--secondary);">
+          <div class="cell-h">市場浸透（Market Penetration）</div>
+          <span class="strength-badge badge-low">リスク: 低</span>
+          <p style="font-size:11px;color:var(--accent);font-weight:600;margin-bottom:4px;">◀ 現在の重点戦略</p>
+          <ul class="cell-body" style="font-size:12px;">
+            <li>既存顧客のサブスクアップグレード促進</li>
+            <li>紹介プログラムで獲得コスト削減</li>
+            <li>利用頻度向上キャンペーン（月2回→4回）</li>
+          </ul>
+        </div>
+
+        <!-- Quadrant: Product Dev  col8-12 y=192 h=232 -->
+        <div style="position:absolute;left:748px;top:192px;width:460px;height:232px;padding:16px 18px;border-radius:2px;border:1px solid #CDD3DA;">
+          <div class="cell-h">製品開発（Product Development）</div>
+          <span class="strength-badge badge-mid">リスク: 中</span>
+          <p style="font-size:11px;color:var(--secondary);font-weight:600;margin-bottom:4px;">▶ 2027年〜移行予定</p>
+          <ul class="cell-body" style="font-size:12px;">
+            <li>健康管理アプリとの統合新機能開発</li>
+            <li>法人向けBIダッシュボード上位版リリース</li>
+            <li>ホワイトラベルAPI展開（パートナー向け）</li>
+          </ul>
+        </div>
+
+        <!-- row separator  y=424 h=8 -->
+        <div style="position:absolute;left:362px;top:424px;width:846px;height:2px;background:var(--muted);opacity:0.4;"></div>
+
+        <!-- Quadrant: Market Dev  col4-7  y=432 h=200 -->
+        <div style="position:absolute;left:362px;top:432px;width:362px;height:200px;padding:16px 18px;border-radius:2px;border:1px solid #CDD3DA;">
+          <div class="cell-h">市場開発（Market Development）</div>
+          <span class="strength-badge badge-mid">リスク: 中</span>
+          <ul class="cell-body" style="font-size:12px;">
+            <li>東南アジア（タイ・ベトナム）での実証展開</li>
+            <li>シニア層（60代以上）向け専用サービス設計</li>
+          </ul>
+        </div>
+
+        <!-- Quadrant: Diversification  col8-12  y=432 h=200 -->
+        <div style="position:absolute;left:748px;top:432px;width:460px;height:200px;padding:16px 18px;border-radius:2px;border:1px solid #CDD3DA;">
+          <div class="cell-h">多角化（Diversification）</div>
+          <span class="strength-badge badge-high">リスク: 高</span>
+          <ul class="cell-body" style="font-size:12px;">
+            <li>フィンテック隣接領域（少額融資・保険）への進出検討</li>
+            <li>現時点では優先度低・2028年以降に再評価</li>
+          </ul>
+        </div>
+
+        <!-- vertical divider col7-8 x=748-2=746 -->
+        <div style="position:absolute;left:746px;top:192px;width:2px;height:440px;background:var(--muted);opacity:0.35;"></div>
+
+        <!-- risk arrow note  y=640 -->
+        <div style="position:absolute;left:362px;top:643px;width:846px;font-size:13px;color:var(--muted);">
+          ↗ 左下（市場浸透）→右上（多角化）方向にリスク増大 ／ 出典: 自社中期経営計画2025-2028
+        </div>
+        <div class="s-page">05 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PATTERN 6: 3c-analysis
+═══════════════════════════════════════════════════ -->
+<div class="slide-section">
+  <p class="slide-caption">3c-analysis — 3C分析</p>
+  <div class="slide-outer">
+    <div class="slide-scale-wrap">
+      <div class="slide" id="slide-3c">
+
+        <div class="s-title">
+          <div class="s-accent-bar"></div>
+          <div class="s-title-text">技術力と顧客密着が競合との差別化を維持するKSFであり、プロダクト投資を最優先すべきである</div>
+        </div>
+        <div class="s-rule" style="top:140px; width:1136px;"></div>
+
+        <!--
+          3 equal panels, each 4col = 362px
+          col1-4: x=72,  w=362
+          col5-8: x=458, w=362
+          col9-12:x=844, w=364
+          y=144, h=464
+        -->
+
+        <!-- Panel: Company  col1-4  mid fill -->
+        <div class="fill-mid" style="position:absolute;left:72px;top:144px;width:362px;height:464px;padding:16px 18px;border-radius:2px;">
+          <div style="font-size:18px;font-weight:700;color:var(--primary);margin-bottom:6px;">自社（Company）</div>
+          <div style="font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:4px;margin-top:8px;">■ 技術・製品力</div>
+          <ul class="cell-body" style="font-size:12px;">
+            <li>独自AI審査エンジン（不正検知精度99.2%）</li>
+            <li>特許10件・セキュリティ認証PCI DSS Level 1</li>
+          </ul>
+          <div style="font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:4px;margin-top:10px;">■ 財務・収益</div>
+          <ul class="cell-body" style="font-size:12px;">
+            <li>売上成長率YoY +34%・ARR 42億円</li>
+            <li>粗利率67%・EBITDA 転換達成済み</li>
+          </ul>
+          <div style="font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:4px;margin-top:10px;">■ 組織・人材</div>
+          <ul class="cell-body" style="font-size:12px;">
+            <li>エンジニア比率54%・経験者採用継続</li>
+            <li>マーケティング人材が不足（課題）</li>
+          </ul>
+        </div>
+
+        <!-- Panel: Customer  col5-8 -->
+        <div class="fill-light" style="position:absolute;left:458px;top:144px;width:362px;height:464px;padding:16px 18px;border-radius:2px;">
+          <div style="font-size:18px;font-weight:700;color:var(--primary);margin-bottom:6px;">顧客（Customer）</div>
+          <div style="font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:4px;margin-top:8px;">■ ニーズ・課題</div>
+          <ul class="cell-body" style="font-size:12px;">
+            <li>現金レジ廃止ニーズが中小飲食店で急増</li>
+            <li>経費申請の自動化・ペーパーレス化要求</li>
+          </ul>
+          <div style="font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:4px;margin-top:10px;">■ セグメント</div>
+          <ul class="cell-body" style="font-size:12px;">
+            <li>主力: 従業員10名以下の小規模事業者</li>
+            <li>成長: 法人カード管理ニーズを持つスタートアップ</li>
+          </ul>
+          <div style="font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:4px;margin-top:10px;">■ 購買行動</div>
+          <ul class="cell-body" style="font-size:12px;">
+            <li>同業者口コミが導入決定の最大影響因子</li>
+            <li>試用期間30日後の継続率88%</li>
+          </ul>
+        </div>
+
+        <!-- Panel: Competitor  col9-12 -->
+        <div class="fill-light" style="position:absolute;left:844px;top:144px;width:364px;height:464px;padding:16px 18px;border-radius:2px;">
+          <div style="font-size:18px;font-weight:700;color:var(--primary);margin-bottom:6px;">競合（Competitor）</div>
+          <div style="font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:4px;margin-top:8px;">■ 主要競合</div>
+          <ul class="cell-body" style="font-size:12px;">
+            <li>A社: 手数料最安値戦略・シェア28%</li>
+            <li>B社: 大手銀行系・信頼性訴求・シェア22%</li>
+          </ul>
+          <div style="font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:4px;margin-top:10px;">■ 強み・弱み</div>
+          <ul class="cell-body" style="font-size:12px;">
+            <li>A社: 価格強し / 不正検知・サポート弱</li>
+            <li>B社: ブランド強し / スピード・UX弱</li>
+          </ul>
+          <div style="font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:4px;margin-top:10px;">■ 差別化ポイント</div>
+          <ul class="cell-body" style="font-size:12px;">
+            <li>当社のみAPI連携数200+・セキュリティで優位</li>
+            <li>両社ともAI審査エンジンの独自開発未着手</li>
+          </ul>
+        </div>
+
+        <!-- KSF source bar y=624 h=24 -->
+        <div style="position:absolute;left:72px;top:626px;width:1136px;font-size:13px;color:var(--muted);">
+          <span style="color:var(--primary);font-weight:600;">KSF:</span> AIによる不正検知精度と加盟店サポートの組み合わせが、競合未対応の最大ニーズに合致する ／ 出典: 自社競合調査2025年4月
+        </div>
+        <div class="s-page">06 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PATTERN 7: pestel
+═══════════════════════════════════════════════════ -->
+<div class="slide-section">
+  <p class="slide-caption">pestel — PESTEL分析</p>
+  <div class="slide-outer">
+    <div class="slide-scale-wrap">
+      <div class="slide" id="slide-pestel">
+
+        <div class="s-title">
+          <div class="s-accent-bar"></div>
+          <div class="s-title-text">規制強化・技術革新・人口変化が同時進行し、2026年までに事業モデルの適応が急務である</div>
+        </div>
+        <div class="s-rule" style="top:140px; width:1136px;"></div>
+
+        <!--
+          3 equal cols: each 4col = 362px
+          col1-4: x=72,  w=362
+          col5-8: x=458, w=362
+          col9-12:x=844, w=364
+          Upper row: y=144 h=240 fill-light
+          Lower row: y=400 h=200 fill-none (border)
+        -->
+
+        <!-- Political  col1-4  y=144  LIGHT -->
+        <div class="fill-light" style="position:absolute;left:72px;top:144px;width:362px;height:240px;padding:14px 16px;border-radius:2px;">
+          <div style="font-size:15px;font-weight:600;color:var(--primary);margin-bottom:8px;">🏛 政治（Political）</div>
+          <ul class="cell-body">
+            <li>デジタル庁主導のGov-Tech推進で規制サンドボックス拡大</li>
+            <li>インボイス制度完全施行で中小企業のデジタル化需要急増</li>
+            <li>日ASEANデジタル経済協定：越・タイ展開の追い風</li>
+          </ul>
+        </div>
+
+        <!-- Economic  col5-8  y=144  LIGHT -->
+        <div class="fill-light" style="position:absolute;left:458px;top:144px;width:362px;height:240px;padding:14px 16px;border-radius:2px;">
+          <div style="font-size:15px;font-weight:600;color:var(--primary);margin-bottom:8px;">📈 経済（Economic）</div>
+          <ul class="cell-body">
+            <li>金利上昇局面：設備投資抑制で運転資金需要増</li>
+            <li>円安継続（135〜145円台）：輸入コスト増・海外展開メリット</li>
+            <li>中小企業の経常利益率改善（2024年過去最高）</li>
+          </ul>
+        </div>
+
+        <!-- Social  col9-12  y=144  LIGHT -->
+        <div class="fill-light" style="position:absolute;left:844px;top:144px;width:364px;height:240px;padding:14px 16px;border-radius:2px;">
+          <div style="font-size:15px;font-weight:600;color:var(--primary);margin-bottom:8px;">👥 社会（Social）</div>
+          <ul class="cell-body">
+            <li>労働人口減少：業務自動化・DX投資の必然化</li>
+            <li>キャッシュレス比率55%突破・現金決済忌避層拡大</li>
+            <li>Z世代経営者増加でSaaS親和性の高いセグメント台頭</li>
+          </ul>
+        </div>
+
+        <!-- Technological  col1-4  y=400  border -->
+        <div style="position:absolute;left:72px;top:400px;width:362px;height:200px;padding:14px 16px;border-radius:2px;border:1px solid #CDD3DA;">
+          <div style="font-size:15px;font-weight:600;color:var(--primary);margin-bottom:8px;">💡 技術（Technological）</div>
+          <ul class="cell-body">
+            <li>生成AI活用による経理処理の完全自動化が現実的に</li>
+            <li>Open Bankingの国際標準化：API連携コスト低下</li>
+            <li>量子暗号・生体認証でセキュリティ基準が刷新</li>
+          </ul>
+        </div>
+
+        <!-- Environmental  col5-8  y=400  border -->
+        <div style="position:absolute;left:458px;top:400px;width:362px;height:200px;padding:14px 16px;border-radius:2px;border:1px solid #CDD3DA;">
+          <div style="font-size:15px;font-weight:600;color:var(--primary);margin-bottom:8px;">🌱 環境（Environmental）</div>
+          <ul class="cell-body">
+            <li>Scope 3 CO₂開示義務化（上場企業2025年3月期〜）</li>
+            <li>ペーパーレス決済が脱炭素のESG施策として訴求可能</li>
+            <li>データセンター再エネ化コストが運営費に上乗せ</li>
+          </ul>
+        </div>
+
+        <!-- Legal  col9-12  y=400  border -->
+        <div style="position:absolute;left:844px;top:400px;width:364px;height:200px;padding:14px 16px;border-radius:2px;border:1px solid #CDD3DA;">
+          <div style="font-size:15px;font-weight:600;color:var(--primary);margin-bottom:8px;">⚖ 法的（Legal）</div>
+          <ul class="cell-body">
+            <li>改正資金決済法：ステーブルコイン規制が明確化</li>
+            <li>個人情報保護法改正：第三者提供の同意取得厳格化</li>
+            <li>不正競争防止法改正：営業秘密・データ保護強化</li>
+          </ul>
+        </div>
+
+        <div class="s-source" style="top:643px;">出典: デジタル庁・金融庁公表資料 / 総務省「情報通信白書」2025年版 / 環境省Scope3ガイドライン</div>
+        <div class="s-page">07 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Scale each slide to fit its container
+function scaleSlides() {
+  document.querySelectorAll('.slide-scale-wrap').forEach(function(wrap) {
+    var slide = wrap.querySelector('.slide');
+    if (!slide) return;
+    var containerW = wrap.offsetWidth;
+    var scale = containerW / 1280;
+    slide.style.transform = 'scale(' + scale + ')';
+    // The padding-top already reserves the right height via % trick
+  });
+}
+scaleSlides();
+window.addEventListener('resize', scaleSlides);
+</script>
+</body>
+</html>

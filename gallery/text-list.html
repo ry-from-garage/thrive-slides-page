@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📝 テキストリスト — theme: modern-tech（6 パターン）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ===== modern-tech tokens ===== */
+  :root {
+    --color-primary:    #3B4CCA;
+    --color-secondary:  #7C93E8;
+    --color-background: #F8F9FB;
+    --color-surface:    #EDEEF2;
+    --color-accent:     #6C63FF;
+    --color-text:       #1C1F26;
+    --color-muted:      #595F6B;
+    --color-positive:   #1A8A5A;
+    --color-negative:   #C0392B;
+
+    --font-stack: 'Noto Sans JP', Inter, 'Helvetica Neue', Arial, sans-serif;
+
+    --radius-card: 10px;
+    --radius-badge: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #D8DAE0;
+    font-family: var(--font-stack);
+    color: var(--color-text);
+    padding: 48px 0;
+  }
+
+  /* ===== page header ===== */
+  .page-header {
+    text-align: center;
+    margin-bottom: 40px;
+    color: var(--color-text);
+  }
+  .page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .page-header p {
+    font-size: 14px;
+    color: var(--color-muted);
+    margin-top: 8px;
+  }
+
+  /* ===== slide wrapper ===== */
+  .slide-block {
+    margin: 0 auto 56px;
+    max-width: 1280px;
+    width: calc(100% - 48px);
+  }
+  .slide-caption {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+    padding-left: 4px;
+  }
+  .slide-caption span {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* ===== slide canvas: 1280×720 =====
+     safe-area: top/bottom 56px, left/right 72px
+     content effective width: 1136px (12col, gutter 24px, col ~72.67px)
+  */
+  .slide {
+    width: 1280px;
+    height: 720px;
+    background: var(--color-background);
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+    /* Scale down to fit container */
+    transform-origin: top left;
+  }
+
+  /* Responsive scaling */
+  .slide-scaler {
+    width: 1280px;
+    height: 720px;
+    transform-origin: top left;
+  }
+
+  /* ===== shared layout zones ===== */
+  /* title_bar: col 1-12, height 80px, offset 56 */
+  .title-bar {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 56px;
+    height: 80px;
+  }
+  .action-title {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* hairline accent underline under title, 1px, accent color, 1/3 content width ≈ 379px */
+  .title-underline {
+    position: absolute;
+    left: 72px;
+    top: 148px; /* 56+80+12 */
+    width: 379px;
+    height: 1px;
+    background: var(--color-accent);
+  }
+  /* section label small */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* list_area: col 1-12, height 488px, offset 152 */
+  .list-area {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 152px;
+    height: 488px;
+  }
+
+  /* source_bar: col 1-12, height 24px, offset 640 */
+  .source-bar {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 648px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+  }
+  .source-bar span {
+    font-size: 13px;
+    color: var(--color-muted);
+  }
+
+  /* page number */
+  .page-num {
+    position: absolute;
+    right: 72px;
+    bottom: 24px;
+    font-size: 13px;
+    color: var(--color-muted);
+  }
+
+  /* ===== divider line ===== */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: var(--color-surface);
+  }
+
+  /* ============================================================
+     PATTERN 1: numbered-list-body
+     3 items, number badge + heading + body, separated by dividers
+  ============================================================ */
+  .p1-list {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .p1-row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 0 0 0 0;
+    border-bottom: 1px solid var(--color-surface);
+  }
+  .p1-row:last-child { border-bottom: none; }
+  .p1-badge {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: -0.02em;
+  }
+  .p1-text { flex: 1; }
+  .p1-heading {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .p1-body {
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--color-muted);
+    line-height: 1.6;
+  }
+
+  /* ============================================================
+     PATTERN 2: icon-left-text
+     3~4 items, icon (emoji/SVG outline) + heading + description
+  ============================================================ */
+  .p2-list {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 0;
+  }
+  .p2-row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 16px 16px;
+    background: var(--color-surface);
+    border-radius: var(--radius-card);
+    margin-bottom: 12px;
+  }
+  .p2-row:last-child { margin-bottom: 0; }
+  .p2-icon {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 30px;
+    border: 1.5px solid var(--color-muted);
+    border-radius: var(--radius-card);
+    background: var(--color-background);
+    color: var(--color-text);
+  }
+  .p2-text { flex: 1; }
+  .p2-heading {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .p2-desc {
+    font-size: 16px;
+    color: var(--color-muted);
+    line-height: 1.55;
+  }
+
+  /* ============================================================
+     PATTERN 3: numbered-two-col
+     3~4 rows, left=badge+heading, right=bullet details
+  ============================================================ */
+  .p3-list {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .p3-row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border-bottom: 1px solid var(--color-surface);
+  }
+  .p3-row:last-child { border-bottom: none; }
+  /* left col: col 1-5 ≈ 42% */
+  .p3-left {
+    width: 42%;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-right: 24px;
+  }
+  .p3-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-badge);
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: -0.02em;
+  }
+  .p3-heading {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  /* right col: col 6-12 ≈ 58% */
+  .p3-right {
+    width: 58%;
+    padding-left: 24px;
+    border-left: 1px solid var(--color-surface);
+  }
+  .p3-bullets {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .p3-bullets li {
+    font-size: 16px;
+    color: var(--color-muted);
+    line-height: 1.5;
+    padding-left: 16px;
+    position: relative;
+  }
+  .p3-bullets li::before {
+    content: '▶';
+    position: absolute;
+    left: 0;
+    font-size: 9px;
+    color: var(--color-accent);
+    top: 6px;
+  }
+
+  /* ============================================================
+     PATTERN 4: three-tier-segment
+     left panel (col 1-3) + right segment list (col 4-12)
+  ============================================================ */
+  /* title_bar for this pattern: height 72px, offset 56 */
+  .p4-title-bar {
+    position: absolute;
+    left: 72px; right: 72px;
+    top: 56px; height: 72px;
+  }
+  /* left_label_panel: col 1-3, height 480px, offset 144 */
+  .p4-left {
+    position: absolute;
+    left: 72px;
+    top: 144px;
+    width: 266px; /* 3 col span */
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-right: 24px;
+    border-right: 1px dashed var(--color-muted);
+  }
+  .p4-category-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 16px;
+  }
+  .p4-bracket-heading {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  /* right_segment_list: col 4-12, height 480px, offset 144 */
+  .p4-right {
+    position: absolute;
+    left: calc(72px + 266px + 24px); /* origin + 3col + gutter */
+    right: 72px;
+    top: 144px;
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+  }
+  .p4-seg-row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid var(--color-surface);
+    padding: 8px 0;
+  }
+  .p4-seg-row:last-child { border-bottom: none; }
+  .p4-icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 22px;
+  }
+  .p4-seg-text { flex: 1; }
+  .p4-seg-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 2px;
+  }
+  .p4-seg-heading {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 3px;
+    letter-spacing: -0.01em;
+  }
+  .p4-seg-sub {
+    font-size: 14px;
+    color: var(--color-muted);
+    margin-bottom: 4px;
+  }
+  .p4-seg-bullets {
+    list-style: none;
+    display: flex;
+    gap: 16px;
+  }
+  .p4-seg-bullets li {
+    font-size: 14px;
+    color: var(--color-muted);
+    padding-left: 12px;
+    position: relative;
+  }
+  .p4-seg-bullets li::before {
+    content: '·';
+    position: absolute;
+    left: 2px;
+    font-size: 16px;
+    color: var(--color-primary);
+  }
+  /* source_bar for p4 */
+  .p4-source {
+    position: absolute;
+    left: 72px; right: 72px;
+    top: 648px; height: 24px;
+    display: flex; align-items: center;
+  }
+
+  /* ============================================================
+     PATTERN 5: two-section-stacked
+     upper_section (224px, offset 152) + divider (8px, offset 376)
+     + lower_section (240px, offset 400) + source_bar (24px, offset 640)
+  ============================================================ */
+  .p5-upper {
+    position: absolute;
+    left: 72px; right: 72px;
+    top: 152px; height: 224px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 20px;
+    border-left: 3px solid var(--color-accent);
+  }
+  .p5-section-heading {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .p5-section-body {
+    font-size: 17px;
+    color: var(--color-muted);
+    line-height: 1.65;
+  }
+  .p5-divider {
+    position: absolute;
+    left: 72px; right: 72px;
+    top: 376px; height: 1px;
+    background: var(--color-surface);
+  }
+  .p5-lower {
+    position: absolute;
+    left: 72px; right: 72px;
+    top: 400px; height: 240px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 20px;
+    border-left: 3px solid var(--color-primary);
+  }
+  .p5-lower-body {
+    font-size: 16px;
+    color: var(--color-muted);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+  .p5-numbered-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .p5-numbered-list li {
+    font-size: 16px;
+    color: var(--color-text);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .p5-num {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-accent);
+    min-width: 22px;
+  }
+
+  /* ============================================================
+     PATTERN 6: image-left-text-right
+     image_area (col 1-4, 488px, offset 152)
+     text_area  (col 5-12, 488px, offset 152)
+  ============================================================ */
+  .p6-image {
+    position: absolute;
+    left: 72px;
+    top: 152px;
+    width: 362px; /* 4 col span */
+    height: 488px;
+    background: var(--color-surface);
+    border-radius: var(--radius-card);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--color-muted);
+  }
+  .p6-image-icon { font-size: 48px; }
+  .p6-image-label { font-size: 13px; letter-spacing: 0.05em; }
+  .p6-text {
+    position: absolute;
+    left: calc(72px + 362px + 24px); /* 4col + gutter */
+    right: 72px;
+    top: 152px;
+    height: 488px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+  }
+  .p6-area-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 10px;
+  }
+  .p6-text-heading {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+  .p6-short-rule {
+    width: 120px;
+    height: 1px;
+    background: var(--color-accent);
+    margin-bottom: 20px;
+  }
+  .p6-bullet-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .p6-bullet-list li {
+    font-size: 17px;
+    color: var(--color-muted);
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .p6-bullet-list li::before {
+    content: '·';
+    position: absolute;
+    left: 4px;
+    font-size: 20px;
+    color: var(--color-primary);
+    top: -1px;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>📝 テキストリスト — theme: modern-tech（6 パターン）</h1>
+  <p>layout-text-list.md の全パターンを modern-tech トークンで描画したベリフィケーションギャラリー</p>
+</div>
+
+<!-- ============================================================
+     PATTERN 1: numbered-list-body
+============================================================ -->
+<div class="slide-block">
+  <div class="slide-caption"><span>numbered-list-body</span> — 番号バッジ＋見出し＋本文テキストの縦3行リスト</div>
+  <div class="slide-scaler">
+    <div class="slide" id="slide-1">
+
+      <!-- title bar -->
+      <div class="title-bar">
+        <div class="section-label">PRODUCT STRATEGY</div>
+        <div class="action-title">3つの強みがサービス継続率90%超を支えている</div>
+      </div>
+      <div class="title-underline"></div>
+
+      <!-- list area -->
+      <div class="list-area">
+        <div class="p1-list">
+          <div class="p1-row">
+            <div class="p1-badge">01</div>
+            <div class="p1-text">
+              <div class="p1-heading">リアルタイム解析エンジン</div>
+              <div class="p1-body">ユーザー操作ログを 100ms 以内に処理し、異常検知と推薦最適化を同時に実行する独自パイプライン。バッチ処理が不要なため、施策の効果測定が翌日ではなく当日中に完了する。</div>
+            </div>
+          </div>
+          <div class="p1-row">
+            <div class="p1-badge">02</div>
+            <div class="p1-text">
+              <div class="p1-heading">プライバシーファースト設計</div>
+              <div class="p1-body">個人識別情報をエッジ側で匿名化し、クラウドにはコホート集計データのみを送信する。GDPR・個人情報保護法への対応コストを大幅に削減しながら、精度の高いパーソナライズを維持する。</div>
+            </div>
+          </div>
+          <div class="p1-row">
+            <div class="p1-badge">03</div>
+            <div class="p1-text">
+              <div class="p1-heading">ノーコード A/B テスト</div>
+              <div class="p1-body">エンジニア不要でマーケターが自ら仮説を設定・検証できるUIを提供。リリースサイクルを平均14日から3日に短縮し、意思決定速度の向上を直接的に数値で確認できる。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- source bar -->
+      <div class="source-bar"><span>出典: 社内顧客満足度調査, 2025年Q2</span></div>
+      <div class="page-num">01 / 06</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PATTERN 2: icon-left-text
+============================================================ -->
+<div class="slide-block">
+  <div class="slide-caption"><span>icon-left-text</span> — アイコン＋見出し＋説明テキストの縦3〜4行リスト</div>
+  <div class="slide-scaler">
+    <div class="slide" id="slide-2">
+
+      <div class="title-bar">
+        <div class="section-label">FEATURE OVERVIEW</div>
+        <div class="action-title">4つの機能が現場担当者の日常業務を根本から変える</div>
+      </div>
+      <div class="title-underline"></div>
+
+      <div class="list-area">
+        <div class="p2-list">
+          <div class="p2-row">
+            <div class="p2-icon">📊</div>
+            <div class="p2-text">
+              <div class="p2-heading">ダッシュボードの自動生成</div>
+              <div class="p2-desc">データソースを接続するだけで、KPI可視化ダッシュボードを自動生成。手動でのグラフ作成作業をゼロにし、分析に集中できる環境を整える。更新頻度はリアルタイム・1時間・1日から選択可能。</div>
+            </div>
+          </div>
+          <div class="p2-row">
+            <div class="p2-icon">🔔</div>
+            <div class="p2-text">
+              <div class="p2-heading">インテリジェントアラート</div>
+              <div class="p2-desc">しきい値ベースではなく、季節性・トレンドを学習したモデルが異常を検出し通知。過検知を90%削減し、本当に対応が必要なイベントのみチームに届ける。</div>
+            </div>
+          </div>
+          <div class="p2-row">
+            <div class="p2-icon">🔗</div>
+            <div class="p2-text">
+              <div class="p2-heading">100以上のデータソース接続</div>
+              <div class="p2-desc">BigQuery・Snowflake・SalesForceなど主要プラットフォームへのコネクタを標準搭載。APIキーを設定するだけで10分以内にデータパイプラインが稼働する。</div>
+            </div>
+          </div>
+          <div class="p2-row">
+            <div class="p2-icon">👥</div>
+            <div class="p2-text">
+              <div class="p2-heading">チームコラボレーション機能</div>
+              <div class="p2-desc">ダッシュボードへのコメント・スレッド・承認ワークフローを内蔵。意思決定の根拠をデータと紐付けて残せるため、組織的な学習資産として蓄積される。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="source-bar"><span>出典: 製品機能仕様書 v3.2, 2026年3月</span></div>
+      <div class="page-num">02 / 06</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PATTERN 3: numbered-two-col
+============================================================ -->
+<div class="slide-block">
+  <div class="slide-caption"><span>numbered-two-col</span> — 番号バッジ＋見出し（左）＋箇条書き詳細（右）の2カラム行</div>
+  <div class="slide-scaler">
+    <div class="slide" id="slide-3">
+
+      <div class="title-bar">
+        <div class="section-label">ROADMAP</div>
+        <div class="action-title">3フェーズで段階的に導入することでリスクを最小化できる</div>
+      </div>
+      <div class="title-underline"></div>
+
+      <div class="list-area">
+        <div class="p3-list">
+          <div class="p3-row">
+            <div class="p3-left">
+              <div class="p3-badge">01</div>
+              <div class="p3-heading">基盤データ整備<br>（〜3ヶ月）</div>
+            </div>
+            <div class="p3-right">
+              <ul class="p3-bullets">
+                <li>既存データウェアハウスのスキーマ統合と重複排除</li>
+                <li>マスターデータ管理ルールの策定・ドキュメント化</li>
+                <li>パイプライン監視ダッシュボードの初期構築</li>
+              </ul>
+            </div>
+          </div>
+          <div class="p3-row">
+            <div class="p3-left">
+              <div class="p3-badge">02</div>
+              <div class="p3-heading">分析・可視化<br>（4〜6ヶ月）</div>
+            </div>
+            <div class="p3-right">
+              <ul class="p3-bullets">
+                <li>部門横断 KPI ダッシュボードを全マネージャーに展開</li>
+                <li>A/B テスト基盤の整備と第1回仮説検証の実施</li>
+                <li>自動レポート配信ワークフローの本番稼働</li>
+              </ul>
+            </div>
+          </div>
+          <div class="p3-row">
+            <div class="p3-left">
+              <div class="p3-badge">03</div>
+              <div class="p3-heading">予測・自動化<br>（7〜12ヶ月）</div>
+            </div>
+            <div class="p3-right">
+              <ul class="p3-bullets">
+                <li>チャーン予測モデルの本番リリースと施策自動化</li>
+                <li>需要予測を在庫管理システムとリアルタイム連携</li>
+                <li>モデル精度の継続モニタリング体制を確立</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="source-bar"><span>出典: プロダクトロードマップ v2.1, 2026年1月</span></div>
+      <div class="page-num">03 / 06</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PATTERN 4: three-tier-segment
+============================================================ -->
+<div class="slide-block">
+  <div class="slide-caption"><span>three-tier-segment</span> — 左括りラベルパネル＋右3セグメント縦リスト</div>
+  <div class="slide-scaler">
+    <div class="slide" id="slide-4">
+
+      <!-- title bar (72px, offset 56) -->
+      <div class="p4-title-bar">
+        <div class="section-label">CUSTOMER SEGMENTATION</div>
+        <div class="action-title" style="font-size:36px;">3つの顧客セグメントが異なるニーズを持つことが今後の分岐点になる</div>
+      </div>
+      <div class="title-underline"></div>
+
+      <!-- left label panel (col 1-3, 480px, offset 144) -->
+      <div class="p4-left">
+        <div class="p4-category-label">SEGMENT TYPE</div>
+        <div class="p4-bracket-heading">ユーザーの<br>成長ステージ<br>による3分類</div>
+      </div>
+
+      <!-- right segment list (col 4-12, 480px, offset 144) -->
+      <div class="p4-right">
+        <div class="p4-seg-row">
+          <div class="p4-icon-circle">🌱</div>
+          <div class="p4-seg-text">
+            <div class="p4-seg-label">TIER 1 — 導入期</div>
+            <div class="p4-seg-heading">スタートアップ・個人開発者</div>
+            <div class="p4-seg-sub">月額 $0〜$49、セルフサービス型で素早く試したい層</div>
+            <ul class="p4-seg-bullets">
+              <li>サポートはドキュメント・コミュニティ中心</li>
+              <li>無料枠で価値体験 → 有料転換が最重要KPI</li>
+            </ul>
+          </div>
+        </div>
+        <div class="p4-seg-row">
+          <div class="p4-icon-circle">🏢</div>
+          <div class="p4-seg-text">
+            <div class="p4-seg-label">TIER 2 — 成長期</div>
+            <div class="p4-seg-heading">SMB・中規模チーム</div>
+            <div class="p4-seg-sub">月額 $50〜$499、チーム機能とインテグレーションを重視</div>
+            <ul class="p4-seg-bullets">
+              <li>シートの横展開（チーム追加）でARR拡大</li>
+              <li>オンボーディング支援で解約率を3%以下に維持</li>
+            </ul>
+          </div>
+        </div>
+        <div class="p4-seg-row">
+          <div class="p4-icon-circle">🌐</div>
+          <div class="p4-seg-text">
+            <div class="p4-seg-label">TIER 3 — 拡張期</div>
+            <div class="p4-seg-heading">エンタープライズ・大手企業</div>
+            <div class="p4-seg-sub">月額 $500+、セキュリティ・SLA・SSO要件が必須</div>
+            <ul class="p4-seg-bullets">
+              <li>専任CSMによるQuarterly Business Reviewを実施</li>
+              <li>カスタム契約・SLA 99.99%・SOC2 対応が差別化</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="p4-source"><span style="font-size:13px;color:var(--color-muted);">出典: 顧客分析レポート Q1 2026, Revenue Operations</span></div>
+      <div class="page-num">04 / 06</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PATTERN 5: two-section-stacked
+============================================================ -->
+<div class="slide-block">
+  <div class="slide-caption"><span>two-section-stacked</span> — 上下2セクション縦積み（背景・概要 + 手順・対応策）</div>
+  <div class="slide-scaler">
+    <div class="slide" id="slide-5">
+
+      <div class="title-bar">
+        <div class="section-label">CHALLENGE & RESPONSE</div>
+        <div class="action-title">データサイロ問題を解消すれば意思決定サイクルを半分に短縮できる</div>
+      </div>
+      <div class="title-underline"></div>
+
+      <!-- upper section: 224px, offset 152 -->
+      <div class="p5-upper">
+        <div class="p5-section-heading">課題：分断されたデータが判断を遅らせている</div>
+        <div class="p5-section-body">
+          現状、営業・マーケ・CS の各チームが異なるツールでデータを管理しており、全社レポートを作成するたびに手動でCSVを結合する作業が発生している。
+          この作業に週あたり平均12時間が消費されており、リアルタイムな経営判断を妨げる最大の要因となっている。加えて、ツール間のデータ定義の不統一が誤集計を生みやすい構造的リスクも内在している。
+        </div>
+      </div>
+
+      <!-- divider: 1px, offset 376 -->
+      <div class="p5-divider"></div>
+
+      <!-- lower section: 240px, offset 400 -->
+      <div class="p5-lower">
+        <div class="p5-section-heading">対応策：3ステップで統合データ基盤を整備する</div>
+        <div class="p5-lower-body">以下の順序で実施することで、半年以内に単一の信頼できるデータソースを確立する:</div>
+        <ol class="p5-numbered-list">
+          <li><span class="p5-num">① </span>全ツールのデータ定義を統一し、マスター辞書を整備する（4週間）</li>
+          <li><span class="p5-num">② </span>ETL パイプラインを構築して毎朝 6:00 に自動同期を実行する（6週間）</li>
+          <li><span class="p5-num">③ </span>全社ダッシュボードを公開し、レポート手作業を完全廃止する（2週間）</li>
+        </ol>
+      </div>
+
+      <div class="source-bar"><span>出典: IT部門課題ヒアリング結果, 2026年4月</span></div>
+      <div class="page-num">05 / 06</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PATTERN 6: image-left-text-right
+============================================================ -->
+<div class="slide-block">
+  <div class="slide-caption"><span>image-left-text-right</span> — 左ビジュアルプレースホルダー＋右エリアラベル・見出し・箇条書き</div>
+  <div class="slide-scaler">
+    <div class="slide" id="slide-6">
+
+      <div class="title-bar">
+        <div class="section-label">CASE STUDY</div>
+        <div class="action-title">導入6ヶ月で解約率を半減させた具体的な施策を公開する</div>
+      </div>
+      <div class="title-underline"></div>
+
+      <!-- image area: col 1-4, 488px, offset 152 -->
+      <div class="p6-image">
+        <div class="p6-image-icon">🖼️</div>
+        <div class="p6-image-label">CASE PHOTO</div>
+      </div>
+
+      <!-- text area: col 5-12, 488px, offset 152 -->
+      <div class="p6-text">
+        <div class="p6-area-label">SUCCESS STORY</div>
+        <div class="p6-text-heading">ECプラットフォーム A社<br>チャーン率 8.2% → 3.9%</div>
+        <div class="p6-short-rule"></div>
+        <ul class="p6-bullet-list">
+          <li>初回ログイン72時間以内のオンボーディング完了率を65%→91%に改善し、早期離脱を防止</li>
+          <li>ヘルススコアが低下したユーザーに自動でCS担当からのアウトリーチが発動し、解約予兆を早期検知</li>
+          <li>利用機能が2つ以下のアカウントに対し、パーソナライズされた機能紹介メールを週1回配信</li>
+          <li>月次 QBR でROI試算レポートを自動送付し、更新判断を経営層が即日承認できる体制を整備</li>
+        </ul>
+      </div>
+
+      <div class="source-bar"><span>出典: A社 カスタマーサクセス事例レポート, 2025年12月</span></div>
+      <div class="page-num">06 / 06</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Responsive scaling: fit slides to container width
+  function scaleSlides() {
+    const scalers = document.querySelectorAll('.slide-scaler');
+    scalers.forEach(scaler => {
+      const block = scaler.closest('.slide-block');
+      const available = block.clientWidth;
+      const scale = available / 1280;
+      scaler.style.transform = `scale(${scale})`;
+      scaler.style.width = '1280px';
+      scaler.style.height = '720px';
+      // Shrink the block height to match scaled height
+      block.querySelector('.slide-scaler').parentElement.style.height = (720 * scale) + 'px';
+      // Actually we set height on the outer wrapper
+      scaler.parentElement.style.height = (720 * scale) + 'px';
+    });
+  }
+  scaleSlides();
+  window.addEventListener('resize', scaleSlides);
+</script>
+</body>
+</html>

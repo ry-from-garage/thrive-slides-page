@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔄 図解・ダイアグラム — theme: strategy-consulting（7 パターン）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+<style>
+  /* ── Strategy-Consulting Token Variables ── */
+  :root {
+    --primary:    #0A2540;
+    --secondary:  #3C6E91;
+    --background: #FFFFFF;
+    --surface:    #F4F6F8;
+    --accent:     #C8102E;
+    --text:       #1A2332;
+    --muted:      #5A6675;
+    --positive:   #1F7A52;
+    --negative:   #B23A2E;
+
+    --font-serif: 'Noto Serif JP', Georgia, 'Times New Roman', serif;
+    --font-sans:  'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #E8EAF0;
+    font-family: var(--font-sans);
+    color: var(--text);
+    padding: 40px 32px;
+  }
+
+  /* ── Gallery Header ── */
+  .gallery-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .gallery-header h1 {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+  .gallery-header p {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* ── Slide wrapper ── */
+  .pattern-section {
+    margin-bottom: 56px;
+  }
+  .pattern-caption {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* Slide: fixed 1280×720, scaled down to fit viewport */
+  .slide-outer {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    aspect-ratio: 16/9;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #CDD2DA;
+    box-shadow: 0 4px 16px rgba(10,37,64,0.12);
+  }
+  .slide-inner {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1280px;
+    height: 720px;
+    transform-origin: top left;
+    background: var(--background);
+  }
+
+  /* Scale the inner 1280×720 to fill the outer */
+  @media (max-width: 1340px) {
+    .slide-outer { max-width: 100%; }
+  }
+
+  /* ── Common slide elements ── */
+  .slide-bg { position: absolute; inset: 0; background: var(--background); }
+
+  /* Title bar area */
+  .title-bar {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 56px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .accent-bar {
+    width: 4px;
+    height: 48px;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-right: 12px;
+    border-radius: 2px;
+  }
+  .action-title {
+    font-family: var(--font-serif);
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.15;
+    flex: 1;
+  }
+  .thin-rule {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    height: 2px;
+    background: var(--primary);
+    top: 148px;
+  }
+
+  /* Lead text */
+  .lead-text {
+    position: absolute;
+    left: 88px;
+    right: 72px;
+    top: 156px;
+    font-family: var(--font-sans);
+    font-size: 18px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* Source bar */
+  .source-bar {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 648px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* Page number */
+  .page-num {
+    position: absolute;
+    right: 40px;
+    bottom: 12px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ── Shared diagram primitives ── */
+  .diagram-area {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    overflow: visible;
+  }
+
+  /* h2-style labels */
+  .label-h2 {
+    font-family: var(--font-sans);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--primary);
+    line-height: 1.2;
+  }
+  .label-body {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .label-caption {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Gallery Header ── -->
+<div class="gallery-header">
+  <h1>🔄 図解・ダイアグラム — theme: strategy-consulting（7 パターン）</h1>
+  <p>layout-diagram.md の全 ## Pattern: を strategy-consulting テーマ（#0A2540 / #C8102E / Noto Serif JP + Noto Sans JP）でレンダリングした検証ギャラリー</p>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PATTERN 1: cycle-diagram
+════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption">cycle-diagram — 3〜6ステップを円環状に配置し「繰り返すサイクル」を表現</div>
+  <div class="slide-outer">
+    <div class="slide-inner" id="slide-cycle">
+      <div class="slide-bg"></div>
+
+      <!-- Title bar -->
+      <div class="title-bar">
+        <div class="accent-bar"></div>
+        <div class="action-title">継続的改善サイクルにより品質と顧客満足度を同時に向上させる</div>
+      </div>
+      <div class="thin-rule"></div>
+
+      <!-- Lead text -->
+      <div class="lead-text">PDCAを4フェーズで回し、各フェーズで得たインサイトを次サイクルに還流する</div>
+
+      <!-- Diagram area (offset 208, height 416) -->
+      <svg style="position:absolute;left:0;top:0;width:1280px;height:720px;overflow:visible;" viewBox="0 0 1280 720">
+
+        <!-- Outer ring segments (radius 160, inner 96) -->
+        <!-- Plan segment (top-right, 315°→45°) -->
+        <path d="M640,416 L640,256 A160,160 0 0,1 753.1,302.9 Z"
+              fill="#F4F6F8" stroke="white" stroke-width="2"/>
+        <!-- Do segment (right, 45°→135°) -->
+        <path d="M640,416 L753.1,302.9 A160,160 0 0,1 753.1,529.1 Z"
+              fill="#F4F6F8" stroke="white" stroke-width="2"/>
+        <!-- Check segment (bottom-left, 135°→225°) -->
+        <path d="M640,416 L753.1,529.1 A160,160 0 0,1 526.9,529.1 Z"
+              fill="#F4F6F8" stroke="white" stroke-width="2"/>
+        <!-- Act segment (left, 225°→315°) -->
+        <path d="M640,416 L526.9,529.1 A160,160 0 0,1 526.9,302.9 Z"
+              fill="#F4F6F8" stroke="white" stroke-width="2"/>
+        <!-- Close top -->
+        <path d="M640,416 L526.9,302.9 A160,160 0 0,1 640,256 Z"
+              fill="#F4F6F8" stroke="white" stroke-width="2"/>
+
+        <!-- Center hole (white circle) -->
+        <circle cx="640" cy="416" r="96" fill="white"/>
+        <!-- Inner core circle -->
+        <circle cx="640" cy="416" r="80" fill="#3C6E91"/>
+
+        <!-- Center label -->
+        <text x="640" y="410" text-anchor="middle" font-family="'Noto Serif JP', serif" font-size="20" font-weight="700" fill="white">品質</text>
+        <text x="640" y="432" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="14" fill="white">改善サイクル</text>
+
+        <!-- Clockwise arrows between segments -->
+        <!-- Arrow at ~22.5° (between plan top and do right) -->
+        <path d="M 746,329 Q 780,380 750,416" stroke="#0A2540" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <polygon points="750,416 762,402 738,402" fill="#0A2540" transform="rotate(-10,750,416)"/>
+        <!-- Arrow at ~112.5° -->
+        <path d="M 746,503 Q 720,540 680,545" stroke="#0A2540" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <polygon points="680,545 694,533 694,557" fill="#0A2540"/>
+        <!-- Arrow at ~202.5° -->
+        <path d="M 534,503 Q 500,460 530,416" stroke="#0A2540" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <polygon points="530,416 518,430 542,430" fill="#0A2540" transform="rotate(10,530,416)"/>
+        <!-- Arrow at ~292.5° -->
+        <path d="M 534,329 Q 560,290 600,285" stroke="#0A2540" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <polygon points="600,285 586,297 586,273" fill="#0A2540"/>
+
+        <!-- Step label boxes -->
+        <!-- PLAN: top -->
+        <rect x="580" y="212" width="120" height="40" rx="2" fill="#F4F6F8" stroke="#CDD2DA" stroke-width="1"/>
+        <text x="640" y="236" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="16" font-weight="600" fill="#0A2540">① PLAN</text>
+        <text x="640" y="265" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" fill="#5A6675">目標設定・課題分析</text>
+
+        <!-- DO: right -->
+        <rect x="830" y="392" width="120" height="40" rx="2" fill="#F4F6F8" stroke="#CDD2DA" stroke-width="1"/>
+        <text x="890" y="416" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="16" font-weight="600" fill="#0A2540">② DO</text>
+        <text x="890" y="445" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" fill="#5A6675">施策実行・展開</text>
+
+        <!-- CHECK: bottom -->
+        <rect x="580" y="555" width="120" height="40" rx="2" fill="#F4F6F8" stroke="#CDD2DA" stroke-width="1"/>
+        <text x="640" y="579" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="16" font-weight="600" fill="#0A2540">③ CHECK</text>
+        <text x="640" y="600" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" fill="#5A6675">効果測定・検証</text>
+
+        <!-- ACT: left -->
+        <rect x="330" y="392" width="120" height="40" rx="2" fill="#F4F6F8" stroke="#CDD2DA" stroke-width="1"/>
+        <text x="390" y="416" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="16" font-weight="600" fill="#0A2540">④ ACT</text>
+        <text x="390" y="445" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" fill="#5A6675">改善・標準化</text>
+
+        <!-- Connector lines from ring to label boxes -->
+        <line x1="640" y1="256" x2="640" y2="252" stroke="#CDD2DA" stroke-width="1"/>
+        <line x1="800" y1="416" x2="830" y2="412" stroke="#CDD2DA" stroke-width="1"/>
+        <line x1="640" y1="576" x2="640" y2="555" stroke="#CDD2DA" stroke-width="1"/>
+        <line x1="480" y1="416" x2="450" y2="412" stroke="#CDD2DA" stroke-width="1"/>
+      </svg>
+
+      <!-- Source bar -->
+      <div class="source-bar">出典: 社内品質マネジメント規程 v3.2, 2025年</div>
+      <div class="page-num">01 / 07</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PATTERN 2: hub-spoke
+════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption">hub-spoke — 中心概念に紐づく4〜6要素を等価放射状に配置</div>
+  <div class="slide-outer">
+    <div class="slide-inner" id="slide-hub-spoke">
+      <div class="slide-bg"></div>
+
+      <!-- Title bar -->
+      <div class="title-bar">
+        <div class="accent-bar"></div>
+        <div class="action-title">デジタルトランスフォーメーション成功の5つの重要推進要素</div>
+      </div>
+      <div class="thin-rule"></div>
+
+      <!-- Lead text -->
+      <div class="lead-text">組織・技術・プロセス・人材・文化の五軸が揃ったときに初めてDXは持続的成長へと転換する</div>
+
+      <!-- SVG diagram -->
+      <svg style="position:absolute;left:0;top:0;width:1280px;height:720px;" viewBox="0 0 1280 720">
+
+        <!-- Hub pentagon shape approximation as circle -->
+        <circle cx="640" cy="416" r="72" fill="#0A2540"/>
+        <text x="640" y="410" text-anchor="middle" font-family="'Noto Serif JP', serif" font-size="18" font-weight="700" fill="white">DX</text>
+        <text x="640" y="432" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="13" fill="#F4F6F8">推進コア</text>
+
+        <!-- Spokes: 5 directions at 72° intervals starting from top (270°) -->
+        <!-- Spoke 1: top    270° → (640, 344) outer end (640, 210) -->
+        <line x1="640" y1="344" x2="640" y2="252" stroke="#CDD2DA" stroke-width="1.5"/>
+        <!-- Spoke 2: top-right 342° → -->
+        <line x1="640" y1="344" x2="640" y2="344" stroke="none"/>
+        <!-- Calculate 5 spoke positions at 72° each, starting 270° -->
+        <!-- spoke1: 270° = (640, 344) to (640, 210) -->
+        <line x1="640" y1="344" x2="640" y2="218" stroke="#CDD2DA" stroke-width="1.5"/>
+        <!-- spoke2: 342° = 270+72=342 → x=640+196*cos(342°), y=416+196*sin(342°) -->
+        <!-- cos342=-0.809 wait, radians: 342°=5.969r; cos342=cos(-18°)=0.951; sin342=sin(-18°)=-0.309 -->
+        <!-- end = 640+196*0.951=826.4, 416+196*(-0.309)=355.4 -->
+        <line x1="640" y1="344" x2="826" y2="356" stroke="#CDD2DA" stroke-width="1.5"/>
+        <!-- spoke3: 54° = 270+2*72=414=54° → cos54=0.588, sin54=0.809 → 640+196*0.588=755, 416+196*0.809=574 -->
+        <line x1="640" y1="488" x2="755" y2="574" stroke="#CDD2DA" stroke-width="1.5"/>
+        <!-- spoke4: 126° → cos126=-0.588, sin126=0.809 → 640-115=525, 416+158=574 -->
+        <line x1="640" y1="488" x2="525" y2="574" stroke="#CDD2DA" stroke-width="1.5"/>
+        <!-- spoke5: 198° = 270+4*72=558-360=198 → cos198=-0.951, sin198=-0.309 → 640-186=454, 416-61=355 -->
+        <line x1="640" y1="344" x2="454" y2="356" stroke="#CDD2DA" stroke-width="1.5"/>
+
+        <!-- Badge circles + text boxes -->
+        <!-- Spoke 1: Top (270°) -->
+        <circle cx="640" cy="210" r="20" fill="#F4F6F8" stroke="#3C6E91" stroke-width="1.5"/>
+        <text x="640" y="215" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" font-weight="600" fill="#0A2540">01</text>
+        <text x="640" y="182" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="16" font-weight="600" fill="#0A2540">組織変革</text>
+        <text x="640" y="162" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" fill="#5A6675">縦割り組織をアジャイルな</text>
+        <text x="640" y="176" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" fill="#5A6675">クロスファンクション体制に再編</text>
+
+        <!-- Spoke 2: Top-right (342°) -->
+        <circle cx="858" cy="349" r="20" fill="#F4F6F8" stroke="#3C6E91" stroke-width="1.5"/>
+        <text x="858" y="354" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" font-weight="600" fill="#0A2540">02</text>
+        <text x="978" y="338" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="16" font-weight="600" fill="#0A2540">技術基盤</text>
+        <text x="978" y="358" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" fill="#5A6675">クラウドネイティブ化・API連携</text>
+
+        <!-- Spoke 3: Bottom-right (54°) -->
+        <circle cx="775" cy="585" r="20" fill="#F4F6F8" stroke="#3C6E91" stroke-width="1.5"/>
+        <text x="775" y="590" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" font-weight="600" fill="#0A2540">03</text>
+        <text x="880" y="585" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="16" font-weight="600" fill="#0A2540">データ活用</text>
+        <text x="880" y="605" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" fill="#5A6675">リアルタイム分析・意思決定高度化</text>
+
+        <!-- Spoke 4: Bottom-left (126°) -->
+        <circle cx="505" cy="585" r="20" fill="#F4F6F8" stroke="#3C6E91" stroke-width="1.5"/>
+        <text x="505" y="590" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" font-weight="600" fill="#0A2540">04</text>
+        <text x="395" y="585" text-anchor="right" font-family="'Noto Sans JP', sans-serif" font-size="16" font-weight="600" fill="#0A2540" text-anchor="end">人材育成</text>
+        <text x="400" y="605" text-anchor="end" font-family="'Noto Sans JP', sans-serif" font-size="12" fill="#5A6675">デジタルリテラシー向上施策</text>
+
+        <!-- Spoke 5: Top-left (198°) -->
+        <circle cx="422" cy="349" r="20" fill="#F4F6F8" stroke="#3C6E91" stroke-width="1.5"/>
+        <text x="422" y="354" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" font-weight="600" fill="#0A2540">05</text>
+        <text x="302" y="338" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="16" font-weight="600" fill="#0A2540">企業文化</text>
+        <text x="302" y="358" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" fill="#5A6675">失敗を学びに変える変革マインド</text>
+      </svg>
+
+      <div class="source-bar">出典: 社内DX推進委員会報告書, 2025年Q2</div>
+      <div class="page-num">02 / 07</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PATTERN 3: four-quadrant-center
+════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption">four-quadrant-center — 2×2グリッド分割、中心ハブ円付き</div>
+  <div class="slide-outer">
+    <div class="slide-inner" id="slide-4q">
+      <div class="slide-bg"></div>
+
+      <!-- Title bar -->
+      <div class="title-bar">
+        <div class="accent-bar"></div>
+        <div class="action-title">顧客価値創出の4象限フレームワークで戦略優先度を明確化する</div>
+      </div>
+
+      <!-- 4 quadrant blocks -->
+      <!-- Top-left: col 1-6, offset 152, height 288 → px: left=72, width=556, top=152 -->
+      <div style="position:absolute;left:72px;top:152px;width:556px;height:288px;background:#F4F6F8;padding:24px 28px;border-radius:2px;">
+        <div style="width:40px;height:40px;border:2px solid #CDD2DA;border-radius:2px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3C6E91" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+        </div>
+        <div style="font-family:var(--font-sans);font-size:20px;font-weight:600;color:var(--primary);margin-bottom:8px;">スピード</div>
+        <div style="font-family:var(--font-sans);font-size:15px;color:var(--text);line-height:1.55;">
+          市場投入リードタイムを業界平均比<span style="color:var(--accent);font-weight:700;">40%短縮</span>。<br>アジャイル開発・DevOpsパイプライン整備により<br>意思決定から実装完了までを圧縮する。
+        </div>
+      </div>
+
+      <!-- Top-right: col 7-12, offset 152, height 288 → left=652, width=556 -->
+      <div style="position:absolute;left:652px;top:152px;width:556px;height:288px;background:#F4F6F8;padding:24px 28px;border-radius:2px;">
+        <div style="width:40px;height:40px;border:2px solid #CDD2DA;border-radius:2px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3C6E91" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div style="font-family:var(--font-sans);font-size:20px;font-weight:600;color:var(--primary);margin-bottom:8px;">品質</div>
+        <div style="font-family:var(--font-sans);font-size:15px;color:var(--text);line-height:1.55;">
+          NPS 75以上を維持し、顧客解約率を<span style="color:var(--accent);font-weight:700;">1.8%以下</span>に抑制。<br>自動テスト・コードレビュー体制で<br>欠陥流出ゼロを目指す品質基盤を構築。
+        </div>
+      </div>
+
+      <!-- Bottom-left: col 1-6, offset 464, height 176 -->
+      <div style="position:absolute;left:72px;top:464px;width:556px;height:176px;background:#F4F6F8;padding:20px 28px;border-radius:2px;">
+        <div style="font-family:var(--font-sans);font-size:20px;font-weight:600;color:var(--primary);margin-bottom:8px;">コスト効率</div>
+        <div style="font-family:var(--font-sans);font-size:15px;color:var(--text);line-height:1.55;">
+          インフラ自動化とクラウド最適化により<br>運用コストを年間<span style="color:var(--accent);font-weight:700;">23%削減</span>。余剰リソースをイノベーション投資に再配分。
+        </div>
+      </div>
+
+      <!-- Bottom-right: col 7-12, offset 464, height 176 -->
+      <div style="position:absolute;left:652px;top:464px;width:556px;height:176px;background:#F4F6F8;padding:20px 28px;border-radius:2px;">
+        <div style="font-family:var(--font-sans);font-size:20px;font-weight:600;color:var(--primary);margin-bottom:8px;">スケーラビリティ</div>
+        <div style="font-family:var(--font-sans);font-size:15px;color:var(--text);line-height:1.55;">
+          グローバル展開・トラフィック急増に耐える<br>マイクロサービス基盤で<span style="color:var(--accent);font-weight:700;">10倍需要</span>に対応。
+        </div>
+      </div>
+
+      <!-- Center hub circle (col 5-8, offset 320, height 88) → center x=640, y=364, r=44 -->
+      <div style="position:absolute;left:596px;top:320px;width:88px;height:88px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;z-index:10;box-shadow:0 2px 12px rgba(10,37,64,0.25);">
+        <div style="text-align:center;">
+          <div style="font-family:var(--font-serif);font-size:14px;font-weight:700;color:white;line-height:1.2;">顧客</div>
+          <div style="font-family:var(--font-serif);font-size:14px;font-weight:700;color:white;line-height:1.2;">価値</div>
+        </div>
+      </div>
+
+      <div class="source-bar">出典: プロダクト戦略会議資料, 2025年6月</div>
+      <div class="page-num">03 / 07</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PATTERN 4: circle-hub-list-right
+════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption">circle-hub-list-right — 左に大円ハブ、右に番号付きリストを縦積み配置</div>
+  <div class="slide-outer">
+    <div class="slide-inner" id="slide-circle-hub">
+      <div class="slide-bg"></div>
+
+      <!-- Title bar -->
+      <div class="title-bar">
+        <div class="accent-bar"></div>
+        <div class="action-title">クラウドネイティブ移行がもたらす6つの競争優位性</div>
+      </div>
+      <div class="thin-rule"></div>
+
+      <!-- Hub area: col 1-4, offset 152, height 464 -->
+      <!-- col 1-4 width ≈ 362.67px, left=72 -->
+      <div style="position:absolute;left:72px;top:152px;width:363px;height:464px;display:flex;align-items:center;justify-content:center;">
+        <div style="width:280px;height:280px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;position:relative;">
+          <!-- Connection lines will be SVG overlay -->
+          <div style="text-align:center;">
+            <div style="font-family:var(--font-serif);font-size:26px;font-weight:700;color:white;line-height:1.25;">クラウド</div>
+            <div style="font-family:var(--font-serif);font-size:26px;font-weight:700;color:white;line-height:1.25;">移行</div>
+            <div style="font-family:var(--font-sans);font-size:13px;color:#F4F6F8;margin-top:8px;line-height:1.4;">Cloud-Native<br>Transformation</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Connector lines from hub to list items (SVG overlay) -->
+      <svg style="position:absolute;left:0;top:0;width:1280px;height:720px;pointer-events:none;" viewBox="0 0 1280 720">
+        <!-- Hub right edge: x=72+363/2+140=435+72=507 approximately hub right edge at x≈435+140=575 wait
+             Hub center: x = 72 + 363/2 = 72+181.5 = 253.5; y = 152+464/2 = 152+232 = 384
+             Hub right edge: x = 253.5+140 = 393.5 -->
+        <!-- List item y positions: 6 items in 464px height starting y=152 -->
+        <!-- Item height = 464/6 ≈ 77px; centers at 152+38, 152+115, 152+192, 152+269, 152+346, 152+423 -->
+        <line x1="394" y1="384" x2="450" y2="190" stroke="#CDD2DA" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="394" y1="384" x2="450" y2="267" stroke="#CDD2DA" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="394" y1="384" x2="450" y2="344" stroke="#CDD2DA" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="394" y1="384" x2="450" y2="421" stroke="#CDD2DA" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="394" y1="384" x2="450" y2="498" stroke="#CDD2DA" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="394" y1="384" x2="450" y2="575" stroke="#CDD2DA" stroke-width="1" stroke-dasharray="4,4"/>
+      </svg>
+
+      <!-- List area: col 5-12, offset 152, height 464 -->
+      <!-- col 5-12 left = 72 + 4*(72.67+24) = 72 + 386.68 = 458.68 ≈ 459; width = 8col ≈ 749 -->
+      <div style="position:absolute;left:459px;top:152px;width:749px;height:464px;">
+        <!-- 6 items -->
+        <div style="display:flex;flex-direction:column;height:100%;justify-content:space-between;padding:8px 0;">
+
+          <!-- Item 1 -->
+          <div style="display:flex;align-items:flex-start;gap:16px;padding-bottom:8px;border-bottom:1px solid #E0E4E8;">
+            <div style="min-width:32px;height:32px;border-radius:50%;background:#F4F6F8;border:1.5px solid #3C6E91;display:flex;align-items:center;justify-content:center;font-family:var(--font-sans);font-size:12px;font-weight:600;color:#0A2540;flex-shrink:0;">01</div>
+            <div>
+              <div style="font-family:var(--font-sans);font-size:17px;font-weight:600;color:var(--primary);">スケーラビリティの向上</div>
+              <div style="font-family:var(--font-sans);font-size:13px;color:var(--text);margin-top:2px;">需要変動に応じた自動スケールでインフラコスト最適化・可用性99.9%確保</div>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div style="display:flex;align-items:flex-start;gap:16px;padding-bottom:8px;border-bottom:1px solid #E0E4E8;">
+            <div style="min-width:32px;height:32px;border-radius:50%;background:#F4F6F8;border:1.5px solid #3C6E91;display:flex;align-items:center;justify-content:center;font-family:var(--font-sans);font-size:12px;font-weight:600;color:#0A2540;flex-shrink:0;">02</div>
+            <div>
+              <div style="font-family:var(--font-sans);font-size:17px;font-weight:600;color:var(--primary);">デプロイ頻度の加速</div>
+              <div style="font-family:var(--font-sans);font-size:13px;color:var(--text);margin-top:2px;">CI/CDパイプライン完備により週次→日次リリースサイクルに短縮</div>
+            </div>
+          </div>
+
+          <!-- Item 3 -->
+          <div style="display:flex;align-items:flex-start;gap:16px;padding-bottom:8px;border-bottom:1px solid #E0E4E8;">
+            <div style="min-width:32px;height:32px;border-radius:50%;background:#F4F6F8;border:1.5px solid #3C6E91;display:flex;align-items:center;justify-content:center;font-family:var(--font-sans);font-size:12px;font-weight:600;color:#0A2540;flex-shrink:0;">03</div>
+            <div>
+              <div style="font-family:var(--font-sans);font-size:17px;font-weight:600;color:var(--primary);">セキュリティの強化</div>
+              <div style="font-family:var(--font-sans);font-size:13px;color:var(--text);margin-top:2px;">ゼロトラストアーキテクチャ・暗号化通信でコンプライアンス対応を一元化</div>
+            </div>
+          </div>
+
+          <!-- Item 4 -->
+          <div style="display:flex;align-items:flex-start;gap:16px;padding-bottom:8px;border-bottom:1px solid #E0E4E8;">
+            <div style="min-width:32px;height:32px;border-radius:50%;background:#F4F6F8;border:1.5px solid #3C6E91;display:flex;align-items:center;justify-content:center;font-family:var(--font-sans);font-size:12px;font-weight:600;color:#0A2540;flex-shrink:0;">04</div>
+            <div>
+              <div style="font-family:var(--font-sans);font-size:17px;font-weight:600;color:var(--primary);">コスト可視化</div>
+              <div style="font-family:var(--font-sans);font-size:13px;color:var(--text);margin-top:2px;">FinOps実践によりリソース無駄を特定し、インフラ費用を前年比23%削減</div>
+            </div>
+          </div>
+
+          <!-- Item 5 -->
+          <div style="display:flex;align-items:flex-start;gap:16px;padding-bottom:8px;border-bottom:1px solid #E0E4E8;">
+            <div style="min-width:32px;height:32px;border-radius:50%;background:#F4F6F8;border:1.5px solid #3C6E91;display:flex;align-items:center;justify-content:center;font-family:var(--font-sans);font-size:12px;font-weight:600;color:#0A2540;flex-shrink:0;">05</div>
+            <div>
+              <div style="font-family:var(--font-sans);font-size:17px;font-weight:600;color:var(--primary);">グローバル展開の容易化</div>
+              <div style="font-family:var(--font-sans);font-size:13px;color:var(--text);margin-top:2px;">マルチリージョン構成で海外拠点へのサービス展開を数週間で完了</div>
+            </div>
+          </div>
+
+          <!-- Item 6 -->
+          <div style="display:flex;align-items:flex-start;gap:16px;">
+            <div style="min-width:32px;height:32px;border-radius:50%;background:#F4F6F8;border:1.5px solid #3C6E91;display:flex;align-items:center;justify-content:center;font-family:var(--font-sans);font-size:12px;font-weight:600;color:#0A2540;flex-shrink:0;">06</div>
+            <div>
+              <div style="font-family:var(--font-sans);font-size:17px;font-weight:600;color:var(--primary);">イノベーション速度の向上</div>
+              <div style="font-family:var(--font-sans);font-size:13px;color:var(--text);margin-top:2px;">マネージドAI/MLサービス活用でPoC〜本番展開サイクルを大幅短縮</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="source-bar">出典: クラウド移行プロジェクト最終報告, 2025年3月</div>
+      <div class="page-num">04 / 07</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PATTERN 5: center-illustration-spoke
+════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption">center-illustration-spoke — 中央ビジュアルに複数スポークノードが集約する図解</div>
+  <div class="slide-outer">
+    <div class="slide-inner" id="slide-center-illu">
+      <div class="slide-bg"></div>
+
+      <!-- Title bar -->
+      <div class="title-bar">
+        <div class="accent-bar"></div>
+        <div class="action-title">5つのデータソースを統合分析基盤に集約し意思決定を一元化する</div>
+      </div>
+
+      <!-- Diagram area SVG -->
+      <svg style="position:absolute;left:0;top:0;width:1280px;height:720px;" viewBox="0 0 1280 720">
+
+        <!-- Center illustration placeholder: 280×280, center x=640, y=392 (152+240) -->
+        <rect x="500" y="252" width="280" height="280" rx="2" fill="#F4F6F8" stroke="#3C6E91" stroke-width="1.5"/>
+        <text x="640" y="388" text-anchor="middle" font-family="'Noto Serif JP', serif" font-size="22" font-weight="700" fill="#0A2540">統合分析</text>
+        <text x="640" y="416" text-anchor="middle" font-family="'Noto Serif JP', serif" font-size="22" font-weight="700" fill="#0A2540">プラットフォーム</text>
+        <text x="640" y="448" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="13" fill="#5A6675">Data Analytics Hub</text>
+
+        <!-- 5 spoke positions (top, top-left, top-right, bottom-left, bottom-right) -->
+        <!-- Spoke 1: Top (640, 200) -->
+        <line x1="640" y1="252" x2="640" y2="220" stroke="#0A2540" stroke-width="2" marker-end="url(#arrow)"/>
+        <circle cx="640" cy="190" r="26" fill="#3C6E91"/>
+        <text x="640" y="195" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="12" fill="white">CRM</text>
+        <text x="640" y="154" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="15" font-weight="600" fill="#0A2540">顧客データ</text>
+
+        <!-- Spoke 2: Top-left (320, 270) -->
+        <line x1="500" y1="298" x2="360" y2="283" stroke="#0A2540" stroke-width="2" marker-end="url(#arrow)"/>
+        <circle cx="330" cy="280" r="26" fill="#3C6E91"/>
+        <text x="330" y="285" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="white">ERP</text>
+        <text x="250" y="262" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="15" font-weight="600" fill="#0A2540">販売データ</text>
+
+        <!-- Spoke 3: Top-right (960, 270) -->
+        <line x1="780" y1="298" x2="918" y2="283" stroke="#0A2540" stroke-width="2" marker-end="url(#arrow)"/>
+        <circle cx="948" cy="280" r="26" fill="#3C6E91"/>
+        <text x="948" y="285" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="white">IoT</text>
+        <text x="1028" y="262" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="15" font-weight="600" fill="#0A2540">センサーデータ</text>
+
+        <!-- Spoke 4: Bottom-left (320, 520) -->
+        <line x1="500" y1="490" x2="360" y2="500" stroke="#0A2540" stroke-width="2" marker-end="url(#arrow)"/>
+        <circle cx="330" cy="510" r="26" fill="#3C6E91"/>
+        <text x="330" y="515" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="white">SNS</text>
+        <text x="250" y="545" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="15" font-weight="600" fill="#0A2540">口コミデータ</text>
+
+        <!-- Spoke 5: Bottom-right (960, 520) -->
+        <line x1="780" y1="490" x2="918" y2="500" stroke="#0A2540" stroke-width="2" marker-end="url(#arrow)"/>
+        <circle cx="948" cy="510" r="26" fill="#3C6E91"/>
+        <text x="948" y="515" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="white">SCM</text>
+        <text x="1032" y="545" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="15" font-weight="600" fill="#0A2540">在庫・物流データ</text>
+
+        <!-- Arrow marker definition -->
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#0A2540"/>
+          </marker>
+        </defs>
+      </svg>
+
+      <div class="source-bar">出典: データ基盤統合プロジェクト提案書, 2025年5月</div>
+      <div class="page-num">05 / 07</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PATTERN 6: org-chart-tree
+════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption">org-chart-tree — 最上位ノードから3階層で分岐する組織・階層図</div>
+  <div class="slide-outer">
+    <div class="slide-inner" id="slide-org">
+      <div class="slide-bg"></div>
+
+      <!-- Title bar: offset 56, height 72 -->
+      <div class="title-bar" style="height:72px;top:56px;">
+        <div class="accent-bar"></div>
+        <div class="action-title" style="font-size:34px;">2025年度 デジタル事業本部 組織体制を確定した</div>
+      </div>
+
+      <!-- Level 1: offset 144, height 64 -->
+      <!-- 2 nodes centered -->
+      <div style="position:absolute;left:72px;right:72px;top:144px;height:64px;display:flex;justify-content:center;gap:40px;align-items:center;">
+        <div style="padding:0 24px;height:48px;background:var(--primary);border-radius:2px;display:flex;align-items:center;justify-content:center;min-width:200px;">
+          <span style="font-family:var(--font-sans);font-size:16px;font-weight:600;color:white;">取締役会</span>
+        </div>
+        <div style="padding:0 24px;height:48px;background:var(--primary);border-radius:2px;display:flex;align-items:center;justify-content:center;min-width:200px;">
+          <span style="font-family:var(--font-sans);font-size:16px;font-weight:600;color:white;">監査役会</span>
+        </div>
+      </div>
+
+      <!-- Vertical connector 1: offset 208, height 24 -->
+      <div style="position:absolute;left:50%;top:208px;width:2px;height:24px;background:#CDD2DA;transform:translateX(-50%);"></div>
+      <!-- Horizontal connector spanning L2 nodes -->
+      <div style="position:absolute;left:200px;right:200px;top:230px;height:2px;background:#CDD2DA;"></div>
+
+      <!-- Level 2: offset 256, height 64 — 4 departments -->
+      <!-- dept positions: evenly across 1136px content -->
+      <div style="position:absolute;left:72px;right:72px;top:256px;height:64px;display:flex;justify-content:space-around;align-items:center;gap:16px;">
+        <!-- Vert connectors down from H-bar to each dept -->
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div style="width:2px;height:24px;background:#CDD2DA;margin-bottom:0;"></div>
+          <div style="padding:0 12px;height:48px;background:#F4F6F8;border:1px solid #3C6E91;border-radius:2px;display:flex;align-items:center;justify-content:center;width:100%;max-width:230px;">
+            <span style="font-family:var(--font-sans);font-size:15px;font-weight:600;color:var(--primary);">プロダクト開発部</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div style="width:2px;height:24px;background:#CDD2DA;"></div>
+          <div style="padding:0 12px;height:48px;background:#F4F6F8;border:1px solid #3C6E91;border-radius:2px;display:flex;align-items:center;justify-content:center;width:100%;max-width:230px;">
+            <span style="font-family:var(--font-sans);font-size:15px;font-weight:600;color:var(--primary);">データ基盤部</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div style="width:2px;height:24px;background:#CDD2DA;"></div>
+          <div style="padding:0 12px;height:48px;background:#F4F6F8;border:1px solid #3C6E91;border-radius:2px;display:flex;align-items:center;justify-content:center;width:100%;max-width:230px;">
+            <span style="font-family:var(--font-sans);font-size:15px;font-weight:600;color:var(--primary);">UX/デザイン部</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div style="width:2px;height:24px;background:#CDD2DA;"></div>
+          <div style="padding:0 12px;height:48px;background:#F4F6F8;border:1px solid #3C6E91;border-radius:2px;display:flex;align-items:center;justify-content:center;width:100%;max-width:230px;">
+            <span style="font-family:var(--font-sans);font-size:15px;font-weight:600;color:var(--primary);">セキュリティ部</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vertical connectors to level 3 -->
+      <div style="position:absolute;left:72px;right:72px;top:320px;height:24px;display:flex;justify-content:space-around;gap:16px;">
+        <div style="flex:1;display:flex;justify-content:center;"><div style="width:2px;height:24px;background:#CDD2DA;"></div></div>
+        <div style="flex:1;display:flex;justify-content:center;"><div style="width:2px;height:24px;background:#CDD2DA;"></div></div>
+        <div style="flex:1;display:flex;justify-content:center;"><div style="width:2px;height:24px;background:#CDD2DA;"></div></div>
+        <div style="flex:1;display:flex;justify-content:center;"><div style="width:2px;height:24px;background:#CDD2DA;"></div></div>
+      </div>
+
+      <!-- Level 3: offset 360, height 264 — role lists -->
+      <div style="position:absolute;left:72px;right:72px;top:360px;height:264px;display:flex;justify-content:space-around;gap:16px;">
+
+        <!-- Dept 1: プロダクト開発部 -->
+        <div style="flex:1;background:#F4F6F8;border-radius:2px;padding:14px 16px;">
+          <div style="font-family:var(--font-sans);font-size:12px;color:var(--muted);margin-bottom:10px;border-bottom:1px solid #CDD2DA;padding-bottom:8px;">プロダクト開発部</div>
+          <div style="font-family:var(--font-sans);font-size:13px;color:var(--text);line-height:2;">
+            プロダクトマネージャー<br>フロントエンドエンジニア<br>バックエンドエンジニア<br>QAエンジニア<br>テックリード
+          </div>
+        </div>
+
+        <!-- Dept 2: データ基盤部 -->
+        <div style="flex:1;background:#F4F6F8;border-radius:2px;padding:14px 16px;">
+          <div style="font-family:var(--font-sans);font-size:12px;color:var(--muted);margin-bottom:10px;border-bottom:1px solid #CDD2DA;padding-bottom:8px;">データ基盤部</div>
+          <div style="font-family:var(--font-sans);font-size:13px;color:var(--text);line-height:2;">
+            データエンジニア<br>MLエンジニア<br>データアナリスト<br>MLOpsエンジニア<br>BI開発者
+          </div>
+        </div>
+
+        <!-- Dept 3: UX/デザイン部 -->
+        <div style="flex:1;background:#F4F6F8;border-radius:2px;padding:14px 16px;">
+          <div style="font-family:var(--font-sans);font-size:12px;color:var(--muted);margin-bottom:10px;border-bottom:1px solid #CDD2DA;padding-bottom:8px;">UX/デザイン部</div>
+          <div style="font-family:var(--font-sans);font-size:13px;color:var(--text);line-height:2;">
+            UXリサーチャー<br>UIデザイナー<br>インタラクションデザイナー<br>コンテンツストラテジスト<br>アクセシビリティ担当
+          </div>
+        </div>
+
+        <!-- Dept 4: セキュリティ部 -->
+        <div style="flex:1;background:#F4F6F8;border-radius:2px;padding:14px 16px;">
+          <div style="font-family:var(--font-sans);font-size:12px;color:var(--muted);margin-bottom:10px;border-bottom:1px solid #CDD2DA;padding-bottom:8px;">セキュリティ部</div>
+          <div style="font-family:var(--font-sans);font-size:13px;color:var(--text);line-height:2;">
+            CISOオフィス<br>インシデントレスポンス<br>ペネトレーションテスト<br>コンプライアンス管理<br>脆弱性管理
+          </div>
+        </div>
+
+      </div>
+
+      <div class="source-bar">出典: 人事総務部 組織図確定版, 2025年4月1日施行</div>
+      <div class="page-num">06 / 07</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PATTERN 7: bilateral-flow
+════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption">bilateral-flow — 左右大円ノードを中央双方向矢印で結ぶ相互交流・エコシステム図</div>
+  <div class="slide-outer">
+    <div class="slide-inner" id="slide-bilateral">
+      <div class="slide-bg"></div>
+
+      <!-- Title bar -->
+      <div class="title-bar">
+        <div class="accent-bar"></div>
+        <div class="action-title">プラットフォームとパートナー企業の双方向バリュー交換が持続的成長を生む</div>
+      </div>
+      <div class="thin-rule"></div>
+
+      <!-- Left circle area: col 1-4, offset 152, height 480 -->
+      <!-- col 1-4 width ≈ 362px, left=72 -->
+      <div style="position:absolute;left:72px;top:152px;width:363px;height:480px;display:flex;align-items:center;justify-content:center;">
+        <div style="width:300px;height:300px;border-radius:50%;background:var(--primary);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+          <div style="font-family:var(--font-serif);font-size:22px;font-weight:700;color:white;text-align:center;">プラットフォーム</div>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
+            <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:4px 16px;font-family:var(--font-sans);font-size:13px;color:white;">ユーザー基盤 1,200万人</div>
+            <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:4px 16px;font-family:var(--font-sans);font-size:13px;color:white;">決済インフラ</div>
+            <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:4px 16px;font-family:var(--font-sans);font-size:13px;color:white;">APIエコシステム</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center arrow area: col 5-8, offset 152, height 480 -->
+      <!-- col 5-8 left ≈ 459, width ≈ 363px -->
+      <div style="position:absolute;left:459px;top:152px;width:362px;height:480px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;">
+
+        <!-- Upper arrow: left → right -->
+        <div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div style="font-family:var(--font-sans);font-size:14px;color:var(--muted);text-align:center;">ユーザーアクセス・<br>マーケティング支援</div>
+          <div style="position:relative;width:100%;height:32px;display:flex;align-items:center;justify-content:center;">
+            <div style="width:80%;height:6px;background:var(--secondary);border-radius:3px;position:relative;">
+              <div style="position:absolute;right:-2px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:12px solid var(--secondary);border-top:8px solid transparent;border-bottom:8px solid transparent;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lower arrow: right → left -->
+        <div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div style="position:relative;width:100%;height:32px;display:flex;align-items:center;justify-content:center;">
+            <div style="width:80%;height:6px;background:var(--accent);border-radius:3px;position:relative;">
+              <div style="position:absolute;left:-2px;top:50%;transform:translateY(-50%);width:0;height:0;border-right:12px solid var(--accent);border-top:8px solid transparent;border-bottom:8px solid transparent;"></div>
+            </div>
+          </div>
+          <div style="font-family:var(--font-sans);font-size:14px;color:var(--muted);text-align:center;">製品・サービス提供・<br>レベニューシェア</div>
+        </div>
+
+      </div>
+
+      <!-- Right circle area: col 9-12, offset 152, height 480 -->
+      <!-- col 9-12 left ≈ 845, width ≈ 363px -->
+      <div style="position:absolute;left:845px;top:152px;width:363px;height:480px;display:flex;align-items:center;justify-content:center;">
+        <div style="width:300px;height:300px;border-radius:50%;background:#F4F6F8;border:2px solid #3C6E91;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+          <div style="font-family:var(--font-serif);font-size:22px;font-weight:700;color:var(--primary);text-align:center;">パートナー</div>
+          <div style="font-family:var(--font-serif);font-size:17px;font-weight:700;color:var(--secondary);text-align:center;">企業</div>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:center;margin-top:8px;">
+            <div style="background:#E8EDF2;border-radius:12px;padding:4px 16px;font-family:var(--font-sans);font-size:13px;color:var(--primary);">金融・保険サービス</div>
+            <div style="background:#E8EDF2;border-radius:12px;padding:4px 16px;font-family:var(--font-sans);font-size:13px;color:var(--primary);">ECストア出店者</div>
+            <div style="background:#E8EDF2;border-radius:12px;padding:4px 16px;font-family:var(--font-sans);font-size:13px;color:var(--primary);">コンテンツプロバイダー</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="source-bar">出典: パートナーエコシステム戦略資料, 2025年Q3</div>
+      <div class="page-num">07 / 07</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Responsive scaling script ── -->
+<script>
+  function scaleSlides() {
+    document.querySelectorAll('.slide-outer').forEach(outer => {
+      const inner = outer.querySelector('.slide-inner');
+      if (!inner) return;
+      const outerW = outer.clientWidth;
+      const scale = outerW / 1280;
+      inner.style.transform = `scale(${scale})`;
+      // set outer height to match scaled inner
+      outer.style.height = (720 * scale) + 'px';
+    });
+  }
+  scaleSlides();
+  window.addEventListener('resize', scaleSlides);
+</script>
+
+</body>
+</html>

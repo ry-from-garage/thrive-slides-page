@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🃏 カード・グリッド — theme: vibrant-pitch（7 パターン）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  /* ── vibrant-pitch design tokens ── */
+  :root {
+    --primary:    #6600FF;
+    --secondary:  #CC00AA;
+    --background: #FFFFFF;
+    --surface:    #F5F0FF;
+    --accent:     #FF6000;
+    --text:       #150A2E;
+    --muted:      #4A3D6B;
+    --positive:   #0A7A30;
+    --negative:   #E02020;
+    --gradient-hero: linear-gradient(135deg, #6600FF 0%, #CC00AA 100%);
+
+    /* type */
+    --font-stack: 'Noto Sans JP', Inter, 'Helvetica Neue', Arial, sans-serif;
+    --size-display: 72px;
+    --size-h1: 44px;
+    --size-h2: 26px;
+    --size-body: 18px;
+    --size-caption: 13px;
+
+    /* spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 24px;
+    --space-2xl: 32px;
+    --space-3xl: 48px;
+
+    /* layout */
+    --safe-left: 72px;
+    --safe-top: 56px;
+    --canvas-w: 1280px;
+    --canvas-h: 720px;
+    --radius: 12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #EEEAF7;
+    font-family: var(--font-stack);
+    color: var(--text);
+    padding: 40px 48px 64px;
+  }
+
+  /* ── page header ── */
+  .page-header {
+    margin-bottom: 40px;
+  }
+  .page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 6px;
+  }
+  .page-header p {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* ── pattern section ── */
+  .pattern-section {
+    margin-bottom: 56px;
+  }
+  .pattern-caption {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .pattern-caption strong {
+    color: var(--primary);
+    font-size: 15px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* ── slide wrapper (scales 50%) ── */
+  .slide-wrapper {
+    width: calc(var(--canvas-w) * 0.5);
+    height: calc(var(--canvas-h) * 0.5);
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(102,0,255,0.18), 0 1px 4px rgba(0,0,0,0.1);
+  }
+  .slide-scaler {
+    width: var(--canvas-w);
+    height: var(--canvas-h);
+    transform: scale(0.5);
+    transform-origin: top left;
+    position: relative;
+    background: var(--background);
+    overflow: hidden;
+  }
+
+  /* ── shared slide internals ── */
+  .slide-root {
+    width: 1280px;
+    height: 720px;
+    background: var(--background);
+    position: relative;
+    font-family: var(--font-stack);
+  }
+
+  /* title bold rule under action title */
+  .title-rule {
+    width: 56px;
+    height: 4px;
+    background: var(--primary);
+    border-radius: 2px;
+    margin-top: 8px;
+  }
+
+  /* slide section label (top-right) */
+  .section-label {
+    position: absolute;
+    top: 56px;
+    right: 72px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* page number */
+  .page-num {
+    position: absolute;
+    bottom: 20px;
+    right: 40px;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--primary);
+  }
+
+  /* source bar */
+  .source-bar {
+    position: absolute;
+    left: 72px;
+    top: 640px;
+    width: 1136px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* card base */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px 20px 20px;
+    position: absolute;
+    overflow: hidden;
+  }
+
+  /* number badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-bottom: 10px;
+  }
+
+  .card-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .card-body {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* ── icon placeholder ── */
+  .icon-ph {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #E8DCFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    font-size: 28px;
+  }
+
+  /* ── CTA button ── */
+  .cta-btn {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 7px 18px;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+
+  /* ── metrics zone ── */
+  .metrics-zone {
+    border-top: 1px solid #DDD6F7;
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+  .metric-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .metric-value {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1.1;
+  }
+  .metric-value.accent {
+    color: var(--accent);
+  }
+
+  /* ── section divider ── */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: absolute;
+  }
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: var(--muted);
+    opacity: 0.35;
+  }
+  .divider-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* ── number banner ── */
+  .num-banner {
+    height: 32px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    padding-left: 16px;
+    margin: -24px -20px 16px;
+  }
+
+  /* ── connector symbol ── */
+  .connector {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 26px;
+    font-weight: 900;
+    z-index: 10;
+  }
+
+  /* grid for action title area */
+  .action-title-block {
+    position: absolute;
+    left: 72px;
+    top: 56px;
+    width: 1136px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .action-title {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>🃏 カード・グリッド — theme: vibrant-pitch（7 パターン）</h1>
+  <p>layout-card-grid.md に定義された全 7 パターンを vibrant-pitch テーマで描画した検証ギャラリー。グリッド: 1280×720 / safe-area 56/72 / 12-col / gutter 24 / baseline 8。</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PATTERN 1: cards-2x2
+═══════════════════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption"><strong>cards-2x2</strong> — 4項目を2行×2列の均等グリッドに配置。番号バッジ・見出し・本文。</div>
+  <div class="slide-wrapper">
+    <div class="slide-scaler">
+      <div class="slide-root">
+
+        <!-- section label -->
+        <div class="section-label">FEATURES</div>
+
+        <!-- action title bar: top=56, h=80 -->
+        <div class="action-title-block">
+          <div class="action-title">成長を加速する4つの戦略的優位性が明確になった</div>
+          <div class="title-rule"></div>
+        </div>
+
+        <!-- card top-left: col1-6 → left=72, w=556, top=152, h=224 -->
+        <div class="card" style="left:72px; top:152px; width:556px; height:224px;">
+          <div class="badge">01</div>
+          <div class="card-title">データ主導の意思決定</div>
+          <div class="card-body">リアルタイムダッシュボードにより、全チームが同一データで迅速に判断できる体制を実現。意思決定サイクルが従来比50%短縮。</div>
+        </div>
+
+        <!-- card top-right: col7-12 → left=652, w=556, top=152, h=224 -->
+        <div class="card" style="left:652px; top:152px; width:556px; height:224px;">
+          <div class="badge">02</div>
+          <div class="card-title">AI 自動化エンジン</div>
+          <div class="card-body">反復業務の80%をAIが代替し、人的リソースをコア戦略業務に集中させる。月間200時間の工数削減を達成。</div>
+        </div>
+
+        <!-- card bottom-left: col1-6, top=400, h=224 -->
+        <div class="card" style="left:72px; top:400px; width:556px; height:224px;">
+          <div class="badge">03</div>
+          <div class="card-title">グローバル展開基盤</div>
+          <div class="card-body">多言語・多通貨対応のインフラで、日本発のプロダクトをアジア7カ国へ即座に展開可能。ローカライズコストを60%削減。</div>
+        </div>
+
+        <!-- card bottom-right: col7-12, top=400, h=224 -->
+        <div class="card" style="left:652px; top:400px; width:556px; height:224px;">
+          <div class="badge">04</div>
+          <div class="card-title">顧客成功プログラム</div>
+          <div class="card-body">オンボーディングからエクスパンションまで、専任CSチームと自動化ツールを組み合わせてNPS+72を継続維持。</div>
+        </div>
+
+        <!-- source bar -->
+        <div class="source-bar">社内調査 2025年Q3データより</div>
+
+        <div class="page-num">01 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PATTERN 2: cards-2x3
+═══════════════════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption"><strong>cards-2x3</strong> — 6項目を2行×3列に配置。各カードに番号・見出し・本文。</div>
+  <div class="slide-wrapper">
+    <div class="slide-scaler">
+      <div class="slide-root">
+
+        <div class="section-label">ROADMAP</div>
+
+        <div class="action-title-block">
+          <div class="action-title">6つのコア機能で競合との差別化を完成させる</div>
+          <div class="title-rule"></div>
+        </div>
+
+        <!-- 3 cols: col1-4=72, col5-8=458, col9-12=845; w=362 each; gap=24 -->
+        <!-- row1 top=152, row2 top=400; h=224 -->
+
+        <!-- row1 col1 -->
+        <div class="card" style="left:72px; top:152px; width:362px; height:224px;">
+          <div class="badge">01</div>
+          <div class="card-title">マルチテナント対応</div>
+          <div class="card-body">単一インスタンスで複数企業を安全に分離。運用コスト1/3を実現。</div>
+        </div>
+        <!-- row1 col2 -->
+        <div class="card" style="left:458px; top:152px; width:362px; height:224px;">
+          <div class="badge">02</div>
+          <div class="card-title">ノーコード自動化</div>
+          <div class="card-body">ビジュアルフローエディタで、エンジニアなしに複雑な業務を自動化できる。</div>
+        </div>
+        <!-- row1 col3 -->
+        <div class="card" style="left:845px; top:152px; width:363px; height:224px;">
+          <div class="badge">03</div>
+          <div class="card-title">リアルタイム分析</div>
+          <div class="card-body">ストリームデータを即時処理し、ダッシュボードに100ms以内で反映。</div>
+        </div>
+
+        <!-- row2 col1 -->
+        <div class="card" style="left:72px; top:400px; width:362px; height:224px;">
+          <div class="badge">04</div>
+          <div class="card-title">API ファースト設計</div>
+          <div class="card-body">すべての機能をRESTおよびGraphQL APIで提供。既存システムと即日連携。</div>
+        </div>
+        <!-- row2 col2 -->
+        <div class="card" style="left:458px; top:400px; width:362px; height:224px;">
+          <div class="badge">05</div>
+          <div class="card-title">エンタープライズSSO</div>
+          <div class="card-body">SAML 2.0・OIDC対応。大企業のセキュリティ要件をゼロ追加コストで満たす。</div>
+        </div>
+        <!-- row2 col3 -->
+        <div class="card" style="left:845px; top:400px; width:363px; height:224px;">
+          <div class="badge">06</div>
+          <div class="card-title">24/7 サポート体制</div>
+          <div class="card-body">日本語対応の専任エンジニアチームが障害を平均15分以内に初動対応。</div>
+        </div>
+
+        <div class="source-bar">プロダクトロードマップ v2.4 — 2025年10月改定</div>
+        <div class="page-num">02 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PATTERN 3: cards-2x4
+═══════════════════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption"><strong>cards-2x4</strong> — 8項目を2行×4列に配置。高密度網羅レイアウト。</div>
+  <div class="slide-wrapper">
+    <div class="slide-scaler">
+      <div class="slide-root">
+
+        <div class="section-label">INITIATIVES</div>
+
+        <div class="action-title-block">
+          <div class="action-title">8つの成長施策で2026年ARR 10億円を達成する</div>
+          <div class="title-rule"></div>
+        </div>
+
+        <!-- 4 cols: col1-3=72, col4-6=338, col7-9=605, col10-12=871; w=266; h=224 -->
+        <!-- row1 top=152, row2 top=400 -->
+
+        <div class="card" style="left:72px; top:152px; width:266px; height:224px; padding:18px 14px 14px;">
+          <div class="badge">01</div>
+          <div class="card-title" style="font-size:18px;">PLG展開</div>
+          <div class="card-body" style="font-size:13px;">フリーミアム導線でセルフサーブ獲得数を3倍へ拡大する</div>
+        </div>
+        <div class="card" style="left:362px; top:152px; width:266px; height:224px; padding:18px 14px 14px;">
+          <div class="badge">02</div>
+          <div class="card-title" style="font-size:18px;">SMB攻略</div>
+          <div class="card-body" style="font-size:13px;">中小企業向け低価格プランで新規200社獲得を目指す</div>
+        </div>
+        <div class="card" style="left:652px; top:152px; width:266px; height:224px; padding:18px 14px 14px;">
+          <div class="badge">03</div>
+          <div class="card-title" style="font-size:18px;">海外進出</div>
+          <div class="card-body" style="font-size:13px;">東南アジア3カ国への同時ローンチでTAMを4倍拡大</div>
+        </div>
+        <div class="card" style="left:942px; top:152px; width:266px; height:224px; padding:18px 14px 14px;">
+          <div class="badge">04</div>
+          <div class="card-title" style="font-size:18px;">パートナー網</div>
+          <div class="card-body" style="font-size:13px;">SIer20社との正式契約で間接チャネル売上を構築</div>
+        </div>
+
+        <div class="card" style="left:72px; top:400px; width:266px; height:224px; padding:18px 14px 14px;">
+          <div class="badge">05</div>
+          <div class="card-title" style="font-size:18px;">AI拡張</div>
+          <div class="card-body" style="font-size:13px;">生成AI機能を主力SKUに統合し単価ARPUを40%向上</div>
+        </div>
+        <div class="card" style="left:362px; top:400px; width:266px; height:224px; padding:18px 14px 14px;">
+          <div class="badge">06</div>
+          <div class="card-title" style="font-size:18px;">コミュニティ</div>
+          <div class="card-body" style="font-size:13px;">ユーザーコミュニティ1万人でオーガニック流入を強化</div>
+        </div>
+        <div class="card" style="left:652px; top:400px; width:266px; height:224px; padding:18px 14px 14px;">
+          <div class="badge">07</div>
+          <div class="card-title" style="font-size:18px;">チャーン対策</div>
+          <div class="card-body" style="font-size:13px;">プロアクティブCSでチャーンレートを現状比50%削減</div>
+        </div>
+        <div class="card" style="left:942px; top:400px; width:266px; height:224px; padding:18px 14px 14px;">
+          <div class="badge">08</div>
+          <div class="card-title" style="font-size:18px;">価格改定</div>
+          <div class="card-body" style="font-size:13px;">バリューベース価格体系へ移行し収益単価を最大化</div>
+        </div>
+
+        <div class="source-bar">中期成長計画 2026 — CFO承認済み v3.0</div>
+        <div class="page-num">03 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PATTERN 4: three-col-icon-card
+═══════════════════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption"><strong>three-col-icon-card</strong> — 3列均等。アイコン・見出し・説明テキスト・CTAボタン。</div>
+  <div class="slide-wrapper">
+    <div class="slide-scaler">
+      <div class="slide-root">
+
+        <div class="section-label">WHY US</div>
+
+        <div class="action-title-block">
+          <div class="action-title">3つの圧倒的強みがスケールを不可避にする</div>
+          <div class="title-rule"></div>
+        </div>
+
+        <!-- lead text: top=152, h=32 -->
+        <div style="position:absolute; left:72px; top:152px; width:1136px; height:32px; display:flex; align-items:center; font-size:17px; color:var(--muted);">
+          テクノロジー・カスタマーサクセス・ネットワーク効果の三位一体で競合を引き離す
+        </div>
+
+        <!-- cards: top=208, h=432; col1-4=72, col5-8=458, col9-12=845; w=362 -->
+
+        <!-- left card -->
+        <div class="card" style="left:72px; top:208px; width:362px; height:432px; padding:28px 24px 20px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+          <div class="icon-ph">⚡</div>
+          <div class="card-title" style="text-align:center;">超高速処理エンジン</div>
+          <div class="card-body" style="text-align:center; margin-top:8px;">独自設計のストリーム処理基盤で、業界標準比10倍の処理速度を実現。大量データも遅延なく即時反映します。</div>
+          <div style="margin-top:auto;">
+            <div class="cta-btn">処理速度 10×</div>
+          </div>
+        </div>
+
+        <!-- center card -->
+        <div class="card" style="left:458px; top:208px; width:362px; height:432px; padding:28px 24px 20px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+          <div class="icon-ph">🎯</div>
+          <div class="card-title" style="text-align:center;">専任サクセスチーム</div>
+          <div class="card-body" style="text-align:center; margin-top:8px;">導入から定着まで、業界経験10年以上のCSスペシャリストが伴走。平均オンボーディング期間を14日に短縮します。</div>
+          <div style="margin-top:auto;">
+            <div class="cta-btn">NPS +72</div>
+          </div>
+        </div>
+
+        <!-- right card -->
+        <div class="card" style="left:845px; top:208px; width:363px; height:432px; padding:28px 24px 20px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+          <div class="icon-ph">🌐</div>
+          <div class="card-title" style="text-align:center;">拡張エコシステム</div>
+          <div class="card-body" style="text-align:center; margin-top:8px;">300社以上のパートナーアプリと即日連携。顧客が既存ツールを変えずに価値を享受できるネットワーク網を持ちます。</div>
+          <div style="margin-top:auto;">
+            <div class="cta-btn">300+ 連携先</div>
+          </div>
+        </div>
+
+        <div class="source-bar">自社調査 n=1,200 / 2025年9月</div>
+        <div class="page-num">04 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PATTERN 5: three-card-icon-subheading
+═══════════════════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption"><strong>three-card-icon-subheading</strong> — セクション区切り見出し＋番号バナー帯＋アイコン円付き3カード。</div>
+  <div class="slide-wrapper">
+    <div class="slide-scaler">
+      <div class="slide-root">
+
+        <div class="section-label">SOLUTION</div>
+
+        <div class="action-title-block">
+          <div class="action-title">3ステップで導入翌日から成果が出る仕組みを作る</div>
+          <div class="title-rule"></div>
+        </div>
+
+        <!-- section divider: top=152, h=32 -->
+        <div class="section-divider" style="top:152px; left:72px; width:1136px;">
+          <div class="divider-line"></div>
+          <div class="divider-text">導入フロー</div>
+          <div class="divider-line"></div>
+        </div>
+
+        <!-- cards: top=208, h=432; same col widths as three-col-icon-card -->
+
+        <!-- left card -->
+        <div class="card" style="left:72px; top:208px; width:362px; height:432px; padding:0 0 20px; display:flex; flex-direction:column; align-items:center; text-align:center; overflow:hidden;">
+          <div class="num-banner" style="width:100%; margin:0 0 20px; border-radius:0; justify-content:center;">STEP 01</div>
+          <div style="width:56px; height:56px; border-radius:50%; border:2px solid var(--primary); display:flex; align-items:center; justify-content:center; font-size:26px; margin-bottom:14px;">🔌</div>
+          <div class="card-title" style="text-align:center; padding:0 20px;">データ接続</div>
+          <div class="card-body" style="text-align:center; margin-top:8px; padding:0 20px;">既存SFA・MA・ERPと30分で連携完了。専任エンジニアがリモートで初期設定を完全サポートします。</div>
+        </div>
+
+        <!-- center card -->
+        <div class="card" style="left:458px; top:208px; width:362px; height:432px; padding:0 0 20px; display:flex; flex-direction:column; align-items:center; text-align:center; overflow:hidden;">
+          <div class="num-banner" style="width:100%; margin:0 0 20px; border-radius:0; justify-content:center;">STEP 02</div>
+          <div style="width:56px; height:56px; border-radius:50%; border:2px solid var(--primary); display:flex; align-items:center; justify-content:center; font-size:26px; margin-bottom:14px;">⚙️</div>
+          <div class="card-title" style="text-align:center; padding:0 20px;">自動化設定</div>
+          <div class="card-body" style="text-align:center; margin-top:8px; padding:0 20px;">ドラッグ&ドロップUIでルール設定。平均2時間でコアフローの自動化が完成します。</div>
+        </div>
+
+        <!-- right card -->
+        <div class="card" style="left:845px; top:208px; width:363px; height:432px; padding:0 0 20px; display:flex; flex-direction:column; align-items:center; text-align:center; overflow:hidden;">
+          <div class="num-banner" style="width:100%; margin:0 0 20px; border-radius:0; justify-content:center;">STEP 03</div>
+          <div style="width:56px; height:56px; border-radius:50%; border:2px solid var(--primary); display:flex; align-items:center; justify-content:center; font-size:26px; margin-bottom:14px;">📈</div>
+          <div class="card-title" style="text-align:center; padding:0 20px;">成果モニタリング</div>
+          <div class="card-body" style="text-align:center; margin-top:8px; padding:0 20px;">KPIダッシュボードで翌日から効果を可視化。週次レポートを自動生成し改善サイクルを加速。</div>
+        </div>
+
+        <div class="source-bar">導入事例 n=450社 / 平均オンボーディング実績値</div>
+        <div class="page-num">05 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PATTERN 6: two-column-split-boxes
+═══════════════════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption"><strong>two-column-split-boxes</strong> — 左右2等分の対比ボックス。中央に接続シンボル。</div>
+  <div class="slide-wrapper">
+    <div class="slide-scaler">
+      <div class="slide-root">
+
+        <div class="section-label">BEFORE / AFTER</div>
+
+        <div class="action-title-block">
+          <div class="action-title">導入前後でオペレーション品質が劇的に変わる</div>
+          <div class="title-rule"></div>
+        </div>
+
+        <!-- lead text: top=152 -->
+        <div style="position:absolute; left:72px; top:152px; width:1136px; height:32px; display:flex; align-items:center; font-size:17px; color:var(--muted);">
+          現状の課題を直視し、導入後の姿を対比で確認してください
+        </div>
+
+        <!-- box left: col1-6 → left=72, w=556, top=208, h=432 -->
+        <div class="card" style="left:72px; top:208px; width:556px; height:432px; background:#FFF0EC; border:2px solid #FFD0B8; padding:28px 28px 24px;">
+          <div style="font-size:14px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">導入前</div>
+          <div style="font-size:24px; font-weight:700; color:var(--text); margin-bottom:16px;">属人的・断片的な業務運営</div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; align-items:flex-start; gap:10px; padding-bottom:14px; border-bottom:1px solid rgba(255,96,0,0.2);">
+              <span style="color:var(--negative); font-weight:700;">▼</span>
+              <div style="font-size:16px; color:var(--muted);">顧客データが各部門に分散し、全体像が把握できない</div>
+            </div>
+            <div style="display:flex; align-items:flex-start; gap:10px; padding-bottom:14px; border-bottom:1px solid rgba(255,96,0,0.2);">
+              <span style="color:var(--negative); font-weight:700;">▼</span>
+              <div style="font-size:16px; color:var(--muted);">手動レポート作成に週8時間を消費。ミスも頻発</div>
+            </div>
+            <div style="display:flex; align-items:flex-start; gap:10px; padding-bottom:14px; border-bottom:1px solid rgba(255,96,0,0.2);">
+              <span style="color:var(--negative); font-weight:700;">▼</span>
+              <div style="font-size:16px; color:var(--muted);">チャーン予兆を掴めず、解約後に気づく後手の対応</div>
+            </div>
+            <div style="display:flex; align-items:flex-start; gap:10px;">
+              <span style="color:var(--negative); font-weight:700;">▼</span>
+              <div style="font-size:16px; color:var(--muted);">システム連携が複雑で新ツール追加に3ヶ月かかる</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- connector: centered at box vertical midpoint 208+216=424 -->
+        <div class="connector" style="left:608px; top:392px;">→</div>
+
+        <!-- box right: col7-12 → left=652, w=556, top=208, h=432 -->
+        <div class="card" style="left:652px; top:208px; width:556px; height:432px; background:#F0ECFF; border:2px solid #C8B0FF; padding:28px 28px 24px;">
+          <div style="font-size:14px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">導入後</div>
+          <div style="font-size:24px; font-weight:700; color:var(--text); margin-bottom:16px;">統合・自動化された成長エンジン</div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; align-items:flex-start; gap:10px; padding-bottom:14px; border-bottom:1px solid rgba(102,0,255,0.15);">
+              <span style="color:var(--positive); font-weight:700;">▲</span>
+              <div style="font-size:16px; color:var(--muted);">統合ダッシュボードで全顧客の状況をリアルタイム把握</div>
+            </div>
+            <div style="display:flex; align-items:flex-start; gap:10px; padding-bottom:14px; border-bottom:1px solid rgba(102,0,255,0.15);">
+              <span style="color:var(--positive); font-weight:700;">▲</span>
+              <div style="font-size:16px; color:var(--muted);">レポートが自動生成。週8時間の工数をゼロに削減</div>
+            </div>
+            <div style="display:flex; align-items:flex-start; gap:10px; padding-bottom:14px; border-bottom:1px solid rgba(102,0,255,0.15);">
+              <span style="color:var(--positive); font-weight:700;">▲</span>
+              <div style="font-size:16px; color:var(--muted);">AIが解約予兆を30日前に検知。チャーン率50%削減</div>
+            </div>
+            <div style="display:flex; align-items:flex-start; gap:10px;">
+              <span style="color:var(--positive); font-weight:700;">▲</span>
+              <div style="font-size:16px; color:var(--muted);">APIファーストで新ツール連携を平均1日で完了</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="source-bar">導入企業 n=180社 平均値 / 2025年度顧客成功レポート</div>
+        <div class="page-num">06 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PATTERN 7: feature-metrics-cells
+═══════════════════════════════════════════════════════════ -->
+<div class="pattern-section">
+  <div class="pattern-caption"><strong>feature-metrics-cells</strong> — 4機能カードに機能説明＋定量指標（KPI数値）を共存させる特徴＋数値ハイブリッド。</div>
+  <div class="slide-wrapper">
+    <div class="slide-scaler">
+      <div class="slide-root">
+
+        <div class="section-label">TRACTION</div>
+
+        <div class="action-title-block">
+          <div class="action-title">4つの主要機能すべてに圧倒的な導入効果の数値がある</div>
+          <div class="title-rule"></div>
+        </div>
+
+        <!-- lead text: top=152 -->
+        <div style="position:absolute; left:72px; top:152px; width:1136px; height:32px; display:flex; align-items:center; font-size:17px; color:var(--muted);">
+          導入企業実績値をもとにした機能別インパクト指標
+        </div>
+
+        <!-- cards: top=208, h=432; col1-3=72, col4-6=362, col7-9=652, col10-12=942; w=266 each -->
+
+        <!-- card 1 -->
+        <div class="card" style="left:72px; top:208px; width:266px; height:432px; padding:20px 18px 16px; display:flex; flex-direction:column;">
+          <div class="badge">01</div>
+          <div style="font-size:24px; margin-bottom:8px;">⚡</div>
+          <div class="card-title" style="font-size:18px;">AIスコアリング</div>
+          <div class="card-body" style="font-size:13px; margin-bottom:12px;">全顧客の健全度をAIが毎日自動評価。リスク顧客を早期に特定。</div>
+          <div class="metrics-zone" style="margin-top:auto;">
+            <div class="metric-label">チャーン予防率</div>
+            <div class="metric-value">↑68%</div>
+            <div style="margin-top:8px;">
+              <div class="metric-label">AI精度</div>
+              <div class="metric-value" style="font-size:22px;">94.3%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- card 2 -->
+        <div class="card" style="left:362px; top:208px; width:266px; height:432px; padding:20px 18px 16px; display:flex; flex-direction:column;">
+          <div class="badge">02</div>
+          <div style="font-size:24px; margin-bottom:8px;">📊</div>
+          <div class="card-title" style="font-size:18px;">統合ダッシュボード</div>
+          <div class="card-body" style="font-size:13px; margin-bottom:12px;">全システムのデータを1画面に集約。意思決定を加速します。</div>
+          <div class="metrics-zone" style="margin-top:auto;">
+            <div class="metric-label">意思決定時間</div>
+            <div class="metric-value accent" style="font-size:28px;">▼50%</div>
+            <div style="margin-top:8px;">
+              <div class="metric-label">週次節約工数</div>
+              <div class="metric-value" style="font-size:22px;">8h/人</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- card 3 -->
+        <div class="card" style="left:652px; top:208px; width:266px; height:432px; padding:20px 18px 16px; display:flex; flex-direction:column;">
+          <div class="badge">03</div>
+          <div style="font-size:24px; margin-bottom:8px;">🤖</div>
+          <div class="card-title" style="font-size:18px;">自動ワークフロー</div>
+          <div class="card-body" style="font-size:13px; margin-bottom:12px;">条件分岐付きの業務自動化でリードタイムを大幅短縮。</div>
+          <div class="metrics-zone" style="margin-top:auto;">
+            <div class="metric-label">自動化率</div>
+            <div class="metric-value">80%</div>
+            <div style="margin-top:8px;">
+              <div class="metric-label">月間削減コスト</div>
+              <div class="metric-value" style="font-size:22px;">¥1.2M</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- card 4 -->
+        <div class="card" style="left:942px; top:208px; width:266px; height:432px; padding:20px 18px 16px; display:flex; flex-direction:column;">
+          <div class="badge">04</div>
+          <div style="font-size:24px; margin-bottom:8px;">🔗</div>
+          <div class="card-title" style="font-size:18px;">API連携ハブ</div>
+          <div class="card-body" style="font-size:13px; margin-bottom:12px;">300以上のSaaSと即日接続。データサイロを完全解消します。</div>
+          <div class="metrics-zone" style="margin-top:auto;">
+            <div class="metric-label">連携完了時間</div>
+            <div class="metric-value">1日</div>
+            <div style="margin-top:8px;">
+              <div class="metric-label">対応コネクタ数</div>
+              <div class="metric-value" style="font-size:22px;">300+</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="source-bar">出典: 自社顧客成功データ 2025年Q3 / 導入企業 n=450 平均値</div>
+        <div class="page-num">07 / 07</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

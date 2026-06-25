@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>❓ Q&A・FAQ — theme: corporate-trust（4 パターン）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ── corporate-trust tokens ── */
+  :root {
+    --primary:    #1565C0;
+    --secondary:  #3B88C3;
+    --background: #F0F4F9;
+    --surface:    #D6E2F0;
+    --accent:     #A84300;
+    --text:       #0D1B2A;
+    --muted:      #4A5568;
+    --positive:   #1A6B3C;
+    --negative:   #B91C1C;
+
+    --font: 'Noto Sans JP', 'Source Sans 3', 'Noto Sans', Arial, sans-serif;
+
+    /* spacing */
+    --sp-xs:   4px;
+    --sp-sm:   8px;
+    --sp-md:   12px;
+    --sp-lg:   16px;
+    --sp-xl:   24px;
+    --sp-2xl:  32px;
+    --sp-3xl:  48px;
+
+    /* safe-area */
+    --sa-x: 72px;
+    --sa-y: 56px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #e8edf4;
+    font-family: var(--font);
+    color: var(--text);
+    padding: 40px 24px;
+  }
+
+  /* ── page header ── */
+  .page-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .page-header p {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* ── slide wrapper ── */
+  .slide-block {
+    margin-bottom: 48px;
+  }
+  .slide-caption {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 8px;
+    padding-left: 4px;
+    border-left: 3px solid var(--primary);
+    padding-left: 8px;
+    line-height: 1.4;
+  }
+  .slide-caption span {
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  /* ── slide canvas: 1280×720, scaled for display ── */
+  .slide-outer {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .slide-scaler {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1280 / 720;
+    overflow: hidden;
+  }
+  .slide-scaler > iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1280px;
+    height: 720px;
+    transform-origin: top left;
+    border: none;
+  }
+
+  /* ── slide canvas (inline) ── */
+  .slide {
+    width: 1280px;
+    height: 720px;
+    position: relative;
+    background: var(--background);
+    overflow: hidden;
+    font-family: var(--font);
+    color: var(--text);
+  }
+
+  /* scale-wrapper trick: render at 1280×720 then CSS-scale to fit */
+  .scale-wrap {
+    width: 100%;
+    aspect-ratio: 1280/720;
+    position: relative;
+    overflow: hidden;
+  }
+  .scale-wrap .slide {
+    position: absolute;
+    top: 0; left: 0;
+    transform-origin: top left;
+  }
+
+  /* ── shared slide elements ── */
+
+  /* footer line — always present */
+  .footer-line {
+    position: absolute;
+    left: var(--sa-x);
+    right: var(--sa-x);
+    bottom: calc(720px - 664px); /* y≈664 from top */
+    height: 0.5px;
+    background: var(--muted);
+  }
+  /* place it at y=664 from top */
+  .footer-line {
+    top: 664px;
+    bottom: auto;
+    height: 0.5px;
+    left: var(--sa-x);
+    right: var(--sa-x);
+    background: var(--muted);
+  }
+
+  /* page number */
+  .page-num {
+    position: absolute;
+    right: var(--sa-x);
+    top: 672px;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    line-height: 1;
+  }
+
+  /* action title bar region — y=56, h=88 */
+  .action-title-bar {
+    position: absolute;
+    top: var(--sa-y);
+    left: var(--sa-x);
+    right: var(--sa-x);
+    height: 88px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  /* 3px vertical accent bar */
+  .accent-bar {
+    width: 3px;
+    height: 51px; /* ≈ h1 line-height: 38×1.35 */
+    background: var(--primary);
+    flex-shrink: 0;
+    margin-right: var(--sp-md);
+  }
+  .action-title {
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--text);
+    flex: 1;
+  }
+  /* hairline rule under title — y = 56+88+gap ≈ 56+88=144 → place at y=148 */
+  .title-rule {
+    position: absolute;
+    top: 148px;
+    left: var(--sa-x);
+    right: var(--sa-x);
+    height: 1.5px;
+    background: var(--primary);
+  }
+
+  /* source note — y=640, h=24 */
+  .source-note {
+    position: absolute;
+    top: 640px;
+    left: var(--sa-x);
+    right: var(--sa-x);
+    height: 24px;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    line-height: 24px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── FAQ GRID pattern ── */
+  .faq-grid-row {
+    position: absolute;
+    left: var(--sa-x);
+    right: var(--sa-x);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--sp-xl);
+  }
+  .faq-grid-row.row1 { top: 160px; height: 232px; }
+  .faq-grid-row.row2 { top: 400px; height: 232px; }
+
+  .faq-cell {
+    background: var(--surface);
+    border-radius: 4px;
+    padding: var(--sp-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-sm);
+    height: 232px;
+    overflow: hidden;
+  }
+  .faq-cell-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 24px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .faq-cell-q {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .faq-cell-a {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  /* ── FAQ SINGLE COLUMN pattern ── */
+  .qa-box {
+    position: absolute;
+    left: var(--sa-x);
+    right: var(--sa-x);
+    background: var(--surface);
+    border-radius: 4px;
+    padding: var(--sp-lg) var(--sp-2xl);
+    display: flex;
+    flex-direction: row;
+    gap: var(--sp-xl);
+    overflow: hidden;
+  }
+  .qa-box.box1 { top: 160px; height: 152px; }
+  .qa-box.box2 { top: 320px; height: 152px; }
+  .qa-box.box3 { top: 480px; height: 152px; }
+
+  .qa-box-label {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary);
+    width: 36px;
+    flex-shrink: 0;
+    line-height: 1.3;
+    padding-top: 2px;
+  }
+  .qa-box-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-sm);
+  }
+  .qa-box-q {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .qa-box-a {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── FAQ STACKED QA BOXES pattern ── */
+  .q-box, .a-box {
+    position: absolute;
+    left: var(--sa-x);
+    right: var(--sa-x);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-xl);
+    overflow: hidden;
+  }
+  .q-box { background: var(--surface); height: 48px; }
+  .a-box { background: var(--background); border-left: 3px solid var(--surface); height: 96px; }
+
+  .q-box-1 { top: 160px; }
+  .a-box-1 { top: 208px; }
+  .q-box-2 { top: 312px; }
+  .a-box-2 { top: 360px; }
+  .q-box-3 { top: 464px; }
+  .a-box-3 { top: 512px; }
+
+  .q-box-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary);
+    width: 56px;
+    text-align: center;
+    flex-shrink: 0;
+    padding-left: var(--sp-xl);
+  }
+  .q-box-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+    flex: 1;
+  }
+  .a-box-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+    width: 56px;
+    text-align: center;
+    flex-shrink: 0;
+    padding-left: var(--sp-xl);
+  }
+  .a-box-text {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--muted);
+    line-height: 1.7;
+    flex: 1;
+    padding: var(--sp-md) 0;
+  }
+
+  /* ── QA SESSION CLOSING pattern ── */
+  /* left: qa_hero_panel — col 1-5, 5 col ≈ (5×72.67 + 4×24) = 459.33px */
+  /* right: col 6-12, 7 col ≈ (7×72.67 + 6×24) = 652.67px */
+  /* left width = 5/12 of 1136 + adjustments; use calc */
+
+  .qa-hero-panel {
+    position: absolute;
+    top: 160px;
+    left: var(--sa-x);
+    width: calc((1136px / 12) * 5 + 24px * 4);  /* 5 cols */
+    height: 480px;
+    background: var(--primary);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qa-hero-label {
+    font-size: 80px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-align: center;
+  }
+  .qa-hero-sub {
+    font-size: 22px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    margin-top: var(--sp-sm);
+    text-align: center;
+  }
+  /* 5 col width = (1136/12)*5 + 24*4 = 459.33px (≈459px) */
+  /* right col start x = 72 + 459 + 24 = 555px */
+  .session-info-col {
+    position: absolute;
+    /* col 6-12: x = 72 + (5 cols + 5 gutters) = 72 + (5*72.67 + 5*24) = 72 + 363.33+120 = 555px */
+    left: calc(var(--sa-x) + (1136px / 12) * 5 + 24px * 5);
+    right: var(--sa-x);
+    top: 160px;
+    height: 224px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: var(--sp-md);
+    padding-top: var(--sp-lg);
+  }
+  .session-info-heading {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--primary);
+    line-height: 1.5;
+    margin-bottom: var(--sp-xs);
+  }
+  .session-info-item {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.6;
+    padding-left: var(--sp-lg);
+    position: relative;
+  }
+  .session-info-item::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+  }
+
+  .contact-info-col {
+    position: absolute;
+    left: calc(var(--sa-x) + (1136px / 12) * 5 + 24px * 5);
+    right: var(--sa-x);
+    top: 400px;
+    height: 240px;
+    background: var(--surface);
+    border-radius: 4px;
+    padding: var(--sp-lg) var(--sp-xl);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--sp-sm);
+  }
+  .contact-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .contact-org {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .contact-item {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .contact-item strong {
+    color: var(--primary);
+    font-weight: 600;
+    margin-right: var(--sp-xs);
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>❓ Q&A・FAQ — theme: corporate-trust（4 パターン）</h1>
+  <p>layout-qa.md の全パターンを corporate-trust テーマで描画した検証ギャラリーです。1280×720px / safe-area 56/72 / 12-col / gutter 24 / baseline 8 準拠。</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     Pattern 1: faq-grid
+     ════════════════════════════════════════════════════ -->
+<div class="slide-block">
+  <div class="slide-caption">
+    faq-grid <span>— FAQ を2〜3列のグリッドに均等配置。3列×2行（6項目）バリアント。</span>
+  </div>
+  <div class="scale-wrap" id="wrap-1">
+    <div class="slide" id="slide-1">
+
+      <!-- action title bar: y=56, h=88 -->
+      <div class="action-title-bar">
+        <div class="accent-bar"></div>
+        <div class="action-title">よくあるご質問6点にまとめて回答します</div>
+      </div>
+      <div class="title-rule"></div>
+
+      <!-- Row 1: y=160, h=232 -->
+      <div class="faq-grid-row row1">
+        <div class="faq-cell">
+          <div class="faq-cell-badge">Q1</div>
+          <div class="faq-cell-q">導入にどれくらいの期間がかかりますか？</div>
+          <div class="faq-cell-a">標準的なケースで初期設定から本稼働まで約4週間です。データ移行量によって変動しますが、専任担当者がスケジュールを策定します。</div>
+        </div>
+        <div class="faq-cell">
+          <div class="faq-cell-badge">Q2</div>
+          <div class="faq-cell-q">既存システムとの連携は可能ですか？</div>
+          <div class="faq-cell-a">REST API および主要ERPとの標準コネクタを提供しています。カスタム連携が必要な場合は別途お見積もりをご提案します。</div>
+        </div>
+        <div class="faq-cell">
+          <div class="faq-cell-badge">Q3</div>
+          <div class="faq-cell-q">セキュリティ要件はどう満たされていますか？</div>
+          <div class="faq-cell-a">ISO 27001認証取得済み。通信はTLS 1.3、保存データはAES-256で暗号化。政府系クラウドサービス基準にも対応しています。</div>
+        </div>
+      </div>
+
+      <!-- Row 2: y=400, h=232 -->
+      <div class="faq-grid-row row2">
+        <div class="faq-cell">
+          <div class="faq-cell-badge">Q4</div>
+          <div class="faq-cell-q">ユーザー数に上限はありますか？</div>
+          <div class="faq-cell-a">プランによって異なります。スタンダードプランは50名まで、エンタープライズプランは無制限です。同時接続数に制限はありません。</div>
+        </div>
+        <div class="faq-cell">
+          <div class="faq-cell-badge">Q5</div>
+          <div class="faq-cell-q">サポート体制はどのようになっていますか？</div>
+          <div class="faq-cell-a">平日9〜18時のメール・電話サポートを標準提供。有償の24/365サポートオプションもご用意しており、SLA 99.9%を保証します。</div>
+        </div>
+        <div class="faq-cell">
+          <div class="faq-cell-badge">Q6</div>
+          <div class="faq-cell-q">契約期間の縛りはありますか？</div>
+          <div class="faq-cell-a">最低契約期間は1年です。更新時は30日前までにご連絡いただければ解約可能です。途中解約の違約金は発生しません。</div>
+        </div>
+      </div>
+
+      <!-- source note: y=640, h=24 -->
+      <div class="source-note">出典: 自社製品FAQ（2026年版）</div>
+
+      <!-- footer -->
+      <div class="footer-line"></div>
+      <div class="page-num">01 / 04</div>
+
+    </div><!-- .slide -->
+  </div><!-- .scale-wrap -->
+</div><!-- .slide-block -->
+
+
+<!-- ════════════════════════════════════════════════════
+     Pattern 2: faq-single-column
+     ════════════════════════════════════════════════════ -->
+<div class="slide-block">
+  <div class="slide-caption">
+    faq-single-column <span>— 重要Q&Aを1カラム全幅に3件縦積み。各回答に十分な行数を確保。</span>
+  </div>
+  <div class="scale-wrap" id="wrap-2">
+    <div class="slide" id="slide-2">
+
+      <div class="action-title-bar">
+        <div class="accent-bar"></div>
+        <div class="action-title">導入前の主要な懸念3点に丁寧にお答えします</div>
+      </div>
+      <div class="title-rule"></div>
+
+      <!-- qa_box_1: y=160, h=152 -->
+      <div class="qa-box box1">
+        <div class="qa-box-label">Q1</div>
+        <div class="qa-box-content">
+          <div class="qa-box-q">個人情報・機密データはどのように保護されますか？</div>
+          <div class="qa-box-a">国内データセンターのみでデータを保管し、海外への持ち出しは一切行いません。アクセスログを90日間保存し、不正アクセス検知システムが24時間稼働しています。個人情報保護法・GDPR双方への対応を確認済みです。</div>
+        </div>
+      </div>
+
+      <!-- qa_box_2: y=320, h=152 -->
+      <div class="qa-box box2">
+        <div class="qa-box-label">Q2</div>
+        <div class="qa-box-content">
+          <div class="qa-box-q">障害が発生した場合の復旧時間はどのくらいですか？</div>
+          <div class="qa-box-a">RTO（目標復旧時間）は4時間、RPO（目標復旧時点）は1時間を保証しています。冗長構成により可用性99.9%（年間停止時間8.7時間以内）を実現。定期的なDRテストで実効性を検証しています。</div>
+        </div>
+      </div>
+
+      <!-- qa_box_3: y=480, h=152 -->
+      <div class="qa-box box3">
+        <div class="qa-box-label">Q3</div>
+        <div class="qa-box-content">
+          <div class="qa-box-q">解約後、データはどのように扱われますか？</div>
+          <div class="qa-box-a">解約から30日間はデータのエクスポートが可能です。その後、当社保有データは完全削除されます。削除完了証明書の発行にも対応しており、監査対応も安心です。</div>
+        </div>
+      </div>
+
+      <div class="source-note">出典: サービス利用規約・セキュリティホワイトペーパー（2026年3月）</div>
+      <div class="footer-line"></div>
+      <div class="page-num">02 / 04</div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════
+     Pattern 3: faq-stacked-qa-boxes
+     ════════════════════════════════════════════════════ -->
+<div class="slide-block">
+  <div class="slide-caption">
+    faq-stacked-qa-boxes <span>— Q枠（濃）とA枠（淡）を分離した2層ボックスを縦積み。Q/Aの役割を視覚的に区別。</span>
+  </div>
+  <div class="scale-wrap" id="wrap-3">
+    <div class="slide" id="slide-3">
+
+      <div class="action-title-bar">
+        <div class="accent-bar"></div>
+        <div class="action-title">調達担当者が最も気にする3つの質問にお答えします</div>
+      </div>
+      <div class="title-rule"></div>
+
+      <!-- Q1: y=160, h=48 -->
+      <div class="q-box q-box-1">
+        <div class="q-box-label">Q1</div>
+        <div class="q-box-text">国の調達基準（セキュリティ管理基準）に適合していますか？</div>
+      </div>
+      <!-- A1: y=208, h=96 -->
+      <div class="a-box a-box-1">
+        <div class="a-box-label">A.</div>
+        <div class="a-box-text">政府情報システムのためのセキュリティ評価制度（ISMAP）登録済みです。ISO/IEC 27001・27017を取得しており、クラウドサービス安全性評価の情報提供開示もすべて対応しています。調達時の審査資料も提供可能です。</div>
+      </div>
+
+      <!-- Q2: y=312, h=48 -->
+      <div class="q-box q-box-2">
+        <div class="q-box-label">Q2</div>
+        <div class="q-box-text">価格改定のリスクはどう管理されていますか？</div>
+      </div>
+      <!-- A2: y=360, h=96 -->
+      <div class="a-box a-box-2">
+        <div class="a-box-label">A.</div>
+        <div class="a-box-text">複数年契約の場合、契約期間中の価格は固定されます。改定の際は90日前に書面で通知します。価格上昇率は国内CPI連動を上限とする条件を標準契約書に明記しており、予算計画に安定性をもたらします。</div>
+      </div>
+
+      <!-- Q3: y=464, h=48 -->
+      <div class="q-box q-box-3">
+        <div class="q-box-label">Q3</div>
+        <div class="q-box-text">ベンダーロックインへの懸念はどう対処されていますか？</div>
+      </div>
+      <!-- A3: y=512, h=96 -->
+      <div class="a-box a-box-3">
+        <div class="a-box-label">A.</div>
+        <div class="a-box-text">オープンスタンダード準拠のAPIを公開しており、データはCSV・JSONの標準形式でいつでもエクスポートできます。他社サービスへの移行支援も有償で提供しており、乗り換えコストを最小化できます。</div>
+      </div>
+
+      <div class="source-note">出典: 製品仕様書・標準契約書サンプル（2026年版）</div>
+      <div class="footer-line"></div>
+      <div class="page-num">03 / 04</div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════
+     Pattern 4: qa-session-closing
+     ════════════════════════════════════════════════════ -->
+<div class="slide-block">
+  <div class="slide-caption">
+    qa-session-closing <span>— プレゼン末尾のQ&Aセッション開始告知。左ヒーロー＋右セッション情報の非対称2カラム。</span>
+  </div>
+  <div class="scale-wrap" id="wrap-4">
+    <div class="slide" id="slide-4">
+
+      <div class="action-title-bar">
+        <div class="accent-bar"></div>
+        <div class="action-title">ここまでのご説明に関してご質問をお受けします</div>
+      </div>
+      <div class="title-rule"></div>
+
+      <!-- qa_hero_panel: col 1-5, y=160, h=480 -->
+      <div class="qa-hero-panel">
+        <div style="text-align:center;">
+          <div class="qa-hero-label">Q&A</div>
+          <div class="qa-hero-sub">Questions?</div>
+        </div>
+      </div>
+
+      <!-- session_info_col: col 6-12, y=160, h=224 -->
+      <div class="session-info-col">
+        <div class="session-info-heading">質疑応答のご案内</div>
+        <div class="session-info-item">残り時間 約15分。挙手またはチャットでご質問ください。</div>
+        <div class="session-info-item">1問あたり2〜3分を目安にお時間をいただきます。</div>
+        <div class="session-info-item">時間内に回答できない場合は後日メールにてご連絡します。</div>
+      </div>
+
+      <!-- contact_info_col: col 6-12, y=400, h=240 -->
+      <div class="contact-info-col">
+        <div class="contact-name">山田 誠一（Seiichi Yamada）</div>
+        <div class="contact-org">株式会社フロムガレージ ソリューション事業部 シニアマネージャー</div>
+        <div style="height: 8px;"></div>
+        <div class="contact-item"><strong>Email</strong>s.yamada@fromgarage.co</div>
+        <div class="contact-item"><strong>Tel</strong>03-XXXX-XXXX（平日 9:00–18:00）</div>
+        <div class="contact-item"><strong>LinkedIn</strong>linkedin.com/in/seiichi-yamada</div>
+      </div>
+
+      <div class="source-note">本資料に関するお問い合わせは上記連絡先まで</div>
+      <div class="footer-line"></div>
+      <div class="page-num">04 / 04</div>
+
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // Scale each slide to fill its container width
+  function scaleSlides() {
+    document.querySelectorAll('.scale-wrap').forEach(function(wrap) {
+      var slide = wrap.querySelector('.slide');
+      var containerW = wrap.offsetWidth;
+      var scale = containerW / 1280;
+      slide.style.transform = 'scale(' + scale + ')';
+      // height of wrapper = 720 * scale
+      wrap.style.height = (720 * scale) + 'px';
+    });
+  }
+  scaleSlides();
+  window.addEventListener('resize', scaleSlides);
+</script>
+</body>
+</html>

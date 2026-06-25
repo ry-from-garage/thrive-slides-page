@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>▦ 汎用グリッド/ベント — theme: editorial-keynote（5 パターン）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;800;900&display=swap" rel="stylesheet">
+<style>
+  /* ── editorial-keynote tokens ── */
+  :root {
+    --color-background: #0D0D0D;
+    --color-surface:    #1A1A1A;
+    --color-text:       #F0EDEA;
+    --color-primary:    #F0EDEA;
+    --color-secondary:  #5C5856;
+    --color-accent:     #FF4D1C;
+    --color-muted:      #8A8480;
+    --color-positive:   #34D66A;
+    --color-negative:   #FF5252;
+
+    --font-stack: 'Noto Sans JP', 'Helvetica Neue', 'Arial Black', Arial, sans-serif;
+
+    --safe-top:    56px;
+    --safe-bottom: 56px;
+    --safe-left:   72px;
+    --safe-right:  72px;
+    --gutter:      24px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #111;
+    font-family: var(--font-stack);
+    color: var(--color-text);
+    padding: 40px 32px;
+  }
+
+  /* ── Gallery header ── */
+  .gallery-header {
+    text-align: center;
+    margin-bottom: 48px;
+    color: var(--color-text);
+  }
+  .gallery-header h1 {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    color: var(--color-text);
+  }
+  .gallery-header h1 span { color: var(--color-accent); }
+  .gallery-header p {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--color-muted);
+    font-weight: 400;
+  }
+
+  /* ── Pattern section ── */
+  .pattern-section {
+    margin-bottom: 64px;
+  }
+  .pattern-caption {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--color-muted);
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .pattern-caption strong {
+    color: var(--color-accent);
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: none;
+  }
+
+  /* ── Slide wrapper: scales 1280×720 to fit ── */
+  .slide-wrapper {
+    width: 100%;
+    max-width: 1280px;
+    aspect-ratio: 16/9;
+    position: relative;
+    overflow: hidden;
+    background: var(--color-background);
+  }
+
+  /* Scale child .slide (1280×720) to fill .slide-wrapper */
+  .slide-wrapper .slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1280px;
+    height: 720px;
+    transform-origin: top left;
+    background: var(--color-background);
+  }
+
+  /* ── Base slide typography ── */
+  .slide {
+    font-family: var(--font-stack);
+    color: var(--color-text);
+  }
+
+  /* action title h1 */
+  .action-title {
+    position: absolute;
+    top: var(--safe-top);
+    left: var(--safe-left);
+    right: var(--safe-right);
+    height: 80px;
+    display: flex;
+    align-items: center;
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .action-title::after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--color-accent);
+  }
+
+  /* accent word */
+  .accent { color: var(--color-accent); }
+
+  /* source bar */
+  .source-bar {
+    position: absolute;
+    top: 640px;
+    left: var(--safe-left);
+    right: var(--safe-right);
+    height: 24px;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-muted);
+  }
+
+  /* cell shared */
+  .cell {
+    position: absolute;
+    overflow: hidden;
+    border-radius: 0;
+  }
+  .cell-surface { background: var(--color-surface); }
+  .cell-mid     { background: #272727; }
+  .cell-none    { background: transparent; border: 1px solid #2A2A2A; }
+
+  /* cell inner padding */
+  .cell-inner {
+    padding: 20px 20px 16px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .cell-label {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--color-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .cell-heading {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--color-text);
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .cell-body {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--color-text);
+    line-height: 1.5;
+    opacity: 0.85;
+  }
+  .cell-number {
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--color-text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .cell-number-unit {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--color-muted);
+  }
+  .cell-number-accent {
+    color: var(--color-accent);
+  }
+  .cell-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .cell-list li {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--color-text);
+    line-height: 1.5;
+    padding: 4px 0;
+    border-bottom: 0.5px solid #2A2A2A;
+    display: flex;
+    gap: 8px;
+  }
+  .cell-list li:last-child { border-bottom: none; }
+  .cell-list .li-num {
+    color: var(--color-accent);
+    font-weight: 800;
+    min-width: 20px;
+  }
+
+  .cell-index {
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--color-muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+  }
+
+  /* page number */
+  .page-num {
+    position: absolute;
+    bottom: 8px;
+    right: var(--safe-right);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-muted);
+  }
+
+
+  /* ══════════════════════════════════════════
+     PATTERN 1: bento-grid
+     Canvas 1280×720
+     safe-area L/R: 72px, T/B: 56px
+     col-width ≈ 72.67px, gutter: 24px
+     ══════════════════════════════════════════ */
+  /* 6-col width = 556px, 3-col = 266px */
+  #bento .hero-cell {
+    left: 72px; top: 152px;
+    width: 556px; height: 488px;
+  }
+  #bento .small-a {
+    left: 652px; top: 152px;
+    width: 266px; height: 232px;
+  }
+  #bento .small-b {
+    left: 942px; top: 152px;
+    width: 266px; height: 232px;
+  }
+  #bento .small-bottom {
+    left: 652px; top: 408px;
+    width: 556px; height: 232px;
+  }
+
+  /* chart-like decoration inside hero */
+  .hero-chart {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    padding-top: 16px;
+  }
+  .bar {
+    flex: 1;
+    border-radius: 0;
+    opacity: 0.9;
+  }
+  .bar-label {
+    font-size: 10px;
+    color: var(--color-muted);
+    text-align: center;
+    margin-top: 4px;
+  }
+
+
+  /* ══════════════════════════════════════════
+     PATTERN 2: modular-3x3
+     3 cols × 3 rows, 144px cell height, gutter 24px
+     4-col span width ≈ 362.67px
+     ══════════════════════════════════════════ */
+  /* col starts: 1→72, 5→72+362.67+24=458.67, 9→458.67+362.67+24=845.33 */
+  #mod3x3 .c-r1c1 { left: 72px;   top: 152px; width: 363px; height: 144px; }
+  #mod3x3 .c-r1c2 { left: 459px;  top: 152px; width: 363px; height: 144px; }
+  #mod3x3 .c-r1c3 { left: 845px;  top: 152px; width: 363px; height: 144px; }
+  #mod3x3 .c-r2c1 { left: 72px;   top: 320px; width: 363px; height: 144px; }
+  #mod3x3 .c-r2c2 { left: 459px;  top: 320px; width: 363px; height: 144px; }
+  #mod3x3 .c-r2c3 { left: 845px;  top: 320px; width: 363px; height: 144px; }
+  #mod3x3 .c-r3c1 { left: 72px;   top: 488px; width: 363px; height: 144px; }
+  #mod3x3 .c-r3c2 { left: 459px;  top: 488px; width: 363px; height: 144px; }
+  #mod3x3 .c-r3c3 { left: 845px;  top: 488px; width: 363px; height: 144px; }
+
+  #mod3x3 .cell-inner { padding: 14px 16px 12px; }
+  #mod3x3 .cell-index {
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+  #mod3x3 .cell-heading {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+  #mod3x3 .cell-body { font-size: 13px; }
+
+
+  /* ══════════════════════════════════════════
+     PATTERN 3: modular-2x3
+     3 cols × 2 rows, 232px cell height, gutter 24px
+     4-col span same widths as above
+     ══════════════════════════════════════════ */
+  #mod2x3 .c-r1c1 { left: 72px;  top: 152px; width: 363px; height: 232px; }
+  #mod2x3 .c-r1c2 { left: 459px; top: 152px; width: 363px; height: 232px; }
+  #mod2x3 .c-r1c3 { left: 845px; top: 152px; width: 363px; height: 232px; }
+  #mod2x3 .c-r2c1 { left: 72px;  top: 408px; width: 363px; height: 232px; }
+  #mod2x3 .c-r2c2 { left: 459px; top: 408px; width: 363px; height: 232px; }
+  #mod2x3 .c-r2c3 { left: 845px; top: 408px; width: 363px; height: 232px; }
+
+  #mod2x3 .icon-area {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  #mod2x3 .cell-heading {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+  #mod2x3 .cell-body { font-size: 14px; }
+
+
+  /* ══════════════════════════════════════════
+     PATTERN 4: z-pattern-hero
+     upper: col 1-7 (556+72.67+24=652.67≈653px) / col 8-12 (459px)
+     lower: col 1-6 (556px) / col 7-12 (556px+gutter = 652px from left)
+     ══════════════════════════════════════════ */
+  /* col 1-7: 7col = 72.67*7 + 24*6 = 508.67+144 = 652.67 ≈ 653px */
+  /* col 8-12: 5col = 72.67*5 + 24*4 = 363.33+96 = 459.33 ≈ 459px */
+  #zpat .top-left  {
+    left: 72px; top: 152px;
+    width: 653px; height: 320px;
+    /* fill: none → transparent with subtle border */
+  }
+  #zpat .top-right {
+    left: 749px; top: 152px;
+    width: 459px; height: 320px;
+  }
+  /* col 1-6: 556px; col 7-12 starts at 72+556+24=652px, width=556px */
+  #zpat .bot-left  {
+    left: 72px; top: 496px;
+    width: 556px; height: 144px;
+  }
+  #zpat .bot-right {
+    left: 652px; top: 496px;
+    width: 556px; height: 144px;
+  }
+
+  #zpat .top-left {
+    border: 1px solid #2A2A2A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    overflow: hidden;
+  }
+  .hero-visual-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .hero-visual-inner .big-text {
+    font-size: 88px;
+    font-weight: 900;
+    color: var(--color-text);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+  .hero-visual-inner .big-text em {
+    color: var(--color-accent);
+    font-style: normal;
+  }
+  .hero-visual-inner .sub {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--color-muted);
+  }
+
+  #zpat .top-right.cell-surface .cell-inner {
+    justify-content: center;
+  }
+  #zpat .top-right .kpi-main {
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--color-text);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  #zpat .top-right .kpi-label {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--color-muted);
+  }
+
+  #zpat .bot-left.cell-none .cell-inner {
+    justify-content: center;
+  }
+  #zpat .bot-right.cell-mid .cell-inner {
+    justify-content: center;
+  }
+  #zpat .cta-text {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--color-text);
+    line-height: 1.2;
+  }
+  #zpat .cta-text em {
+    color: var(--color-accent);
+    font-style: normal;
+  }
+
+
+  /* ══════════════════════════════════════════
+     PATTERN 5: f-pattern-content
+     top_band: full width, h=96, offset 152
+     left_body: col 1-8, h=344, offset 272
+     right_sidebar: col 9-12, h=344, offset 272
+     col 1-8: 8col = 72.67*8 + 24*7 = 581.33+168 = 749.33 ≈ 749px
+     col 9-12: 4col = 362.67px, left = 72+749+24 = 845px
+     ══════════════════════════════════════════ */
+  #fpat .top-band {
+    position: absolute;
+    left: 72px; top: 152px;
+    width: 1136px; height: 96px;
+    background: var(--color-surface);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+  }
+  #fpat .top-band .band-content {
+    display: flex;
+    gap: 48px;
+    align-items: baseline;
+  }
+  #fpat .top-band .band-kpi {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  #fpat .top-band .kn {
+    font-size: 40px;
+    font-weight: 900;
+    color: var(--color-text);
+    line-height: 1;
+  }
+  #fpat .top-band .kn-accent { color: var(--color-accent); }
+  #fpat .top-band .kl {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--color-muted);
+  }
+  #fpat .top-band .band-summary {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--color-text);
+    opacity: 0.85;
+    border-left: 1px solid #333;
+    padding-left: 24px;
+  }
+
+  #fpat .left-body {
+    position: absolute;
+    left: 72px; top: 272px;
+    width: 749px; height: 344px;
+    background: transparent;
+    padding: 16px 0 0 0;
+  }
+  #fpat .f-list {
+    list-style: none;
+    padding: 0; margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  #fpat .f-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 0.5px solid #2A2A2A;
+  }
+  #fpat .f-list li:last-child { border-bottom: none; }
+  #fpat .f-list .f-num {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--color-accent);
+    min-width: 28px;
+    padding-top: 1px;
+    letter-spacing: 0.05em;
+  }
+  #fpat .f-list .f-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-text);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  #fpat .f-list .f-desc {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--color-text);
+    opacity: 0.75;
+    line-height: 1.5;
+  }
+
+  #fpat .right-sidebar {
+    position: absolute;
+    left: 845px; top: 272px;
+    width: 363px; height: 344px;
+    background: var(--color-surface);
+    padding: 20px 20px 16px;
+  }
+  #fpat .sidebar-label {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    border-bottom: 0.5px solid #2A2A2A;
+    padding-bottom: 8px;
+  }
+  #fpat .sidebar-list {
+    list-style: none;
+    padding: 0; margin: 0;
+  }
+  #fpat .sidebar-list li {
+    padding: 10px 0;
+    border-bottom: 0.5px solid #2A2A2A;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #fpat .sidebar-list li:last-child { border-bottom: none; }
+  #fpat .sidebar-list .sl-label {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--color-muted);
+  }
+  #fpat .sidebar-list .sl-val {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--color-text);
+  }
+  #fpat .sidebar-list .sl-val.pos { color: var(--color-positive); }
+  #fpat .sidebar-list .sl-val.neg { color: var(--color-negative); }
+
+</style>
+</head>
+<body>
+
+<!-- ════ Gallery Header ════ -->
+<header class="gallery-header">
+  <h1>▦ 汎用グリッド/ベント — theme: <span>editorial-keynote</span>（5 パターン）</h1>
+  <p>layout-grid-system.md 全 ## Pattern: を editorial-keynote トークンで検証レンダリング | 1280×720 safe-area 56/72 12-col gutter 24 baseline 8</p>
+</header>
+
+<!-- ════════════════════════════════════════════
+     PATTERN 1: bento-grid
+═════════════════════════════════════════════ -->
+<section class="pattern-section">
+  <p class="pattern-caption"><strong>bento-grid</strong> — ヒーローセル（6×2 スパン）＋右上2小セル（3×1）＋右下セル（6×1）の非対称ベントグリッド</p>
+  <div class="slide-wrapper">
+    <div class="slide" id="bento">
+
+      <!-- action title -->
+      <div class="action-title">
+        新規事業の<span class="accent">成長率は前年比 3.2 倍</span>——今期の重点領域を明確にせよ
+      </div>
+
+      <!-- hero cell: left col 1-6, 556×488 -->
+      <div class="cell cell-mid hero-cell" style="display:flex;flex-direction:column;">
+        <div class="cell-inner" style="flex:0 0 auto;">
+          <div class="cell-label">主要指標推移 2022–2025</div>
+          <div class="cell-heading">売上高トレンド</div>
+        </div>
+        <div class="hero-chart" style="padding: 0 20px 20px;">
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+            <div class="bar" style="height:80px;background:#2C2C2C;"></div>
+            <div class="bar-label">2022</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+            <div class="bar" style="height:120px;background:#3A3A3A;"></div>
+            <div class="bar-label">2023</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+            <div class="bar" style="height:200px;background:#4A4A4A;"></div>
+            <div class="bar-label">2024</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+            <div class="bar" style="height:310px;background:var(--color-accent);"></div>
+            <div class="bar-label" style="color:var(--color-accent);font-weight:800;">2025</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- small-a: col 7-9, 266×232 -->
+      <div class="cell cell-surface small-a">
+        <div class="cell-inner">
+          <div class="cell-label">新規顧客獲得数</div>
+          <div class="cell-number">1,840<span class="cell-number-unit">社</span></div>
+          <div class="cell-body" style="color:var(--color-positive);">▲ 前年比 +62%</div>
+        </div>
+      </div>
+
+      <!-- small-b: col 10-12, 266×232 -->
+      <div class="cell cell-surface small-b">
+        <div class="cell-inner">
+          <div class="cell-label">LTV 中央値</div>
+          <div class="cell-number"><span class="cell-number-accent">¥280</span><span class="cell-number-unit">万</span></div>
+          <div class="cell-body">目標 ¥250万 を達成</div>
+        </div>
+      </div>
+
+      <!-- small-bottom: col 7-12, 556×232 -->
+      <div class="cell cell-none small-bottom">
+        <div class="cell-inner" style="justify-content:center;">
+          <div class="cell-label">今期の優先アクション</div>
+          <ul class="cell-list">
+            <li><span class="li-num">01</span><span>エンタープライズ向けカスタマーサクセス体制を第一四半期中に整備する</span></li>
+            <li><span class="li-num">02</span><span>中小 SMB セグメントへのプライシング改定を Q2 前に実施し ARR を底上げする</span></li>
+            <li><span class="li-num">03</span><span>海外パートナー 3 社との契約交渉を完結し東南アジア展開を本格化させる</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- source bar -->
+      <div class="source-bar">出典: 社内 BI ダッシュボード, 2025年6月</div>
+      <div class="page-num">01</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     PATTERN 2: modular-3x3
+═════════════════════════════════════════════ -->
+<section class="pattern-section">
+  <p class="pattern-caption"><strong>modular-3x3</strong> — 9つのコンテンツセルを3列×3行の均等モジュラーグリッドに整列</p>
+  <div class="slide-wrapper">
+    <div class="slide" id="mod3x3">
+
+      <div class="action-title">
+        プロダクト戦略の<span class="accent">9 つの柱</span>——全員が優先順位を共有する
+      </div>
+
+      <!-- row 1 -->
+      <div class="cell cell-surface c-r1c1">
+        <div class="cell-inner">
+          <div class="cell-index">01</div>
+          <div class="cell-heading">グロース設計</div>
+          <div class="cell-body">PLG ループを軸に自然流入型の成長エンジンを設計する</div>
+        </div>
+      </div>
+      <div class="cell cell-surface c-r1c2">
+        <div class="cell-inner">
+          <div class="cell-index">02</div>
+          <div class="cell-heading">データ基盤</div>
+          <div class="cell-body">意思決定に必要な指標を 24h 以内に参照できる環境を整備</div>
+        </div>
+      </div>
+      <div class="cell cell-surface c-r1c3">
+        <div class="cell-inner">
+          <div class="cell-index">03</div>
+          <div class="cell-heading">AI 活用</div>
+          <div class="cell-body">社内ワークフローへの生成 AI 組み込みで工数 30% 削減を実現</div>
+        </div>
+      </div>
+
+      <!-- row 2 -->
+      <div class="cell cell-surface c-r2c1">
+        <div class="cell-inner">
+          <div class="cell-index">04</div>
+          <div class="cell-heading">パートナー展開</div>
+          <div class="cell-body">国内 SIer 5 社との協業体制で間接販売チャネルを拡大する</div>
+        </div>
+      </div>
+      <div class="cell cell-surface c-r2c2" style="border: 1px solid var(--color-accent);">
+        <div class="cell-inner">
+          <div class="cell-index" style="color:var(--color-accent);">05</div>
+          <div class="cell-heading">顧客成功</div>
+          <div class="cell-body">オンボーディング TTV を 7 日以内に短縮し解約率を半減させる</div>
+        </div>
+      </div>
+      <div class="cell cell-surface c-r2c3">
+        <div class="cell-inner">
+          <div class="cell-index">06</div>
+          <div class="cell-heading">プライシング改定</div>
+          <div class="cell-body">利用量課金モデルへ移行し SMB セグメントの参入障壁を下げる</div>
+        </div>
+      </div>
+
+      <!-- row 3 -->
+      <div class="cell cell-surface c-r3c1">
+        <div class="cell-inner">
+          <div class="cell-index">07</div>
+          <div class="cell-heading">セキュリティ強化</div>
+          <div class="cell-body">ISO 27001 取得を Q3 に完了しエンタープライズ案件の信頼を獲得</div>
+        </div>
+      </div>
+      <div class="cell cell-surface c-r3c2">
+        <div class="cell-inner">
+          <div class="cell-index">08</div>
+          <div class="cell-heading">グローバル化</div>
+          <div class="cell-body">英語・タイ語対応を完了し東南アジア 3 ヶ国でのパイロットを開始</div>
+        </div>
+      </div>
+      <div class="cell cell-surface c-r3c3">
+        <div class="cell-inner">
+          <div class="cell-index">09</div>
+          <div class="cell-heading">採用強化</div>
+          <div class="cell-body">エンジニア 20 名・セールス 10 名を下期中に採用しチームを倍増</div>
+        </div>
+      </div>
+
+      <div class="source-bar">社内プロダクト戦略会議資料 v2.3, 2025年6月</div>
+      <div class="page-num">02</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     PATTERN 3: modular-2x3
+═════════════════════════════════════════════ -->
+<section class="pattern-section">
+  <p class="pattern-caption"><strong>modular-2x3</strong> — 6つのセルを3列×2行、行高 232px の均等モジュラーグリッドで提示</p>
+  <div class="slide-wrapper">
+    <div class="slide" id="mod2x3">
+
+      <div class="action-title">
+        サービス設計の<span class="accent">6 つの原則</span>——顧客価値を最大化するための共通言語
+      </div>
+
+      <!-- row 1 -->
+      <div class="cell cell-surface c-r1c1">
+        <div class="cell-inner">
+          <div class="icon-area">◎</div>
+          <div class="cell-index">01</div>
+          <div class="cell-heading">ユーザー中心設計</div>
+          <div class="cell-body">すべての意思決定を「ユーザーの課題解決につながるか」という問いを軸に行う。定性インサイトをプロダクトロードマップに直接反映する。</div>
+        </div>
+      </div>
+      <div class="cell cell-surface c-r1c2">
+        <div class="cell-inner">
+          <div class="icon-area">⚡</div>
+          <div class="cell-index">02</div>
+          <div class="cell-heading">スピード優先</div>
+          <div class="cell-body">完璧を待たず仮説を早期に市場検証する。2 週間スプリントを維持し学習速度が競争優位の源泉となる。</div>
+        </div>
+      </div>
+      <div class="cell cell-surface c-r1c3">
+        <div class="cell-inner">
+          <div class="icon-area">△</div>
+          <div class="cell-index">03</div>
+          <div class="cell-heading">データ駆動</div>
+          <div class="cell-body">感覚ではなく数値で決める。北極星指標（NSM）を全チームで共有し単一の方向に力を集中させる。</div>
+        </div>
+      </div>
+
+      <!-- row 2 -->
+      <div class="cell cell-surface c-r2c1">
+        <div class="cell-inner">
+          <div class="icon-area">◈</div>
+          <div class="cell-index">04</div>
+          <div class="cell-heading">スケーラビリティ</div>
+          <div class="cell-body">10 倍の規模成長を前提にアーキテクチャを設計する。今日の制約が明日のボトルネックにならない技術選定を行う。</div>
+        </div>
+      </div>
+      <div class="cell cell-surface c-r2c2" style="border:1px solid var(--color-accent);">
+        <div class="cell-inner">
+          <div class="icon-area" style="color:var(--color-accent);">✦</div>
+          <div class="cell-index" style="color:var(--color-accent);">05</div>
+          <div class="cell-heading">透明性</div>
+          <div class="cell-body">意思決定の根拠を社内外に開示する。透明性はチームの信頼と顧客からの信頼を同時に生む文化的な基盤となる。</div>
+        </div>
+      </div>
+      <div class="cell cell-surface c-r2c3">
+        <div class="cell-inner">
+          <div class="icon-area">⬡</div>
+          <div class="cell-index">06</div>
+          <div class="cell-heading">継続的改善</div>
+          <div class="cell-body">リリースは終点ではなく出発点だ。本番指標を監視し毎週の振り返りで改善サイクルを回し続ける。</div>
+        </div>
+      </div>
+
+      <div class="source-bar">サービスデザイン原則 v1.0, プロダクト本部, 2025年6月</div>
+      <div class="page-num">03</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     PATTERN 4: z-pattern-hero
+═════════════════════════════════════════════ -->
+<section class="pattern-section">
+  <p class="pattern-caption"><strong>z-pattern-hero</strong> — Z字視線誘導。左上ヒーロービジュアル → 右上KPI → 左下根拠 → 右下CTA</p>
+  <div class="slide-wrapper">
+    <div class="slide" id="zpat">
+
+      <div class="action-title">
+        私たちは<span class="accent">日本の働き方</span>を、根本から再設計する
+      </div>
+
+      <!-- top-left anchor: col 1-7 (653px wide), h=320 -->
+      <div class="top-left">
+        <div class="hero-visual-inner">
+          <div class="big-text"><em>2030</em></div>
+          <div class="sub">すべての職場に、AI 共同作業者を。</div>
+        </div>
+      </div>
+
+      <!-- top-right stat: col 8-12 (459px wide), h=320 -->
+      <div class="cell cell-surface top-right">
+        <div class="cell-inner" style="justify-content:center;gap:4px;">
+          <div class="cell-label">市場規模予測</div>
+          <div class="kpi-main">¥4.2<span style="font-size:28px;font-weight:400;">兆</span></div>
+          <div class="kpi-label">国内 SaaS × AI 市場, 2030 年</div>
+          <div style="margin-top:20px;border-top:0.5px solid #2A2A2A;padding-top:16px;">
+            <div class="cell-label">参入表明済み企業</div>
+            <div style="font-size:40px;font-weight:900;color:var(--color-text);line-height:1;">1,200<span style="font-size:16px;font-weight:400;color:var(--color-muted);">社以上</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- bottom-left support: col 1-6 (556px), h=144 -->
+      <div class="cell cell-none bot-left">
+        <div class="cell-inner" style="justify-content:center;">
+          <ul class="cell-list" style="gap:0;">
+            <li><span class="li-num">—</span><span>国内労働生産性は先進 G7 中最下位、年間損失は 50 兆円超と試算される</span></li>
+            <li><span class="li-num">—</span><span>AI ツール導入企業は未導入対比で1人あたり年 340h の工数を削減している</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- bottom-right CTA: col 7-12 (556px), h=144 -->
+      <div class="cell cell-mid bot-right">
+        <div class="cell-inner" style="justify-content:center;">
+          <div class="cta-text">今すぐ<em>パイロット</em>を始める →</div>
+        </div>
+      </div>
+
+      <div class="source-bar">出典: 経済産業省 AI 活用動向調査 2025 / IDC Japan</div>
+      <div class="page-num">04</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     PATTERN 5: f-pattern-content
+═════════════════════════════════════════════ -->
+<section class="pattern-section">
+  <p class="pattern-caption"><strong>f-pattern-content</strong> — F字視線誘導。最上段バンド（第1水平走査）＋左主本文（縦走査軸）＋右サイドバー（補足）</p>
+  <div class="slide-wrapper">
+    <div class="slide" id="fpat">
+
+      <div class="action-title">
+        Q2 の失速は<span class="accent">獲得コストの急騰</span>が原因——CAC 改善を最優先課題とせよ
+      </div>
+
+      <!-- top_band: full width 1136px, h=96, offset 152 -->
+      <div class="top-band">
+        <div class="band-content">
+          <div class="band-kpi">
+            <span class="kn kn-accent">¥420K</span>
+            <span class="kl">CAC（四半期平均）</span>
+          </div>
+          <div class="band-kpi">
+            <span class="kn">8.4ヶ月</span>
+            <span class="kl">CAC 回収期間</span>
+          </div>
+          <div class="band-kpi">
+            <span class="kn" style="color:var(--color-negative);">▼ -18%</span>
+            <span class="kl">CAC/LTV 比（前四半期比）</span>
+          </div>
+          <div class="band-summary">Q1 比で広告 CPM が 2.4 倍に上昇。有料獲得に依存した構造が限界を迎えた。</div>
+        </div>
+      </div>
+
+      <!-- left_body: col 1-8, 749px, h=344, offset 272 -->
+      <div class="left-body">
+        <ul class="f-list">
+          <li>
+            <span class="f-num">01</span>
+            <div>
+              <div class="f-title">コンテンツ SEO の本格投資</div>
+              <div class="f-desc">月次 20 本の専門記事を公開し、オーガニック流入比率を現状 12% から 35% へ引き上げる。外部 SEM 依存を段階的に削減する。</div>
+            </div>
+          </li>
+          <li>
+            <span class="f-num">02</span>
+            <div>
+              <div class="f-title">リファラルプログラムの再設計</div>
+              <div class="f-desc">既存顧客紹介インセンティブを見直し、1件紹介あたり ¥30,000 相当のクレジットを付与。紹介経由獲得比率 20% を目標とする。</div>
+            </div>
+          </li>
+          <li>
+            <span class="f-num">03</span>
+            <div>
+              <div class="f-title">PLG フリートライアル導入</div>
+              <div class="f-desc">14 日間フリートライアルで自己完結型のオンボーディングを実現。セールスタッチなしの有料転換率 8% を設計目標に置く。</div>
+            </div>
+          </li>
+          <li>
+            <span class="f-num">04</span>
+            <div>
+              <div class="f-title">アウトバウンド精度向上</div>
+              <div class="f-desc">Intent データを活用した ICP スコアリングモデルを導入。営業接触数を 50% 削減しながら成約率を 2 倍に引き上げる。</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- right_sidebar: col 9-12, 363px, h=344, offset 272 -->
+      <div class="right-sidebar">
+        <div class="sidebar-label">チャネル別 CAC 比較</div>
+        <ul class="sidebar-list">
+          <li><span class="sl-label">有料広告</span><span class="sl-val neg">¥680K</span></li>
+          <li><span class="sl-label">SEO 経由</span><span class="sl-val pos">¥85K</span></li>
+          <li><span class="sl-label">紹介</span><span class="sl-val pos">¥48K</span></li>
+          <li><span class="sl-label">PLG</span><span class="sl-val pos">¥32K</span></li>
+          <li><span class="sl-label">アウトバウンド</span><span class="sl-val">¥310K</span></li>
+          <li><span class="sl-label">目標 CAC</span><span class="sl-val" style="color:var(--color-accent);">≤ ¥200K</span></li>
+        </ul>
+      </div>
+
+      <div class="source-bar">出典: 社内 CRM / Google Analytics, Q2 2025 確定値</div>
+      <div class="page-num">05</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════ Scale script ════ -->
+<script>
+  function scaleSlides() {
+    document.querySelectorAll('.slide-wrapper').forEach(wrapper => {
+      const slide = wrapper.querySelector('.slide');
+      if (!slide) return;
+      const scaleX = wrapper.clientWidth / 1280;
+      const scaleY = wrapper.clientHeight / 720;
+      const scale = Math.min(scaleX, scaleY);
+      slide.style.transform = `scale(${scale})`;
+    });
+  }
+  scaleSlides();
+  window.addEventListener('resize', scaleSlides);
+</script>
+</body>
+</html>

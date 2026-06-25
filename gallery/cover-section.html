@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯 表紙・セクション — theme: editorial-keynote</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;800;900&family=Noto+Serif+JP:wght@400;700;900&family=Montserrat:wght@400;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       EDITORIAL-KEYNOTE THEME TOKENS
+       9 color tokens + typography + grid constants
+    ============================================================ */
+    :root {
+      /* Color tokens */
+      --color-primary:    #F0EDEA;  /* off-white, dominant display type */
+      --color-secondary:  #5C5856;  /* warm charcoal, sub elements */
+      --color-background: #0D0D0D;  /* near-black warm — stage darkness */
+      --color-surface:    #1A1A1A;  /* deep dark gray — containers */
+      --color-accent:     #FF4D1C;  /* signal red-orange — 1 per slide */
+      --color-text:       #F0EDEA;  /* warm off-white, 16.7:1 vs bg */
+      --color-muted:      #8A8480;  /* warm mid-gray, captions */
+      --color-positive:   #34D66A;  /* vivid green — must use with ▲ */
+      --color-negative:   #FF5252;  /* vivid red — must use with ▼ */
+
+      /* Typography */
+      --font-stack: 'Noto Sans JP', 'Helvetica Neue', 'Arial Black', Arial, sans-serif;
+      --font-display-size: 88px;
+      --font-h1-size: 52px;
+      --font-h2-size: 28px;
+      --font-body-size: 16px;
+      --font-caption-size: 12px;
+
+      /* Canvas */
+      --canvas-w: 1280px;
+      --canvas-h: 720px;
+      --safe-top: 56px;
+      --safe-bottom: 56px;
+      --safe-left: 72px;
+      --safe-right: 72px;
+
+      /* Spacing scale */
+      --space-xs:  4px;
+      --space-sm:  8px;
+      --space-md:  12px;
+      --space-lg:  16px;
+      --space-xl:  24px;
+      --space-2xl: 32px;
+      --space-3xl: 48px;
+      --space-4xl: 64px;
+      --space-5xl: 96px;
+    }
+
+    /* ============================================================
+       PAGE CHROME
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #111;
+      color: #ddd;
+      font-family: var(--font-stack);
+      padding: 40px 32px 80px;
+      line-height: 1.5;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #F0EDEA;
+      margin-bottom: 8px;
+    }
+    .page-header p {
+      font-size: 14px;
+      color: #8A8480;
+    }
+
+    /* ============================================================
+       SLIDE WRAPPER — scales 1280×720 to ~50% for viewing
+    ============================================================ */
+    .pattern-block {
+      margin-bottom: 64px;
+    }
+
+    .pattern-caption {
+      font-size: 14px;
+      font-weight: 700;
+      color: #FF4D1C;
+      margin-bottom: 10px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .pattern-caption span {
+      font-weight: 400;
+      color: #8A8480;
+      text-transform: none;
+      font-size: 13px;
+    }
+
+    .slide-viewport {
+      width: 640px;    /* 50% of 1280 */
+      height: 360px;   /* 50% of 720 */
+      overflow: hidden;
+      position: relative;
+      border: 1px solid #2a2a2a;
+    }
+
+    /* Scale inner slide container 1280×720 → 50% */
+    .slide {
+      width: 1280px;
+      height: 720px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: scale(0.5);
+      transform-origin: top left;
+      background-color: var(--color-background);
+      font-family: var(--font-stack);
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       SHARED SLIDE UTILITIES
+    ============================================================ */
+
+    /* Page number — bottom-right, outside safe-area */
+    .pg-num {
+      position: absolute;
+      bottom: 16px;
+      right: 24px;
+      font-size: var(--font-caption-size);
+      font-weight: 400;
+      color: var(--color-muted);
+      font-family: var(--font-stack);
+    }
+
+    /* Accent 1px rule under action title */
+    .accent-rule {
+      height: 1px;
+      background: var(--color-accent);
+      width: 100%;
+    }
+
+    /* ============================================================
+       PATTERN 1: cover-title
+       Regions: background, title_block (col1-10, y224, h176),
+                subtitle_block (col1-8, y416, h64),
+                meta_bar (col1-12, y608, h56, fill surface)
+    ============================================================ */
+    .slide-cover-title {
+      background: var(--color-background);
+    }
+
+    .cover-title__title-block {
+      position: absolute;
+      /* col 1-10: x=72, width=(10cols+9gutters) = 72.67*10+24*9 = 726.7+216 = 942.7 */
+      left: 72px;
+      width: 943px;
+      top: 224px;
+      height: 176px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .cover-title__title {
+      font-size: var(--font-display-size);
+      font-weight: 900;
+      color: var(--color-primary);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .cover-title__subtitle-block {
+      position: absolute;
+      /* col 1-8: x=72, width=72.67*8+24*7=581.3+168=749.3 */
+      left: 72px;
+      width: 749px;
+      top: 416px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+    }
+
+    .cover-title__subtitle {
+      font-size: var(--font-h2-size);
+      font-weight: 400;
+      color: var(--color-muted);
+      line-height: 1.4;
+    }
+
+    .cover-title__meta-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 608px;
+      height: 56px;
+      background: var(--color-surface);
+      display: flex;
+      align-items: center;
+      padding-left: 72px;
+      padding-right: 72px;
+    }
+
+    .cover-title__meta-left {
+      display: flex;
+      gap: 32px;
+      flex: 1;
+    }
+
+    .cover-title__meta-text {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--color-muted);
+    }
+
+    .cover-title__meta-logo {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--color-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* accent mark on first word */
+    .accent-word {
+      color: var(--color-accent);
+    }
+
+    /* ============================================================
+       PATTERN 2: cover-visual-split
+       text_pane: col1-6 (y56, h608)
+       visual_pane: col7-12 (y0, h720, full-bleed)
+       title_area: col1-6, y192, h160
+       subtitle_area: col1-5, y384, h48
+       meta_area: col1-5, y608, h40
+    ============================================================ */
+    .slide-cover-visual-split {
+      background: var(--color-background);
+    }
+
+    /* Left text pane */
+    .cover-split__text-pane {
+      position: absolute;
+      left: 72px;
+      /* col 1-6: width=72.67*6+24*5=436+120=556 */
+      width: 556px;
+      top: 56px;
+      height: 608px;
+    }
+
+    .cover-split__title-area {
+      position: absolute;
+      left: 72px;
+      width: 556px;
+      top: 192px;
+      height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .cover-split__title {
+      font-size: 72px;
+      font-weight: 900;
+      color: var(--color-primary);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .cover-split__subtitle-area {
+      position: absolute;
+      left: 72px;
+      /* col 1-5: width=72.67*5+24*4=363.3+96=459.3 */
+      width: 459px;
+      top: 384px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+    }
+
+    .cover-split__subtitle {
+      font-size: var(--font-h2-size);
+      font-weight: 400;
+      color: var(--color-muted);
+    }
+
+    .cover-split__meta-area {
+      position: absolute;
+      left: 72px;
+      width: 459px;
+      top: 608px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+    }
+
+    .cover-split__meta-text {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--color-muted);
+    }
+
+    /* Right visual pane — full-bleed col 7-12 */
+    .cover-split__visual-pane {
+      position: absolute;
+      /* col 7 left edge: 72 + 6*72.67 + 6*24 = 72+436+144 = 652 */
+      left: 652px;
+      top: 0;
+      right: 0;
+      height: 720px;
+      background: var(--color-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Gradient overlay to simulate photo */
+    .cover-split__visual-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #1A1A1A 0%, #2d2520 40%, #3d2010 70%, #1a0a00 100%);
+    }
+
+    .cover-split__visual-label {
+      position: relative;
+      z-index: 1;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--color-muted);
+      text-align: center;
+      opacity: 0.5;
+    }
+
+    /* Vertical divider hint */
+    .cover-split__divider {
+      position: absolute;
+      left: 648px;
+      top: 0;
+      width: 4px;
+      height: 720px;
+      background: var(--color-accent);
+    }
+
+    /* ============================================================
+       PATTERN 3: section-divider
+       background: full dark
+       section_number: col1-4, y224, h128
+       divider_line: col1-2, y360, h8
+       section_title: col1-10, y376, h96
+    ============================================================ */
+    .slide-section-divider {
+      background: var(--color-background);
+    }
+
+    .section-div__number {
+      position: absolute;
+      /* col 1-4: x=72, width=72.67*4+24*3=290.7+72=362.7 */
+      left: 72px;
+      width: 363px;
+      top: 224px;
+      height: 128px;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-div__number-text {
+      font-size: 120px;
+      font-weight: 900;
+      color: var(--color-primary);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .section-div__line {
+      position: absolute;
+      left: 72px;
+      /* col 1-2: width=72.67*2+24=169.3 */
+      width: 169px;
+      top: 360px;
+      height: 8px;
+      background: var(--color-accent);
+    }
+
+    .section-div__title-block {
+      position: absolute;
+      left: 72px;
+      /* col 1-10: width=942.7 */
+      width: 943px;
+      top: 376px;
+      height: 96px;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-div__title {
+      font-size: var(--font-h1-size);
+      font-weight: 900;
+      color: var(--color-primary);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+    }
+
+    /* ============================================================
+       PATTERN 4: key-message
+       background: full
+       separator_top: col5-8, y224, h8
+       key_message_area: col2-11, y240, h160, center
+       separator_bottom: col5-8, y408, h8
+       supplement_area: col3-10, y432, h48, center
+    ============================================================ */
+    .slide-key-message {
+      background: var(--color-background);
+    }
+
+    .key-msg__sep-top {
+      position: absolute;
+      /* col 5-8: left = 72 + 4*72.67 + 4*24 = 72+290.7+96 = 458.7
+         width col5-8 = 72.67*4+24*3 = 362.7 */
+      left: 459px;
+      width: 363px;
+      top: 224px;
+      height: 8px;
+      background: var(--color-muted);
+      opacity: 0.4;
+    }
+
+    .key-msg__message-area {
+      position: absolute;
+      /* col 2-11: left = 72+72.67+24=168.7, width = 72.67*10+24*9=942.7 */
+      left: 169px;
+      width: 943px;
+      top: 240px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .key-msg__text {
+      font-size: 56px;
+      font-weight: 900;
+      color: var(--color-primary);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .key-msg__sep-bottom {
+      position: absolute;
+      left: 459px;
+      width: 363px;
+      top: 408px;
+      height: 8px;
+      background: var(--color-muted);
+      opacity: 0.4;
+    }
+
+    .key-msg__supplement-area {
+      position: absolute;
+      /* col 3-10: left = 72+72.67*2+24*2=72+145.3+48=265.3
+         width = 72.67*8+24*7=749.3 */
+      left: 265px;
+      width: 749px;
+      top: 432px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .key-msg__supplement {
+      font-size: var(--font-caption-size);
+      font-weight: 400;
+      color: var(--color-muted);
+    }
+
+    /* ============================================================
+       PATTERN 5: quote-statement
+       background: full
+       quote_mark_open: col2-3, y152, h96
+       quote_text_area: col2-11, y240, h192, center
+       attribution_divider: col5-8, y448, h8
+       attribution_area: col3-10, y472, h40, center
+       quote_mark_close: col10-11, y456, h96 (decorative, abs right)
+    ============================================================ */
+    .slide-quote {
+      background: var(--color-background);
+    }
+
+    .quote__mark-open {
+      position: absolute;
+      /* col2-3: left=72+72.67+24=168.7, width=169.3 */
+      left: 169px;
+      width: 169px;
+      top: 152px;
+      height: 96px;
+      display: flex;
+      align-items: flex-start;
+      line-height: 1;
+    }
+
+    .quote__mark-glyph {
+      font-size: 160px;
+      font-weight: 900;
+      color: var(--color-accent);
+      line-height: 0.8;
+      font-family: Georgia, serif;
+      opacity: 0.9;
+    }
+
+    .quote__text-area {
+      position: absolute;
+      /* col 2-11: left=169, width=942.7 */
+      left: 169px;
+      width: 943px;
+      top: 240px;
+      height: 192px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .quote__text {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--color-primary);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+    }
+
+    .quote__attribution-divider {
+      position: absolute;
+      left: 459px;
+      width: 363px;
+      top: 448px;
+      height: 8px;
+      background: var(--color-muted);
+      opacity: 0.35;
+    }
+
+    .quote__attribution-area {
+      position: absolute;
+      /* col 3-10: left=265, width=749 */
+      left: 265px;
+      width: 749px;
+      top: 472px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .quote__attribution {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--color-muted);
+      letter-spacing: 0.02em;
+    }
+
+    .quote__mark-close {
+      position: absolute;
+      /* col10-11: decorative, right side */
+      right: 169px;
+      top: 456px;
+      height: 96px;
+      display: flex;
+      align-items: flex-end;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <h1>🎯 表紙・セクション — theme: editorial-keynote（5 パターン）</h1>
+    <p>layout: cover-section &nbsp;|&nbsp; 全 5 パターン &nbsp;|&nbsp; canvas 1280×720 &nbsp;|&nbsp; 表示倍率 50%</p>
+  </div>
+
+  <!-- ===========================================================
+       PATTERN 1: cover-title
+  =========================================================== -->
+  <div class="pattern-block">
+    <div class="pattern-caption">
+      cover-title <span>— デッキの冒頭に置く表紙スライド。タイトル・サブタイトル・メタバーの3層構造</span>
+    </div>
+    <div class="slide-viewport">
+      <div class="slide slide-cover-title">
+
+        <!-- title_block: col 1-10, y224, h176 -->
+        <div class="cover-title__title-block">
+          <div class="cover-title__title">
+            <span class="accent-word">未来</span>を動かす、<br>データの力
+          </div>
+        </div>
+
+        <!-- subtitle_block: col 1-8, y416, h64 -->
+        <div class="cover-title__subtitle-block">
+          <div class="cover-title__subtitle">
+            AIが切り拓く次世代ビジネス戦略 ——2026年度全社キックオフ
+          </div>
+        </div>
+
+        <!-- meta_bar: col 1-12, y608, h56, surface fill -->
+        <div class="cover-title__meta-bar">
+          <div class="cover-title__meta-left">
+            <span class="cover-title__meta-text">山田 太郎（CTO）</span>
+            <span class="cover-title__meta-text">2026年6月25日</span>
+          </div>
+          <div class="cover-title__meta-logo">GARAGE LABS</div>
+        </div>
+
+        <div class="pg-num">01</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===========================================================
+       PATTERN 2: cover-visual-split
+  =========================================================== -->
+  <div class="pattern-block">
+    <div class="pattern-caption">
+      cover-visual-split <span>— 左テキスト／右キービジュアルの左右分割表紙。ビジュアルがメッセージを補強する</span>
+    </div>
+    <div class="slide-viewport">
+      <div class="slide slide-cover-visual-split">
+
+        <!-- title_area: col 1-6, y192, h160 -->
+        <div class="cover-split__title-area">
+          <div class="cover-split__title">
+            生産性を<br><span class="accent-word">10倍</span>にする
+          </div>
+        </div>
+
+        <!-- subtitle_area: col 1-5, y384, h48 -->
+        <div class="cover-split__subtitle-area">
+          <div class="cover-split__subtitle">次世代ワークフロー自動化プラットフォーム</div>
+        </div>
+
+        <!-- meta_area: col 1-5, y608, h40 -->
+        <div class="cover-split__meta-area">
+          <div class="cover-split__meta-text">田中 花子 &nbsp;｜&nbsp; 2026.06.25</div>
+        </div>
+
+        <!-- visual_pane: col 7-12, full-bleed -->
+        <div class="cover-split__visual-pane">
+          <div class="cover-split__visual-bg"></div>
+          <!-- simulated product visual -->
+          <svg class="cover-split__visual-label" style="position:relative;z-index:2;" width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="20" width="260" height="160" rx="0" fill="none" stroke="#FF4D1C" stroke-width="1" opacity="0.4"/>
+            <rect x="40" y="40" width="80" height="8" rx="0" fill="#F0EDEA" opacity="0.3"/>
+            <rect x="40" y="60" width="180" height="4" rx="0" fill="#8A8480" opacity="0.3"/>
+            <rect x="40" y="76" width="140" height="4" rx="0" fill="#8A8480" opacity="0.3"/>
+            <rect x="40" y="100" width="220" height="60" rx="0" fill="#1A1A1A" opacity="0.8"/>
+            <rect x="52" y="112" width="40" height="24" rx="0" fill="#FF4D1C" opacity="0.7"/>
+            <rect x="104" y="112" width="40" height="16" rx="0" fill="#5C5856" opacity="0.7"/>
+            <rect x="156" y="112" width="40" height="30" rx="0" fill="#5C5856" opacity="0.5"/>
+            <rect x="208" y="112" width="40" height="20" rx="0" fill="#5C5856" opacity="0.4"/>
+            <text x="150" y="185" text-anchor="middle" fill="#8A8480" font-size="10" font-family="sans-serif" opacity="0.5">KEY VISUAL</text>
+          </svg>
+        </div>
+
+        <!-- accent divider between panes -->
+        <div class="cover-split__divider"></div>
+
+        <div class="pg-num">01</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===========================================================
+       PATTERN 3: section-divider
+  =========================================================== -->
+  <div class="pattern-block">
+    <div class="pattern-caption">
+      section-divider <span>— セクション番号と大タイトルのみの最小構成インターミッションスライド</span>
+    </div>
+    <div class="slide-viewport">
+      <div class="slide slide-section-divider">
+
+        <!-- section_number: col 1-4, y224, h128 -->
+        <div class="section-div__number">
+          <span class="section-div__number-text">02</span>
+        </div>
+
+        <!-- divider_line: col 1-2, y360, h8 -->
+        <div class="section-div__line"></div>
+
+        <!-- section_title: col 1-10, y376, h96 -->
+        <div class="section-div__title-block">
+          <div class="section-div__title">
+            市場機会の構造分析
+          </div>
+        </div>
+
+        <div class="pg-num">07</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===========================================================
+       PATTERN 4: key-message
+  =========================================================== -->
+  <div class="pattern-block">
+    <div class="pattern-caption">
+      key-message <span>— 1文の核心主張を中央に配置し、余白で重みを演出する強調スライド</span>
+    </div>
+    <div class="slide-viewport">
+      <div class="slide slide-key-message">
+
+        <!-- separator_top: col 5-8, y224, h8 -->
+        <div class="key-msg__sep-top"></div>
+
+        <!-- key_message_area: col 2-11, y240, h160, center -->
+        <div class="key-msg__message-area">
+          <div class="key-msg__text">
+            日本のAI活用率は、<br>まだ<span class="accent-word"> 12% </span>にすぎない。
+          </div>
+        </div>
+
+        <!-- separator_bottom: col 5-8, y408, h8 -->
+        <div class="key-msg__sep-bottom"></div>
+
+        <!-- supplement_area: col 3-10, y432, h48, center -->
+        <div class="key-msg__supplement-area">
+          <div class="key-msg__supplement">出典: 経済産業省「デジタル産業調査」2025年度版</div>
+        </div>
+
+        <div class="pg-num">12</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===========================================================
+       PATTERN 5: quote-statement
+  =========================================================== -->
+  <div class="pattern-block">
+    <div class="pattern-caption">
+      quote-statement <span>— 大型引用記号と引用テキストで名言・統計を際立たせる引用スライド</span>
+    </div>
+    <div class="slide-viewport">
+      <div class="slide slide-quote">
+
+        <!-- quote_mark_open: col 2-3, y152, h96 -->
+        <div class="quote__mark-open">
+          <span class="quote__mark-glyph">&ldquo;</span>
+        </div>
+
+        <!-- quote_text_area: col 2-11, y240, h192, center -->
+        <div class="quote__text-area">
+          <div class="quote__text">
+            テクノロジーは問いに答えるが、<br>ビジョンは問いを生み出す。
+          </div>
+        </div>
+
+        <!-- attribution_divider: col 5-8, y448, h8 -->
+        <div class="quote__attribution-divider"></div>
+
+        <!-- attribution_area: col 3-10, y472, h40, center -->
+        <div class="quote__attribution-area">
+          <div class="quote__attribution">— 佐藤 真一、CTO Summit 2025 基調講演</div>
+        </div>
+
+        <!-- quote_mark_close: col10-11, y456, decorative -->
+        <div class="quote__mark-close">
+          <span class="quote__mark-glyph" style="color: var(--color-muted); opacity: 0.25;">&rdquo;</span>
+        </div>
+
+        <div class="pg-num">04</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

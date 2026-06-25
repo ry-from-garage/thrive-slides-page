@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPI・まとめ — theme: vibrant-pitch（5 パターン）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  /* ── Vibrant-pitch tokens ── */
+  :root {
+    --primary:    #6600FF;
+    --secondary:  #CC00AA;
+    --background: #FFFFFF;
+    --surface:    #F5F0FF;
+    --accent:     #FF6000;
+    --text:       #150A2E;
+    --muted:      #4A3D6B;
+    --positive:   #0A7A30;
+    --negative:   #E02020;
+    --gradient-hero: linear-gradient(135deg, #6600FF 0%, #CC00AA 100%);
+    /* Grid */
+    --safe-top: 56px;
+    --safe-h:   72px;
+    --col-unit: 72.6667px;
+    --gutter:   24px;
+    --radius:   12px;
+    /* Typography */
+    --font-stack: 'Noto Sans JP', Inter, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1a1a2e;
+    font-family: var(--font-stack);
+    color: var(--text);
+    padding: 32px 0;
+  }
+
+  /* ── Gallery wrapper ── */
+  .gallery-header {
+    text-align: center;
+    color: #fff;
+    font-family: var(--font-stack);
+    font-size: 22px;
+    font-weight: 700;
+    padding: 0 0 40px;
+    letter-spacing: 0.01em;
+  }
+  .gallery-header span {
+    display: inline-block;
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .pattern-block {
+    margin: 0 auto 60px;
+    max-width: 1280px;
+    padding: 0 24px;
+  }
+  .pattern-caption {
+    color: #c8b8ff;
+    font-family: var(--font-stack);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+  .pattern-caption strong { color: #fff; font-size: 16px; }
+
+  /* ── Slide frame ── */
+  .slide {
+    position: relative;
+    width: 1280px;
+    height: 720px;
+    background: var(--background);
+    overflow: hidden;
+    border-radius: 6px;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+    /* scale down for viewport */
+    transform-origin: top left;
+  }
+  /* Responsive scale */
+  @media (max-width: 1340px) {
+    .slide { transform: scale(0.85); margin-bottom: -108px; }
+  }
+  @media (max-width: 1120px) {
+    .slide { transform: scale(0.72); margin-bottom: -201px; }
+  }
+  @media (max-width: 960px) {
+    .slide { transform: scale(0.58); margin-bottom: -302px; }
+  }
+
+  /* ── Shared slide internals ── */
+  .action-title-bar {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 56px;
+    height: 88px;
+    display: flex;
+    align-items: center;
+  }
+  .action-title {
+    font-family: var(--font-stack);
+    font-size: 44px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .bold-rule {
+    position: absolute;
+    left: 72px;
+    width: 1136px;
+    top: 144px; /* 56+88=144 */
+    height: 4px;
+    background: var(--primary);
+  }
+  .source-note {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 640px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    font-family: var(--font-stack);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .page-num {
+    position: absolute;
+    right: 60px;
+    bottom: 14px;
+    font-family: var(--font-stack);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--primary);
+  }
+
+  /* ═══════════════════════════════════════════
+     PATTERN 1: three-kpi-big-number
+     KPI cards: offset 160, height 480
+     4-col each (col 1-4 / 5-8 / 9-12)
+     Col width 4col ≈ 362.67px
+  ═══════════════════════════════════════════ */
+  .p1-kpi-card {
+    position: absolute;
+    top: 160px;
+    height: 480px;
+    width: calc((1136px - 2 * 24px) / 3); /* ≈362.67px */
+    background: var(--surface);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    gap: 0;
+  }
+  .p1-kpi-card:nth-child(1) { left: 72px; }
+  .p1-kpi-card:nth-child(2) { left: calc(72px + (1136px - 48px) / 3 + 24px); }
+  .p1-kpi-card:nth-child(3) { left: calc(72px + 2 * ((1136px - 48px) / 3 + 24px)); }
+
+  .kpi-metric-label {
+    font-family: var(--font-stack);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .kpi-big-number {
+    font-family: var(--font-stack);
+    font-size: 72px;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1;
+    text-align: center;
+  }
+  .kpi-big-number.accent { color: var(--accent); }
+  .kpi-unit {
+    font-family: var(--font-stack);
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-top: 4px;
+    text-align: center;
+  }
+  .kpi-supplement {
+    font-family: var(--font-stack);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--text);
+    margin-top: 24px;
+    text-align: center;
+    line-height: 1.5;
+  }
+  .kpi-badge {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-top: 12px;
+  }
+  .kpi-badge.up { background: #d4edda; color: var(--positive); }
+  .kpi-badge.down { background: #fce4e4; color: var(--negative); }
+
+  /* ═══════════════════════════════════════════
+     PATTERN 2: kgi-kpi-dashboard
+  ═══════════════════════════════════════════ */
+  .p2-goal-band {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 160px;
+    height: 48px;
+    background: var(--gradient-hero);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+  }
+  .p2-goal-text {
+    font-family: var(--font-stack);
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .p2-kgi-row {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 216px;
+    height: 152px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .p2-kpi-row {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 376px;
+    height: 152px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .p2-initiative-row {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 536px;
+    height: 96px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .p2-kgi-cell {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .p2-badge {
+    font-family: var(--font-stack);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .p2-kgi-num {
+    font-family: var(--font-stack);
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1;
+  }
+  .p2-kgi-label {
+    font-family: var(--font-stack);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .p2-kpi-cell {
+    border: 2px solid var(--surface);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .p2-kpi-label {
+    font-family: var(--font-stack);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .p2-progress-bar {
+    height: 8px;
+    background: var(--surface);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .p2-progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 4px;
+  }
+  .p2-progress-label {
+    font-family: var(--font-stack);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+  }
+  .p2-initiative-cell {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .p2-init-badge {
+    font-family: var(--font-stack);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .p2-init-title {
+    font-family: var(--font-stack);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* ═══════════════════════════════════════════
+     PATTERN 3: summary-three-points
+     section_label_col: col 1-3 (3col ≈ 266px)
+     points_col: col 4-12 (9col ≈ 846px)
+  ═══════════════════════════════════════════ */
+  .p3-section-label {
+    position: absolute;
+    left: 72px;
+    top: 160px;
+    width: 266px;
+    height: 480px;
+    background: var(--gradient-hero);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .p3-section-text {
+    font-family: var(--font-stack);
+    font-size: 26px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 0.15em;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+  }
+  .p3-points-col {
+    position: absolute;
+    left: calc(72px + 266px + 24px); /* 362px */
+    right: 72px;
+    top: 160px;
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+  }
+  .p3-point-row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 4px;
+  }
+  .p3-point-row + .p3-point-row {
+    border-top: 1px solid var(--surface);
+  }
+  .p3-check {
+    font-size: 28px;
+    color: var(--primary);
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .p3-point-body { flex: 1; }
+  .p3-point-heading {
+    font-family: var(--font-stack);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .p3-point-sub {
+    font-family: var(--font-stack);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ═══════════════════════════════════════════
+     PATTERN 4: action-items-list
+     label_band: offset 160, h 40
+     table_header: offset 208, h 40
+     table_body: offset 256, h 384
+  ═══════════════════════════════════════════ */
+  .p4-label-band {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 160px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .p4-section-label-text {
+    font-family: var(--font-stack);
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--primary);
+    letter-spacing: 0.12em;
+  }
+  .p4-table-header {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 208px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 8px 8px 0 0;
+    display: grid;
+    grid-template-columns: 48px 1fr 180px 120px;
+    align-items: center;
+    padding: 0 16px;
+    gap: 16px;
+  }
+  .p4-th {
+    font-family: var(--font-stack);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.08em;
+  }
+  .p4-table-body {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 248px; /* 208+40 */
+    height: 384px;
+    display: flex;
+    flex-direction: column;
+  }
+  .p4-row {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 48px 1fr 180px 120px;
+    align-items: center;
+    padding: 0 16px;
+    gap: 16px;
+    border-bottom: 1px solid var(--surface);
+  }
+  .p4-row:last-child { border-bottom: none; }
+  .p4-num-badge {
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: #fff;
+    font-family: var(--font-stack);
+    font-size: 15px;
+    font-weight: 900;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .p4-action-text {
+    font-family: var(--font-stack);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--text);
+  }
+  .p4-owner-tag {
+    display: inline-block;
+    background: var(--surface);
+    color: var(--primary);
+    font-family: var(--font-stack);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1.5px solid var(--primary);
+  }
+  .p4-deadline {
+    font-family: var(--font-stack);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--muted);
+    text-align: right;
+  }
+  .p4-deadline.urgent { color: var(--accent); font-size: 16px; font-weight: 900; }
+
+  /* ═══════════════════════════════════════════
+     PATTERN 5: key-takeaways
+     insight_panel: col 1-4 (362.67px), offset 160, h 480
+     takeaways_col: col 5-12 (749.33px), offset 160, h 480
+  ═══════════════════════════════════════════ */
+  .p5-insight-panel {
+    position: absolute;
+    left: 72px;
+    top: 160px;
+    width: 362px;
+    height: 480px;
+    background: var(--gradient-hero);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .p5-insight-badge {
+    font-family: var(--font-stack);
+    font-size: 11px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .p5-insight-main {
+    font-family: var(--font-stack);
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.45;
+    flex: 1;
+  }
+  .p5-insight-data {
+    font-family: var(--font-stack);
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.75);
+    border-top: 1px solid rgba(255,255,255,0.3);
+    padding-top: 12px;
+    line-height: 1.5;
+  }
+  .p5-takeaways-col {
+    position: absolute;
+    left: calc(72px + 362px + 24px); /* 458px */
+    right: 72px;
+    top: 160px;
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+  }
+  .p5-tw-header {
+    font-family: var(--font-stack);
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--primary);
+    letter-spacing: 0.15em;
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+  .p5-tw-item {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 0 0 0 4px;
+    border-bottom: 1px solid var(--surface);
+  }
+  .p5-tw-item:last-child { border-bottom: none; }
+  .p5-tw-marker {
+    width: 28px;
+    height: 28px;
+    background: var(--surface);
+    color: var(--primary);
+    font-family: var(--font-stack);
+    font-size: 14px;
+    font-weight: 900;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .p5-tw-body { flex: 1; padding: 6px 0; }
+  .p5-tw-heading {
+    font-family: var(--font-stack);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  .p5-tw-sub {
+    font-family: var(--font-stack);
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  🏆 <span>KPI・まとめ — theme: vibrant-pitch（5 パターン）</span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PATTERN 1: three-kpi-big-number
+══════════════════════════════════════════════════════ -->
+<div class="pattern-block">
+  <div class="pattern-caption"><strong>three-kpi-big-number</strong> — 3つの重要指標を等幅カードで横並び、BIG数値インパクト最大化</div>
+  <div class="slide">
+    <!-- Bold rule -->
+    <div class="bold-rule"></div>
+    <!-- Action title -->
+    <div class="action-title-bar">
+      <div class="action-title">第2四半期は3指標すべてで過去最高を記録し、上場基準に到達した</div>
+    </div>
+    <!-- KPI Cards -->
+    <div class="p1-kpi-card">
+      <div class="kpi-metric-label">月間アクティブユーザー</div>
+      <div class="kpi-big-number">1.2M</div>
+      <div class="kpi-unit">MAU</div>
+      <div class="kpi-supplement">前四半期比 +38%</div>
+      <div class="kpi-badge up">▲ 前年同期比 +112%</div>
+    </div>
+    <div class="p1-kpi-card">
+      <div class="kpi-metric-label">年間経常収益</div>
+      <div class="kpi-big-number accent">¥8.4B</div>
+      <div class="kpi-unit" style="color: var(--accent)">ARR</div>
+      <div class="kpi-supplement">前四半期比 +52%</div>
+      <div class="kpi-badge up">▲ 目標対比 108%</div>
+    </div>
+    <div class="p1-kpi-card">
+      <div class="kpi-metric-label">ネット収益維持率</div>
+      <div class="kpi-big-number">142%</div>
+      <div class="kpi-unit">NRR</div>
+      <div class="kpi-supplement">業界中央値 108%</div>
+      <div class="kpi-badge up">▲ 3期連続 140%超</div>
+    </div>
+    <!-- Source note -->
+    <div class="source-note">出典: 自社管理会計データ、2026年Q2（2026年4〜6月）</div>
+    <!-- Page num -->
+    <div class="page-num">01 / 05</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PATTERN 2: kgi-kpi-dashboard
+══════════════════════════════════════════════════════ -->
+<div class="pattern-block">
+  <div class="pattern-caption"><strong>kgi-kpi-dashboard</strong> — ゴール→KGI→KPI→施策の4層縦積みで目標体系を1枚に凝縮</div>
+  <div class="slide">
+    <div class="bold-rule"></div>
+    <div class="action-title-bar">
+      <div class="action-title">2026年度はARR30億円達成で国内SaaS市場トップ5入りを目指す</div>
+    </div>
+    <!-- Goal band -->
+    <div class="p2-goal-band">
+      <div class="p2-goal-text">ビジョン：2027年にアジア太平洋地域で最も信頼されるHR-Techプラットフォームになる</div>
+    </div>
+    <!-- KGI row -->
+    <div class="p2-kgi-row">
+      <div class="p2-kgi-cell">
+        <div class="p2-badge">KGI①</div>
+        <div class="p2-kgi-num">¥30B</div>
+        <div class="p2-kgi-label">ARR — 2026年12月末</div>
+      </div>
+      <div class="p2-kgi-cell">
+        <div class="p2-badge">KGI②</div>
+        <div class="p2-kgi-num">5,000社</div>
+        <div class="p2-kgi-label">有料企業顧客数 — Q4末</div>
+      </div>
+      <div class="p2-kgi-cell">
+        <div class="p2-badge">KGI③</div>
+        <div class="p2-kgi-num">135%</div>
+        <div class="p2-kgi-label">NRR 維持 — 通年平均</div>
+      </div>
+    </div>
+    <!-- KPI row -->
+    <div class="p2-kpi-row">
+      <div class="p2-kpi-cell">
+        <div class="p2-badge">KPI①</div>
+        <div class="p2-kpi-label">新規MRR — 月次 ¥250M</div>
+        <div class="p2-progress-bar"><div class="p2-progress-fill" style="width:78%"></div></div>
+        <div class="p2-progress-label">78% 達成（¥195M / ¥250M）</div>
+      </div>
+      <div class="p2-kpi-cell">
+        <div class="p2-badge">KPI②</div>
+        <div class="p2-kpi-label">月間新規顧客獲得数 — 220社</div>
+        <div class="p2-progress-bar"><div class="p2-progress-fill" style="width:91%"></div></div>
+        <div class="p2-progress-label">91% 達成（200社 / 220社）</div>
+      </div>
+      <div class="p2-kpi-cell">
+        <div class="p2-badge">KPI③</div>
+        <div class="p2-kpi-label">解約率 — 月次 0.8%以下</div>
+        <div class="p2-progress-bar"><div class="p2-progress-fill" style="width:95%; background: var(--positive);"></div></div>
+        <div class="p2-progress-label">0.75% ✓ 目標クリア</div>
+      </div>
+    </div>
+    <!-- Initiative row -->
+    <div class="p2-initiative-row">
+      <div class="p2-initiative-cell">
+        <div class="p2-init-badge">重点施策①</div>
+        <div class="p2-init-title">SMB向けPLGモデル展開（無料トライアル → 有料転換 30% 目標）</div>
+      </div>
+      <div class="p2-initiative-cell">
+        <div class="p2-init-badge">重点施策②</div>
+        <div class="p2-init-title">エンタープライズ カスタマーサクセス強化（CSM 20名 → 35名体制）</div>
+      </div>
+    </div>
+    <div class="source-note">出典: 自社 CRM・SalesForce 統合データ、2026年6月25日時点</div>
+    <div class="page-num">02 / 05</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PATTERN 3: summary-three-points
+══════════════════════════════════════════════════════ -->
+<div class="pattern-block">
+  <div class="pattern-caption"><strong>summary-three-points</strong> — 左「SUMMARY」識別帯＋右3ポイントリストで要点を整理</div>
+  <div class="slide">
+    <div class="bold-rule"></div>
+    <div class="action-title-bar">
+      <div class="action-title">今期の成果は製品・販売・組織の3領域すべてで計画超えを達成した</div>
+    </div>
+    <!-- Section label col -->
+    <div class="p3-section-label">
+      <div class="p3-section-text">SUMMARY</div>
+    </div>
+    <!-- Points col -->
+    <div class="p3-points-col">
+      <div class="p3-point-row">
+        <div class="p3-check">✓</div>
+        <div class="p3-point-body">
+          <div class="p3-point-heading">製品：リリース品質スコアが業界最高水準を達成</div>
+          <div class="p3-point-sub">バグ報告率 0.3件/月（業界平均 2.1件比 85%減）、App Store 評価 4.8/5.0 を維持。顧客満足度 NPS +72 を記録。</div>
+        </div>
+      </div>
+      <div class="p3-point-row">
+        <div class="p3-check">✓</div>
+        <div class="p3-point-body">
+          <div class="p3-point-heading">販売：新規ARR ¥4.2Bで四半期計画を128%達成</div>
+          <div class="p3-point-sub">エンタープライズセグメントが全体の62%を占め、ACV 単価は前年比 +34%。解約率は過去最低の 0.68%/月。</div>
+        </div>
+      </div>
+      <div class="p3-point-row">
+        <div class="p3-check">✓</div>
+        <div class="p3-point-body">
+          <div class="p3-point-heading">組織：採用計画の104%達成、エンジニア離職率1.2%</div>
+          <div class="p3-point-sub">Q2で48名のエンジニアを採用（計画46名）。エンゲージメントスコア 82点（前四半期比 +7点）で文化投資が結果に直結。</div>
+        </div>
+      </div>
+    </div>
+    <div class="source-note">出典: 自社データ、外部 eNPS 調査（Qualtrics）、2026年Q2</div>
+    <div class="page-num">03 / 05</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PATTERN 4: action-items-list
+══════════════════════════════════════════════════════ -->
+<div class="pattern-block">
+  <div class="pattern-caption"><strong>action-items-list</strong> — 番号バッジ付きテーブルで次ステップを担当・期限と共に明示</div>
+  <div class="slide">
+    <div class="bold-rule"></div>
+    <div class="action-title-bar">
+      <div class="action-title">Q3に向け5つのアクションを7月末までに着手・完了させる</div>
+    </div>
+    <!-- Label band -->
+    <div class="p4-label-band">
+      <div class="p4-section-label-text">ACTION ITEMS</div>
+    </div>
+    <!-- Table header -->
+    <div class="p4-table-header">
+      <div class="p4-th">No.</div>
+      <div class="p4-th">アクション内容</div>
+      <div class="p4-th">担当</div>
+      <div class="p4-th" style="text-align:right">期限</div>
+    </div>
+    <!-- Table body -->
+    <div class="p4-table-body">
+      <div class="p4-row">
+        <div class="p4-num-badge">1</div>
+        <div class="p4-action-text">PLGオンボーディング改善：トライアル → 有料転換フロー再設計</div>
+        <div><span class="p4-owner-tag">プロダクト</span></div>
+        <div class="p4-deadline urgent">7/10</div>
+      </div>
+      <div class="p4-row">
+        <div class="p4-num-badge">2</div>
+        <div class="p4-action-text">エンタープライズ向け専用CSMチーム立ち上げ（5名体制）</div>
+        <div><span class="p4-owner-tag">CS部門</span></div>
+        <div class="p4-deadline">7/20</div>
+      </div>
+      <div class="p4-row">
+        <div class="p4-num-badge">3</div>
+        <div class="p4-action-text">アジア5カ国向けローカライズ対応完了（UI・契約書・決済）</div>
+        <div><span class="p4-owner-tag">グローバル</span></div>
+        <div class="p4-deadline">7/31</div>
+      </div>
+      <div class="p4-row">
+        <div class="p4-num-badge">4</div>
+        <div class="p4-action-text">FY2026 予算再配分提案：マーケ予算 +15%・SG&A 最適化</div>
+        <div><span class="p4-owner-tag">CFO室</span></div>
+        <div class="p4-deadline">7/15</div>
+      </div>
+      <div class="p4-row">
+        <div class="p4-num-badge">5</div>
+        <div class="p4-action-text">Series B デックアップデートおよびLP候補へのアウトリーチ開始</div>
+        <div><span class="p4-owner-tag">CEO</span></div>
+        <div class="p4-deadline">7/25</div>
+      </div>
+    </div>
+    <div class="source-note">出典: 2026年Q2 振り返り会議（2026年6月25日）決定事項</div>
+    <div class="page-num">04 / 05</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PATTERN 5: key-takeaways
+══════════════════════════════════════════════════════ -->
+<div class="pattern-block">
+  <div class="pattern-caption"><strong>key-takeaways</strong> — 左「KEY INSIGHT」洞察パネル＋右テイクアウェイリストの非対称2カラム</div>
+  <div class="slide">
+    <div class="bold-rule"></div>
+    <div class="action-title-bar">
+      <div class="action-title">製品主導成長×エンタープライズ深耕の二軸戦略が市場での圧倒的優位を生む</div>
+    </div>
+    <!-- Insight panel -->
+    <div class="p5-insight-panel">
+      <div class="p5-insight-badge">KEY INSIGHT</div>
+      <div class="p5-insight-main">PLGとエンタープライズ営業の両輪が回りだした今こそ、競合が追いつく前に海外展開を加速すべき分岐点にある</div>
+      <div class="p5-insight-data">ARR成長率 +52% QoQ・NRR 142%・解約率 0.68%——3指標同時最高更新は国内SaaS史上でも稀なケース（出典: SaaS Japan White Paper 2026）</div>
+    </div>
+    <!-- Takeaways col -->
+    <div class="p5-takeaways-col">
+      <div class="p5-tw-header">TAKEAWAYS</div>
+      <div class="p5-tw-item">
+        <div class="p5-tw-marker">01</div>
+        <div class="p5-tw-body">
+          <div class="p5-tw-heading">SMBのPLG流入がエンタープライズの商談パイプラインを2倍に増やしている</div>
+          <div class="p5-tw-sub">トライアル経由の大手引き合いが全新規商談の34%を占め、CAC は従来比 −42%。</div>
+        </div>
+      </div>
+      <div class="p5-tw-item">
+        <div class="p5-tw-marker">02</div>
+        <div class="p5-tw-body">
+          <div class="p5-tw-heading">NRR 142%はカスタマーサクセスへの投資回収が完了した証拠</div>
+          <div class="p5-tw-sub">CSM 1人あたり管理ARR ¥480Mを達成。ランドアンドエクスパンドが機能している。</div>
+        </div>
+      </div>
+      <div class="p5-tw-item">
+        <div class="p5-tw-marker">03</div>
+        <div class="p5-tw-body">
+          <div class="p5-tw-heading">アジア市場は国内の2倍のTAMを持ち、ローカライズ完了で即参入可能</div>
+          <div class="p5-tw-sub">タイ・ベトナム・インドネシアの3カ国で競合不在のホワイトスペース確認済み。</div>
+        </div>
+      </div>
+      <div class="p5-tw-item">
+        <div class="p5-tw-marker">04</div>
+        <div class="p5-tw-body">
+          <div class="p5-tw-heading">採用と文化投資がエンジニア離職率 1.2%という業界最低水準を実現</div>
+          <div class="p5-tw-sub">採用コスト削減と開発速度維持の両立が、今後のプロダクト競争力の根幹となる。</div>
+        </div>
+      </div>
+    </div>
+    <div class="source-note">出典: 自社データ・SaaS Japan White Paper 2026・外部VC調査（2026年6月）</div>
+    <div class="page-num">05 / 05</div>
+  </div>
+</div>
+
+</body>
+</html>
