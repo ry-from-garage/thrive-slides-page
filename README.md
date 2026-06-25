@@ -4,27 +4,43 @@
 
 # thrive-slides — サンプルギャラリー（GitHub Pages 公開用）
 
-thrive-slides の全スライドパターン（**5テーマ・14カテゴリ・全83パターン**）のサンプルを、ブラウザでそのまま閲覧できるよう GitHub Pages で公開するためのリポジトリです。
+thrive-slides の全スライドパターン（**5テーマ・14カテゴリ・全83パターン＋イントロ＋カテゴリ区切り＝98スライド**）を、reveal.js デッキとしてブラウザで閲覧できるよう GitHub Pages で公開するためのリポジトリです。
+
+ギャラリーは `thrive-slides/renderer` の **決定論的HTMLレンダラ** によって生成されています。
 
 ## ▶ 公開ページ
 
 **https://ry-from-garage.github.io/thrive-slides-page/**
 
-（ルートにアクセスすると、ギャラリー入口 `gallery/index.html` に自動で移動します）
+## ナビゲーション
+
+- `←` / `→` でスライド移動
+- `Esc` または `O` でオーバービューグリッド表示
 
 ## 収録内容
 
-- `gallery/index.html` — ギャラリー入口（5テーマ・14カテゴリへのリンク）
-- `gallery/*.html` — 14カテゴリ × 全83パターン（各カテゴリを相性の良いテーマで描画）
-- `gallery-themes.html` — 5テーマのショーケース
-- `gallery-layouts.html` — 14カテゴリ概観 ＋ ブランド融合デモ
-- `slice-deck.html` — サンプルデッキ（完成例）
+- **5テーマ・14カテゴリ・全83パターン**（＋イントロ＋カテゴリ区切り＝合計98スライド）
+- `index.html` — reveal.js ギャラリーデッキ（サイトルート）
+- `vendor/` — reveal.js ライブラリ
+- `src/` — thrive-slides レンダラ（テーマ・コンポーネント・CSS）
+
+## 再生成方法
+
+本体リポジトリの renderer から再ビルドして反映します：
+
+```bash
+cd thrive-slides/renderer
+npm install
+npx playwright install chromium
+node build.js specs/gallery.json out
+# out/ を thrive-slides-page/ にコピー
+```
 
 ## 関連リポジトリ
 
 - **本体（Skill / デザインシステム）:** https://github.com/ry-from-garage/thrive-slides
 
-> このリポジトリは公開（GitHub Pages）専用です。ギャラリー HTML は本体リポジトリの `previews/` から複製しています。内容を更新する場合は本体側を更新し、ここへ反映してください。
+> このリポジトリは公開（GitHub Pages）専用です。内容を更新する場合は本体リポジトリの `renderer/` でビルドし直し、ここへ反映してください。
 
 ## ライセンス
 

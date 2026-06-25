@@ -1,0 +1,93 @@
+/**
+ * charts.css — theme-aware styling for SVG chart generators
+ *
+ * Series fill colors map to theme CSS variables defined in themes.css.
+ * No 3D, no gradients on data elements.
+ */
+
+/* ── Series colors ──────────────────────────────────────────────────────────── */
+
+.ts-chart-series-1        { fill: var(--primary); }
+.ts-chart-series-2        { fill: var(--secondary); }
+.ts-chart-series-3        { fill: var(--accent); }
+
+/* ── Waterfall / signed colors ──────────────────────────────────────────────── */
+
+.ts-chart-pos             { fill: var(--positive); }
+.ts-chart-neg             { fill: var(--negative); }
+
+/* ── Axes & gridlines ───────────────────────────────────────────────────────── */
+
+.ts-chart-axis {
+  stroke: var(--muted);
+  stroke-width: 1;
+  fill: none;
+}
+
+.ts-chart-grid {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 4, 4;
+  fill: none;
+  opacity: 0.5;
+}
+
+.ts-chart-connector {
+  stroke: var(--muted);
+  stroke-width: 1;
+  fill: none;
+}
+
+/* ── Labels ─────────────────────────────────────────────────────────────────── */
+
+.ts-chart-axis-label {
+  fill: var(--text);
+  font-size: var(--caption);
+  font-family: var(--font-body);
+}
+
+.ts-chart-label {
+  fill: var(--text);
+  font-size: var(--caption);
+  font-family: var(--font-body);
+}
+
+/* ── Line chart specifics ───────────────────────────────────────────────────── */
+
+.ts-chart-line {
+  stroke-width: 2;
+  /* fill is 'none' — set inline; stroke inherits currentColor from series class
+     but we override via a stroke sibling selector below */
+}
+
+.ts-chart-series-1.ts-chart-line  { stroke: var(--primary);   fill: none; }
+.ts-chart-series-2.ts-chart-line  { stroke: var(--secondary); fill: none; }
+.ts-chart-series-3.ts-chart-line  { stroke: var(--accent);    fill: none; }
+
+.ts-chart-dot {
+  stroke: var(--bg);
+  stroke-width: 1.5;
+}
+
+/* ── Bubble chart ───────────────────────────────────────────────────────────── */
+
+.ts-chart-bubble {
+  opacity: 0.8;
+  stroke: var(--bg);
+  stroke-width: 1.5;
+}
+
+.ts-chart-plot-bg {
+  stroke: var(--muted);
+  stroke-width: 1;
+  opacity: 0.4;
+}
+
+/* ── Harvey balls ───────────────────────────────────────────────────────────── */
+
+.ts-harvey-bg   { fill: var(--surface); }
+.ts-harvey-fill { fill: var(--primary); }
+.ts-harvey-ring {
+  stroke: var(--primary);
+  stroke-width: 1.5;
+}
