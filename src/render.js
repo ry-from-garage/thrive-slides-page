@@ -1,9 +1,59 @@
 import { renderPattern } from './patterns/index.js';
 
+/**
+ * Derive a stable section id from a divider's content.title.
+ * Strips emoji/special chars, lowercases, replaces spaces with hyphens.
+ */
+function dividerSlug(title) {
+  return title
+    .replace(/[\u{1F000}-\u{1FFFF}]/gu, '')  // strip emoji (surrogate range)
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')        // strip non-alphanumeric (keep letters/digits/spaces/hyphens)
+    .trim()
+    .replace(/\s+/g, '-')
+    .toLowerCase()
+    || 'cat';
+}
+
+/**
+ * Assign stable ids to all slides.
+ * - _intro → "intro"
+ * - _divider → "cat-<slug>" where slug is derived from content.title
+ * - pattern slides → the pattern name itself (patterns are unique in gallery)
+ */
+function assignSlideIds(slides) {
+  const usedIds = new Set();
+  const dividerCount = {};
+
+  return slides.map((slide) => {
+    const pattern = slide.pattern ?? '_stub';
+    let id;
+
+    if (pattern === '_intro') {
+      id = 'intro';
+    } else if (pattern === '_divider') {
+      const slug = dividerSlug(slide.content?.title ?? 'cat');
+      const base = `cat-${slug}`;
+      // ensure uniqueness in case two dividers produce the same slug
+      let candidate = base;
+      let n = 2;
+      while (usedIds.has(candidate)) {
+        candidate = `${base}-${n++}`;
+      }
+      id = candidate;
+    } else {
+      id = pattern;
+    }
+
+    usedIds.add(id);
+    return { ...slide, _id: id };
+  });
+}
+
 export function renderDeck(spec) {
   const slides = spec.slides ?? [];
+  const slidesWithIds = assignSlideIds(slides);
 
-  const slideSections = slides.map((slide) => {
+  const slideSections = slidesWithIds.map((slide) => {
     const theme = slide.theme ?? 'default';
     const pattern = slide.pattern ?? '_stub';
     const inner = renderPattern(pattern, slide.content ?? {}, { slide, spec });
@@ -13,7 +63,7 @@ export function renderDeck(spec) {
     const pageHtml = slide.page
       ? `<div class="ts-pageno">${slide.page}</div>`
       : '';
-    return `    <section class="ts-slide theme-${theme}" data-pattern="${pattern}">\n${inner}\n${sourceHtml}${pageHtml}\n    </section>`;
+    return `    <section id="${slide._id}" class="ts-slide theme-${theme}" data-pattern="${pattern}">\n${inner}\n${sourceHtml}${pageHtml}\n    </section>`;
   }).join('\n');
 
   return `<!DOCTYPE html>
@@ -32,8 +82,27 @@ export function renderDeck(spec) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    #ts-back-to-catalog {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 9999;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      text-decoration: none;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 13px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      opacity: 0.7;
+      transition: opacity 0.15s;
+    }
+    #ts-back-to-catalog:hover { opacity: 1; }
+  </style>
 </head>
 <body>
+  <a id="ts-back-to-catalog" href="index.html">← カタログ</a>
   <div class="reveal">
     <div class="slides">
 ${slideSections}
@@ -56,3 +125,8 @@ ${slideSections}
 </body>
 </html>`;
 }
+
+/**
+ * Export the id-assignment function so catalog.js and thumbs.mjs can reuse it.
+ */
+export { assignSlideIds, dividerSlug };
