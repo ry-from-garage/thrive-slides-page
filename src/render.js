@@ -92,6 +92,7 @@ export function renderDeck(spec) {
 </head>
 <body>
   <a id="ts-back-to-catalog" href="index.html">← カタログ</a>
+  <a id="ts-usage-link" href="usage.html">📖 使い方</a>
   <div class="reveal">
     <div class="slides">
 ${slideSections}

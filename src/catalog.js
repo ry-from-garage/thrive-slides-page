@@ -133,8 +133,14 @@ export function renderCatalog(spec) {
       font-size: 0.875rem;
       color: var(--text-muted);
     }
-    .deck-link {
+    .header-actions {
       margin-left: auto;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .deck-link {
       background: var(--accent);
       color: #fff;
       text-decoration: none;
@@ -146,6 +152,19 @@ export function renderCatalog(spec) {
       transition: background 0.15s;
     }
     .deck-link:hover { background: var(--accent-hover); }
+    .usage-link {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 7px 16px;
+      border-radius: 20px;
+      white-space: nowrap;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .usage-link:hover { border-color: var(--accent); color: var(--accent); }
 
     /* ── Jump nav ── */
     .jump-nav {
@@ -267,7 +286,10 @@ export function renderCatalog(spec) {
   <header class="site-header">
     <div class="header-top">
       <span class="site-title">thrive-slides — スライドパターンカタログ</span>
-      <a class="deck-link" href="deck.html">▶ デッキで通し閲覧</a>
+      <div class="header-actions">
+        <a class="usage-link" href="usage.html">📖 使い方</a>
+        <a class="deck-link" href="deck.html">▶ デッキで通し閲覧</a>
+      </div>
     </div>
     <div class="site-subtitle">5 テーマ × ${catCount} カテゴリ × ${totalPatterns} パターン</div>
   </header>
