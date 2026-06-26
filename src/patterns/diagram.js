@@ -2,42 +2,57 @@
  * diagram.js — ダイアグラムパターン群 (strategy-consulting theme)
  *
  * Patterns:
- *   cycle-diagram          — PDCA/サイクル図（4ステップ環状）
- *   hub-spoke              — ハブ＆スポーク図（中心+放射）
- *   four-quadrant-center   — 2×2象限＋中央ハブ
- *   circle-hub-list-right  — 左円ハブ＋右リスト
- *   center-illustration-spoke — 中央ビジュアル＋スポーク
+ *   cycle-diagram          — PDCA/サイクル図（環状ステップ + 時計回り矢印）
+ *   hub-spoke              — ハブ＆スポーク図（中心 + 放射スポーク）
+ *   four-quadrant-center   — 2×2象限 + 中央ハブ
+ *   circle-hub-list-right  — 左円ハブ + 右リスト
+ *   center-illustration-spoke — 中央ビジュアル + 集約スポーク
  *   org-chart-tree         — 組織図ツリー（3階層）
  *   bilateral-flow         — 双方向フロー（2主体）
  *
- * Theme: strategy-consulting
- *   white bg, navy (--text), crimson (--accent), serif titles
+ * Geometry is library-backed (build-time, Node):
+ *   - d3-shape  arc()         → cycle ring segments
+ *   - d3-shape  linkVertical()→ org-chart connectors (attach to box edges)
+ *   - d3-hierarchy tree()     → org-chart node layout
+ *   - src/diagrams/radial.js  → shared hub/spoke/center placement, edge-to-edge
+ *                               connectors, angle-based label sides
+ *   - src/diagrams/svg.js     → themed overlay SVG, <marker orient="auto"> arrows
+ *   - src/diagrams/text.js    → no-DOM text measurement to size circles to fit
  *
- * Grid (safe-area x 72..1208, y 56..664):
- *   12 cols, COL_UNIT = 96.6667px
- *   colX(n) = 72 + (n-1) * 96.6667
- *   colW(n) = n * 96.6667 - 24
+ * Output is STATIC themed SVG (no client JS). Colors via CSS vars / currentColor.
+ *
+ * Grid (safe-area x 72..1208, y 56..664): 12 cols, COL_UNIT = 96.6667px.
  */
 
 import { definePattern } from './registry.js';
+import { arc as d3arc } from 'd3-shape';
+import { hierarchy as d3hierarchy, tree as d3tree } from 'd3-hierarchy';
+import { linkVertical } from 'd3-shape';
+import { radialLayout, labelPlacement } from '../diagrams/radial.js';
+import { arrowMarker, overlaySvg, line as svgLine, pathEl, r1 } from '../diagrams/svg.js';
+import { fitCircleRadius } from '../diagrams/text.js';
 
 // ── Grid helpers ──────────────────────────────────────────────────────────────
 const COL_UNIT = 96.6667;
 const SAFE_LEFT = 72;
+const SAFE_RIGHT = 1208;
 
 function colX(n) {
   return SAFE_LEFT + (n - 1) * COL_UNIT;
 }
-
 function colW(n) {
   return n * COL_UNIT - 24;
 }
-
 function colRange(s, e) {
   return { left: Math.round(colX(s)), width: Math.round(colW(e - s + 1)) };
 }
 
-// ── Shared: title region ──────────────────────────────────────────────────────
+// HTML-escape newline → <br> within label text (labels may carry "\n").
+function brs(str = '') {
+  return String(str).replace(/\n/g, '<br>');
+}
+
+// ── Shared: title / lead / source regions ──────────────────────────────────────
 function titleHtml(title, height = 80) {
   const r = colRange(1, 12);
   return `<div data-region="title_bar" class="ts-region" style="
@@ -84,25 +99,39 @@ function sourceHtml(source) {
 </div>`;
 }
 
+// Reusable filled hub circle + centered label (used by several patterns).
+function hubCircle({ cx, cy, r, region = 'hub_shape', fill = 'var(--primary)' }) {
+  return `<div data-region="${region}" class="ts-region" style="
+  left:${Math.round(cx - r)}px; top:${Math.round(cy - r)}px;
+  width:${Math.round(r * 2)}px; height:${Math.round(r * 2)}px;
+  border-radius:50%; background:${fill};
+"></div>`;
+}
+
+function hubLabelBox({ cx, cy, r, label, region = 'hub_label', fontSize = 16, color = 'var(--bg)' }) {
+  return `<div data-region="${region}" class="ts-region" style="
+  left:${Math.round(cx - r)}px; top:${Math.round(cy - r)}px;
+  width:${Math.round(r * 2)}px; height:${Math.round(r * 2)}px;
+  display:flex; align-items:center; justify-content:center;
+  pointer-events:none; box-sizing:border-box; padding:6px;
+">
+  <div style="
+    font-family:var(--font-head);
+    font-size:${fontSize}px;
+    color:${color};
+    font-weight:700;
+    text-align:center;
+    line-height:1.25;
+    white-space:normal; overflow-wrap:break-word; word-break:keep-all;
+  ">${brs(label)}</div>
+</div>`;
+}
+
 // ── Pattern: cycle-diagram ────────────────────────────────────────────────────
 /**
- * content: {
- *   title: string,
- *   lead?: string,
- *   center_label: string,
- *   steps: Array<{ label, body? }>,   // 3–6 steps, clockwise from top
- *   source?: string
- * }
- *
- * Structure:
- *   title_bar   col 1-12  offset 56   height 80
- *   lead_text   col 1-12  offset 152  height 40
- *   diagram_area col 1-12 offset 208  height 416
- *   source_bar  col 1-12  offset 640  height 24
- *
- * Cycle center: x=640, y=416 (208+208).
- * Ring outer radius: 160px; segment labels radius: ~270px.
- * All geometry fits y 208..624.
+ * Ring of N segments (d3 arc) around a center label, clockwise arrows on the
+ * ring boundaries, step label boxes radially outside each segment with a
+ * connector line to the ring edge.
  */
 definePattern('cycle-diagram', (c) => {
   const title = c.title ?? '';
@@ -113,194 +142,126 @@ definePattern('cycle-diagram', (c) => {
 
   const N = steps.length || 4;
   const CX = 640;
-  const CY = 416; // 208 + 208
+  const CY = 416; // diagram_area center (208 + 208)
 
-  // Radii
-  const R_INNER = 56;   // center circle
-  const R_RING_IN = 80; // ring inner edge
-  const R_RING_OUT = 160; // ring outer edge
-  const R_LABEL = 240;  // label box center
+  // Center label circle sized to fit its text; ring sits just outside it.
+  const R_INNER = fitCircleRadius(centerLabel, 13, { padding: 12, min: 52, max: 72 });
+  const R_RING_IN = R_INNER + 20; // ring inner edge
+  const R_RING_OUT = R_RING_IN + 72; // ring outer edge
+  const R_LABEL = 248;    // step-label box center radius
 
-  // Label box dims
-  const LABEL_W = 160;
-  const LABEL_H = 72;
+  const LABEL_W = 168;
+  const LABEL_H = 76;
 
-  // Build SVG for ring + arrows + center circle
-  // Start angle: top = -90deg
-  const angleStep = (2 * Math.PI) / N;
-  const startAngle = -Math.PI / 2;
+  const startAngle = -Math.PI / 2; // top
+  const step = (2 * Math.PI) / N;
+  const GAP = 0.06; // radians between segments
 
-  // Segment paths (donut segments)
-  const GAP_RAD = 0.05; // gap between segments
+  // d3 arc generator (centered at origin; we translate into the overlay later).
+  const ring = d3arc().innerRadius(R_RING_IN).outerRadius(R_RING_OUT).cornerRadius(2);
 
-  let svgContent = '';
+  // Build defs (arrow marker) once.
+  const arrow = arrowMarker({ id: 'cyc-arrow', color: 'var(--secondary)', size: 11 });
 
-  // Draw ring segments
+  let body = '';
+
+  // Ring segments — d3 arc path, translated to (CX,CY).
   for (let i = 0; i < N; i++) {
-    const a0 = startAngle + i * angleStep + GAP_RAD / 2;
-    const a1 = startAngle + (i + 1) * angleStep - GAP_RAD / 2;
-
-    const x0i = Math.cos(a0) * R_RING_IN;
-    const y0i = Math.sin(a0) * R_RING_IN;
-    const x1i = Math.cos(a1) * R_RING_IN;
-    const y1i = Math.sin(a1) * R_RING_IN;
-    const x0o = Math.cos(a0) * R_RING_OUT;
-    const y0o = Math.sin(a0) * R_RING_OUT;
-    const x1o = Math.cos(a1) * R_RING_OUT;
-    const y1o = Math.sin(a1) * R_RING_OUT;
-
-    const largeArc = angleStep > Math.PI ? 1 : 0;
-    const d = [
-      `M ${x0o} ${y0o}`,
-      `A ${R_RING_OUT} ${R_RING_OUT} 0 ${largeArc} 1 ${x1o} ${y1o}`,
-      `L ${x1i} ${y1i}`,
-      `A ${R_RING_IN} ${R_RING_IN} 0 ${largeArc} 0 ${x0i} ${y0i}`,
-      `Z`
-    ].join(' ');
-
-    svgContent += `<path d="${d}" fill="var(--surface)" stroke="var(--bg, #fff)" stroke-width="2"/>`;
+    // d3 arc angles: 0 = up (12 o'clock), clockwise positive. Our screen "top"
+    // start maps to d3 angle 0; segment i spans [i*step, (i+1)*step].
+    const a0 = i * step + GAP / 2;
+    const a1 = (i + 1) * step - GAP / 2;
+    const d = ring({ startAngle: a0, endAngle: a1 });
+    body += `<path d="${d}" transform="translate(${CX},${CY})"
+      fill="var(--surface)" stroke="var(--bg)" stroke-width="2"/>`;
   }
 
-  // Draw arrows between segments (clockwise arrowheads at segment midpoints on outer ring)
+  // Clockwise arrows on each segment boundary (just outside the ring).
   for (let i = 0; i < N; i++) {
-    // Arrow at the boundary between segment i and i+1
-    const boundaryAngle = startAngle + (i + 1) * angleStep;
-    const arrowAngle = boundaryAngle;
-    // Place arrow head slightly outside ring
-    const R_ARROW = R_RING_OUT + 12;
-    const ax = Math.cos(arrowAngle) * R_ARROW;
-    const ay = Math.sin(arrowAngle) * R_ARROW;
-    // tangent direction (clockwise = +90deg from radial)
-    const tx = -Math.sin(arrowAngle);
-    const ty = Math.cos(arrowAngle);
-    const ARR = 8;
-    svgContent += `<polygon points="
-      ${ax - tx * ARR + ty * 4},${ay - ty * ARR - tx * 4}
-      ${ax + tx * ARR},${ay + ty * ARR}
-      ${ax - tx * ARR - ty * 4},${ay - ty * ARR + tx * 4}
-    " fill="var(--muted)" opacity="0.6"/>`;
+    const boundary = startAngle + (i + 1) * step; // screen-space angle of boundary
+    const rA = (R_RING_IN + R_RING_OUT) / 2;
+    const px = CX + Math.cos(boundary) * rA;
+    const py = CY + Math.sin(boundary) * rA;
+    // Tangent (clockwise) direction for a tiny oriented arrow segment.
+    const tx = -Math.sin(boundary);
+    const ty = Math.cos(boundary);
+    const L = 9;
+    body += svgLine({
+      x1: px - tx * L, y1: py - ty * L,
+      x2: px + tx * L, y2: py + ty * L,
+      markerEnd: arrow.id, width: 2.5, opacity: 0.95, color: 'var(--secondary)',
+    });
   }
 
-  // Center circle
-  svgContent += `<circle cx="0" cy="0" r="${R_INNER}" fill="var(--text)" opacity="0.85"/>`;
+  // Connector lines: ring outer edge → step label box center.
+  const labels = steps.map((stepData, i) => {
+    const angle = startAngle + (i + 0.5) * step; // mid-segment angle
+    const ux = Math.cos(angle);
+    const uy = Math.sin(angle);
+    const lx = CX + ux * R_LABEL;
+    const ly = CY + uy * R_LABEL;
+    let boxLeft = lx - LABEL_W / 2;
+    let boxTop = ly - LABEL_H / 2;
+    boxLeft = Math.max(SAFE_LEFT, Math.min(SAFE_RIGHT - LABEL_W, boxLeft));
+    boxTop = Math.max(212, Math.min(620 - LABEL_H, boxTop));
+    const boxCX = boxLeft + LABEL_W / 2;
+    const boxCY = boxTop + LABEL_H / 2;
 
-  // SVG is rendered centered at (0,0); we'll translate via the container
-  // Compute diagram_area SVG viewBox centered
-  const SVG_W = 1136; // safe area width
-  const SVG_H = 416;  // diagram_area height
-  const SVG_CX = CX - SAFE_LEFT; // cx relative to safe left = 640 - 72 = 568
-  const SVG_CY = CY - 208; // cy relative to diagram_area top = 208
+    // Connector from ring outer edge toward the box (stop at box edge).
+    const edgeX = CX + ux * (R_RING_OUT + 2);
+    const edgeY = CY + uy * (R_RING_OUT + 2);
+    body += svgLine({
+      x1: edgeX, y1: edgeY, x2: boxCX - ux * (LABEL_W / 2), y2: boxCY - uy * (LABEL_H / 2),
+      width: 1.25, opacity: 0.5,
+    });
 
-  const diagramSvg = `<svg xmlns="http://www.w3.org/2000/svg"
-  viewBox="${-SVG_CX} ${-SVG_CY} ${SVG_W} ${SVG_H}"
-  width="${SVG_W}" height="${SVG_H}"
-  style="display:block; overflow:visible;"
->
-  ${svgContent}
-</svg>`;
-
-  // Center label text (absolute positioned)
-  const centerLabelHtml = `<div data-region="center_label" class="ts-region" style="
-  left:${CX - R_INNER}px; top:${CY - R_INNER}px;
-  width:${R_INNER * 2}px; height:${R_INNER * 2}px;
-  display:flex; align-items:center; justify-content:center;
-  border-radius:50%;
-  text-align:center;
-  box-sizing:border-box; padding:4px;
-  pointer-events:none;
-">
-  <div style="
-    font-family:var(--font-head);
-    font-size:12px;
-    color:#fff;
-    font-weight:700;
-    line-height:1.2;
-    white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-    text-align:center;
-  ">${centerLabel}</div>
-</div>`;
-
-  // Step label boxes
-  const labelBoxes = steps.map((step, i) => {
-    const angle = startAngle + (i + 0.5) * angleStep;
-    const lx = CX + Math.cos(angle) * R_LABEL;
-    const ly = CY + Math.sin(angle) * R_LABEL;
-    const boxLeft = Math.round(lx - LABEL_W / 2);
-    const boxTop = Math.round(ly - LABEL_H / 2);
-
-    // Clamp within diagram_area bounds (y 208..624) and safe x (72..1208)
-    const safeLeft = Math.max(SAFE_LEFT, Math.min(1208 - LABEL_W, boxLeft));
-    const safeTop = Math.max(208, Math.min(624 - LABEL_H, boxTop));
-
-    // Connector line from ring outer edge to label
-    const edgeX = CX + Math.cos(angle) * (R_RING_OUT + 4);
-    const edgeY = CY + Math.sin(angle) * (R_RING_OUT + 4);
-    const labelCX = safeLeft + LABEL_W / 2;
-    const labelCY = safeTop + LABEL_H / 2;
-
-    return `<svg data-region="step_conn_${i + 1}" class="ts-region" style="
-  left:0px; top:0px; width:1280px; height:720px;
-  pointer-events:none; overflow:visible; position:absolute;
-" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
-  <line x1="${Math.round(edgeX)}" y1="${Math.round(edgeY)}" x2="${Math.round(labelCX)}" y2="${Math.round(labelCY)}" stroke="var(--muted)" stroke-width="1.5" opacity="0.5"/>
-</svg>
-<div data-region="step_label_${i + 1}" class="ts-region" style="
-  left:${safeLeft}px; top:${safeTop}px;
+    return `<div data-region="step_label_${i + 1}" class="ts-region" style="
+  left:${Math.round(boxLeft)}px; top:${Math.round(boxTop)}px;
   width:${LABEL_W}px; height:${LABEL_H}px;
   border:1px solid var(--muted);
   border-radius:4px;
-  box-sizing:border-box; padding:6px 8px;
-  background:var(--bg, #fff);
+  box-sizing:border-box; padding:8px 10px;
+  background:var(--bg);
   overflow:hidden;
+  display:flex; flex-direction:column; justify-content:center;
 ">
   <div style="
     font-family:var(--font-head);
-    font-size:13px;
-    color:var(--text);
-    font-weight:600;
-    line-height:1.3;
-    margin-bottom:3px;
+    font-size:13px; color:var(--text); font-weight:700;
+    line-height:1.25; margin-bottom:3px;
     white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-  ">${step.label ?? ''}</div>
-  ${step.body ? `<div style="
+  ">${stepData.label ?? ''}</div>
+  ${stepData.body ? `<div style="
     font-family:var(--font-body);
-    font-size:11px;
-    color:var(--muted);
-    line-height:1.3;
+    font-size:11px; color:var(--muted); line-height:1.3;
     white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-  ">${step.body}</div>` : ''}
+  ">${stepData.body}</div>` : ''}
 </div>`;
   }).join('\n');
+
+  const overlay = overlaySvg({ defs: arrow.def, body, region: 'cycle_diagram' });
+
+  // Center label circle (filled) + text.
+  const centerShape = hubCircle({ cx: CX, cy: CY, r: R_INNER, region: 'center_shape', fill: 'var(--primary)' });
+  const centerText = hubLabelBox({ cx: CX, cy: CY, r: R_INNER, label: centerLabel, region: 'center_label', fontSize: 13 });
 
   return `
 ${titleHtml(title)}
 ${leadHtml(lead)}
-
-<div data-region="diagram_area" class="ts-region" style="
-  left:${SAFE_LEFT}px; top:208px; width:${Math.round(colW(12))}px; height:416px;
-  overflow:hidden;
-">
-  ${diagramSvg}
-</div>
-
-${centerLabelHtml}
-${labelBoxes}
+${overlay}
+${centerShape}
+${centerText}
+${labels}
 ${sourceHtml(source)}
 `.trim();
 });
 
 // ── Pattern: hub-spoke ────────────────────────────────────────────────────────
 /**
- * content: {
- *   title: string,
- *   lead?: string,
- *   hub_label: string,
- *   spokes: Array<{ heading, body? }>,   // 4–6 spokes
- *   source?: string
- * }
- *
- * Hub center: x=640, y=416. Hub radius 72px.
- * Spokes end at radius ~220px from center.
+ * Central hub circle with N spokes on a circle. Connector runs hub-edge →
+ * badge-edge. Each spoke's heading/body box sits on the angle-correct side
+ * (left of node on the left half, right on the right half, above/below for
+ * top/bottom) via the shared radial helper.
  */
 definePattern('hub-spoke', (c) => {
   const title = c.title ?? '';
@@ -313,123 +274,60 @@ definePattern('hub-spoke', (c) => {
   const CX = 640;
   const CY = 416;
 
-  const R_HUB = 72;
-  const R_BADGE = 200; // badge (number circle) radius from center
-  const R_TEXT = 240;  // text start radius
+  const R_HUB = fitCircleRadius(hubLabel, 16, { padding: 14, min: 64, max: 86 });
+  const R_SPOKE = 190;  // badge center radius
+  const BADGE_R = 19;
+  const TEXT_W = 188;
+  const TEXT_H = 76;
 
-  const BADGE_R = 18;
-  const TEXT_W = 180;
-  const TEXT_H = 80;
+  const { nodes } = radialLayout({
+    cx: CX, cy: CY, n: N, radius: R_SPOKE,
+    hubR: R_HUB, nodeR: BADGE_R, startAngle: -Math.PI / 2,
+  });
 
-  const startAngle = -Math.PI / 2;
-  const angleStep = (2 * Math.PI) / N;
+  const bounds = { left: SAFE_LEFT, right: SAFE_RIGHT, top: 212, bottom: 620 };
 
-  // Hub SVG
-  const hubSvg = `<svg data-region="hub_shape" class="ts-region" style="
-  left:${CX - R_HUB}px; top:${CY - R_HUB}px;
-  width:${R_HUB * 2}px; height:${R_HUB * 2}px;
-  border-radius:50%; overflow:visible;
-" viewBox="${-R_HUB} ${-R_HUB} ${R_HUB * 2} ${R_HUB * 2}" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="0" cy="0" r="${R_HUB}" fill="var(--text)"/>
-</svg>`;
+  let body = '';
+  // Connectors hub-edge → badge-edge (no arrowheads; equal radial relationship).
+  for (const node of nodes) {
+    body += svgLine({
+      x1: node.conn.x1, y1: node.conn.y1, x2: node.conn.x2, y2: node.conn.y2,
+      width: 1.5, opacity: 0.45,
+    });
+  }
+  const overlay = overlaySvg({ body, region: 'hub_spoke' });
 
-  const hubLabelHtml = `<div data-region="hub_label" class="ts-region" style="
-  left:${CX - R_HUB}px; top:${CY - R_HUB}px;
-  width:${R_HUB * 2}px; height:${R_HUB * 2}px;
-  display:flex; align-items:center; justify-content:center;
-  pointer-events:none;
-">
-  <div style="
-    font-family:var(--font-head);
-    font-size:13px;
-    color:#fff;
-    font-weight:700;
-    text-align:center;
-    line-height:1.3;
-    white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-    padding:4px;
-    box-sizing:border-box;
-  ">${hubLabel}</div>
-</div>`;
+  const hubShape = hubCircle({ cx: CX, cy: CY, r: R_HUB, fill: 'var(--primary)' });
+  const hubText = hubLabelBox({ cx: CX, cy: CY, r: R_HUB, label: hubLabel, fontSize: 16 });
 
-  const spokesHtml = spokes.map((spoke, i) => {
-    const angle = startAngle + i * angleStep;
-    const bx = Math.round(CX + Math.cos(angle) * R_BADGE);
-    const by = Math.round(CY + Math.sin(angle) * R_BADGE);
-    const tx = Math.round(CX + Math.cos(angle) * R_TEXT);
-    const ty = Math.round(CY + Math.sin(angle) * R_TEXT);
+  const spokesHtml = nodes.map((node, i) => {
+    const spoke = spokes[i] ?? {};
+    const place = labelPlacement(node, { nodeR: BADGE_R, gap: 12, width: TEXT_W, height: TEXT_H, bounds });
 
-    // Align text left/right based on angle; for near-vertical spokes, place text
-    // to one side of the badge so the number circle never obscures the label.
-    const sinA = Math.sin(angle);
-    const cosA = Math.cos(angle);
-    const isRight = cosA > 0.1;
-    const isLeft  = cosA < -0.1;
-    const isNearVertical = Math.abs(sinA) > Math.abs(cosA); // |sin| > |cos| → mostly up/down
-
-    let textLeft;
-    if (isNearVertical) {
-      // Place text to the right of the badge so the number circle doesn't overlap.
-      textLeft = bx + BADGE_R + 10;
-    } else if (isRight) {
-      textLeft = tx;
-    } else if (isLeft) {
-      textLeft = tx - TEXT_W;
-    } else {
-      textLeft = tx - TEXT_W / 2;
-    }
-    const safeTextLeft = Math.max(SAFE_LEFT, Math.min(1208 - TEXT_W, Math.round(textLeft)));
-
-    // For near-vertical spokes, vertically centre the text on the badge so the
-    // label sits alongside the number circle rather than above/below it.
-    const textTopRaw = isNearVertical
-      ? by - TEXT_H / 2           // vertically centre on badge Y
-      : Math.round(ty - TEXT_H / 2);
-    const safeTextTop = Math.max(208, Math.min(624 - TEXT_H, Math.round(textTopRaw)));
-
-    // Spoke line from hub edge to badge
-    const hubEdgeX = Math.round(CX + Math.cos(angle) * R_HUB);
-    const hubEdgeY = Math.round(CY + Math.sin(angle) * R_HUB);
-
-    return `<svg data-region="spoke_line_${i + 1}" class="ts-region" style="
-  left:0px; top:0px; width:1280px; height:720px;
-  pointer-events:none; overflow:visible; position:absolute;
-" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
-  <line x1="${hubEdgeX}" y1="${hubEdgeY}" x2="${bx}" y2="${by}" stroke="var(--muted)" stroke-width="1.5" opacity="0.5"/>
-</svg>
-<div data-region="spoke_badge_${i + 1}" class="ts-region" style="
-  left:${bx - BADGE_R}px; top:${by - BADGE_R}px;
+    return `<div data-region="spoke_badge_${i + 1}" class="ts-region" style="
+  left:${Math.round(node.x - BADGE_R)}px; top:${Math.round(node.y - BADGE_R)}px;
   width:${BADGE_R * 2}px; height:${BADGE_R * 2}px;
-  border-radius:50%;
-  background:var(--surface);
-  border:1.5px solid var(--muted);
+  border-radius:50%; background:var(--surface);
+  border:1.5px solid var(--secondary);
   display:flex; align-items:center; justify-content:center;
-  font-family:var(--font-body);
-  font-size:10px;
-  color:var(--text);
-  font-weight:600;
+  font-family:var(--font-body); font-size:11px; color:var(--primary); font-weight:700;
 ">${String(i + 1).padStart(2, '0')}</div>
 <div data-region="spoke_text_${i + 1}" class="ts-region" style="
-  left:${safeTextLeft}px; top:${safeTextTop}px;
-  width:${TEXT_W}px; height:${TEXT_H}px;
-  box-sizing:border-box; padding:0 4px;
-  overflow:hidden;
-  ${isLeft ? 'text-align:right;' : ''}
+  left:${place.left}px; top:${place.top}px;
+  width:${place.width}px; height:${place.height}px;
+  box-sizing:border-box;
+  overflow:hidden; text-align:${place.align};
+  display:flex; flex-direction:column; justify-content:center;
 ">
   <div style="
     font-family:var(--font-head);
-    font-size:14px;
-    color:var(--text);
-    font-weight:600;
-    line-height:1.3;
-    margin-bottom:4px;
+    font-size:14px; color:var(--text); font-weight:700;
+    line-height:1.3; margin-bottom:4px;
     white-space:normal; overflow-wrap:break-word; word-break:keep-all;
   ">${spoke.heading ?? ''}</div>
   ${spoke.body ? `<div style="
     font-family:var(--font-body);
-    font-size:11px;
-    color:var(--muted);
-    line-height:1.4;
+    font-size:11px; color:var(--muted); line-height:1.4;
     white-space:normal; overflow-wrap:break-word; word-break:keep-all;
   ">${spoke.body}</div>` : ''}
 </div>`;
@@ -438,14 +336,9 @@ definePattern('hub-spoke', (c) => {
   return `
 ${titleHtml(title)}
 ${leadHtml(lead)}
-
-<div data-region="diagram_area" class="ts-region" style="
-  left:${SAFE_LEFT}px; top:208px; width:${Math.round(colW(12))}px; height:416px;
-  overflow:hidden;
-"></div>
-
-${hubSvg}
-${hubLabelHtml}
+${overlay}
+${hubShape}
+${hubText}
 ${spokesHtml}
 ${sourceHtml(source)}
 `.trim();
@@ -453,24 +346,9 @@ ${sourceHtml(source)}
 
 // ── Pattern: four-quadrant-center ─────────────────────────────────────────────
 /**
- * content: {
- *   title: string,
- *   center_label: string,
- *   top_left: { heading, body },
- *   top_right: { heading, body },
- *   bottom_left: { heading, body },
- *   bottom_right: { heading, body },
- *   source?: string
- * }
- *
- * Structure:
- *   title_bar          col 1-12  offset 56   height 80
- *   quadrant_top_left  col 1-6   offset 152  height 288
- *   quadrant_top_right col 7-12  offset 152  height 288
- *   quadrant_btm_left  col 1-6   offset 464  height 176
- *   quadrant_btm_right col 7-12  offset 464  height 176
- *   center_hub         col 5-8   offset 320  height 88  (overlaid)
- *   source_bar         col 1-12  offset 640  height 24
+ * 2×2 quadrant blocks with a center hub circle overlaid at the grid crossing.
+ * Thin connectors run from the hub edge into each quadrant for a "radiates
+ * from core" read.
  */
 definePattern('four-quadrant-center', (c) => {
   const title = c.title ?? '';
@@ -483,90 +361,73 @@ definePattern('four-quadrant-center', (c) => {
 
   const qtl = colRange(1, 6);
   const qtr = colRange(7, 12);
-  const qbl = colRange(1, 6);
-  const qbr = colRange(7, 12);
   const hub = colRange(5, 8);
 
-  function quadHtml(region, col, top, height, q) {
+  function quadHtml(region, col, top, height, q, padTop) {
     return `<div data-region="${region}" class="ts-region" style="
   left:${col.left}px; top:${top}px; width:${col.width}px; height:${height}px;
   background:var(--surface);
-  box-sizing:border-box; padding:24px 20px 16px;
+  box-sizing:border-box; padding:${padTop}px 24px 16px;
   overflow:hidden;
 ">
   <div style="
     font-family:var(--font-head);
-    font-size:var(--h3, 18px);
-    color:var(--text);
-    font-weight:600;
-    line-height:1.3;
-    margin-bottom:8px;
+    font-size:var(--h3, 18px); color:var(--text); font-weight:700;
+    line-height:1.3; margin-bottom:8px;
     white-space:normal; overflow-wrap:break-word; word-break:keep-all;
   ">${q.heading ?? ''}</div>
   <div style="
     font-family:var(--font-body);
-    font-size:var(--body, 14px);
-    color:var(--muted);
-    line-height:1.6;
+    font-size:var(--body, 14px); color:var(--muted); line-height:1.6;
     white-space:normal; overflow-wrap:break-word; word-break:keep-all;
   ">${q.body ?? ''}</div>
 </div>`;
   }
 
-  // center_hub: col 5-8 = left≈447, width≈340; offset 320, height 88
-  // Center of hub: x = hub.left + hub.width/2, y = 320 + 44 = 364
+  // Hub center at the crossing of the 2×2 grid.
   const hubCX = hub.left + Math.round(hub.width / 2);
   const hubCY = 364;
-  const hubR = 44;
+  const hubR = 46;
 
-  const hubHtml = `<svg data-region="center_hub_shape" class="ts-region" style="
-  left:${hub.left}px; top:320px; width:${hub.width}px; height:88px;
-  overflow:visible; pointer-events:none;
-" viewBox="0 0 ${hub.width} 88" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="${Math.round(hub.width / 2)}" cy="44" r="${hubR}" fill="var(--text)"/>
-</svg>
-<div data-region="center_hub_label" class="ts-region" style="
-  left:${hubCX - hubR}px; top:${hubCY - hubR}px;
-  width:${hubR * 2}px; height:${hubR * 2}px;
-  display:flex; align-items:center; justify-content:center;
-  pointer-events:none;
-">
-  <div style="
-    font-family:var(--font-head);
-    font-size:11px;
-    color:#fff;
-    font-weight:700;
-    text-align:center;
-    line-height:1.2;
-    white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-  ">${centerLabel}</div>
-</div>`;
+  // Connectors from hub edge toward each quadrant inner corner.
+  const corners = [
+    { x: qtl.left + qtl.width - 40, y: 152 + 288 - 40 },   // toward TL inner-bottom-right
+    { x: qtr.left + 40,            y: 152 + 288 - 40 },     // toward TR inner-bottom-left
+    { x: qtl.left + qtl.width - 40, y: 464 + 40 },          // toward BL inner-top-right
+    { x: qtr.left + 40,            y: 464 + 40 },            // toward BR inner-top-left
+  ];
+  let body = '';
+  for (const corner of corners) {
+    const dx = corner.x - hubCX;
+    const dy = corner.y - hubCY;
+    const dist = Math.hypot(dx, dy) || 1;
+    const sx = hubCX + (dx / dist) * hubR;
+    const sy = hubCY + (dy / dist) * hubR;
+    body += svgLine({ x1: sx, y1: sy, x2: corner.x, y2: corner.y, width: 1, opacity: 0.3, dash: '3 4' });
+  }
+  const overlay = overlaySvg({ body, region: 'quadrant_connectors' });
+
+  const hubShape = hubCircle({ cx: hubCX, cy: hubCY, r: hubR, region: 'center_hub_shape', fill: 'var(--primary)' });
+  const hubText = hubLabelBox({ cx: hubCX, cy: hubCY, r: hubR, label: centerLabel, region: 'center_hub_label', fontSize: 12 });
 
   return `
 ${titleHtml(title)}
-${quadHtml('quadrant_top_left', qtl, 152, 288, topLeft)}
-${quadHtml('quadrant_top_right', qtr, 152, 288, topRight)}
-${quadHtml('quadrant_bottom_left', qbl, 464, 176, btmLeft)}
-${quadHtml('quadrant_bottom_right', qbr, 464, 176, btmRight)}
-${hubHtml}
+${overlay}
+${quadHtml('quadrant_top_left', qtl, 152, 288, topLeft, 24)}
+${quadHtml('quadrant_top_right', qtr, 152, 288, topRight, 24)}
+${quadHtml('quadrant_bottom_left', qtl, 464, 176, btmLeft, 20)}
+${quadHtml('quadrant_bottom_right', qtr, 464, 176, btmRight, 20)}
+${hubShape}
+${hubText}
 ${sourceHtml(source)}
 `.trim();
 });
 
 // ── Pattern: circle-hub-list-right ───────────────────────────────────────────
 /**
- * content: {
- *   title: string,
- *   hub_label: string,
- *   items: Array<{ heading, body? }>,   // 5–7 items
- *   source?: string
- * }
- *
- * Structure:
- *   title_bar  col 1-12  offset 56   height 80
- *   hub_area   col 1-4   offset 152  height 464
- *   list_area  col 5-12  offset 152  height 464
- *   source_bar col 1-12  offset 640  height 24
+ * Big left hub circle; right column of numbered rows. Each connector runs from
+ * the hub's right-edge to the row badge (a clean curve), so the lines visibly
+ * originate at the hub.
  */
 definePattern('circle-hub-list-right', (c) => {
   const title = c.title ?? '';
@@ -577,76 +438,55 @@ definePattern('circle-hub-list-right', (c) => {
   const hubArea = colRange(1, 4);
   const listArea = colRange(5, 12);
 
-  // Hub: centered in hub_area, diameter ≈ 60% of hub height = 0.6 * 464 ≈ 278
-  const HUB_D = 240;
+  const HUB_R = fitCircleRadius(hubLabel, 18, { padding: 18, min: 96, max: 124 });
   const HUB_CX = hubArea.left + Math.round(hubArea.width / 2);
   const HUB_CY = 152 + Math.round(464 / 2); // 384
 
-  const hubSvg = `<svg data-region="hub_circle" class="ts-region" style="
-  left:${HUB_CX - HUB_D / 2}px; top:${HUB_CY - HUB_D / 2}px;
-  width:${HUB_D}px; height:${HUB_D}px;
-  border-radius:50%; overflow:visible;
-" viewBox="${-HUB_D / 2} ${-HUB_D / 2} ${HUB_D} ${HUB_D}" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="0" cy="0" r="${HUB_D / 2}" fill="var(--text)"/>
-</svg>
-<div data-region="hub_label" class="ts-region" style="
-  left:${HUB_CX - HUB_D / 2}px; top:${HUB_CY - HUB_D / 2}px;
-  width:${HUB_D}px; height:${HUB_D}px;
-  display:flex; align-items:center; justify-content:center;
-  pointer-events:none;
-">
-  <div style="
-    font-family:var(--font-head);
-    font-size:18px;
-    color:#fff;
-    font-weight:700;
-    text-align:center;
-    line-height:1.3;
-    white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-    padding:8px;
-    box-sizing:border-box;
-  ">${hubLabel}</div>
-</div>`;
-
-  // List items: evenly spaced in list_area (offset 152, height 464)
   const LIST_TOP = 152;
   const LIST_H = 464;
-  const itemCount = items.length;
+  const itemCount = items.length || 1;
   const rowH = Math.floor(LIST_H / itemCount);
   const BADGE_R = 16;
-  const BADGE_GAP = 12;
+  const BADGE_GAP = 14;
+
+  const badgeCX = listArea.left + BADGE_R;
+  const hubEdgeX = HUB_CX + HUB_R;
+
+  // Connectors: hub right-edge → each badge left-edge (gentle quadratic curve).
+  let body = '';
+  items.forEach((_, i) => {
+    const rowTop = LIST_TOP + i * rowH;
+    const cy = rowTop + Math.round(rowH / 2);
+    const x1 = hubEdgeX;
+    const y1 = HUB_CY + (cy - HUB_CY) * (HUB_R / (HUB_R + 40)); // start a touch toward the row
+    const x2 = badgeCX - BADGE_R;
+    const midX = (x1 + x2) / 2;
+    body += pathEl({
+      d: `M ${r1(x1)} ${r1(HUB_CY + (cy - HUB_CY) * 0.0)} C ${r1(midX)} ${r1(HUB_CY)}, ${r1(midX)} ${r1(cy)}, ${r1(x2)} ${r1(cy)}`,
+      width: 1, opacity: 0.35,
+    });
+  });
+  const overlay = overlaySvg({ body, region: 'hub_list_connectors' });
+
+  const hubShape = hubCircle({ cx: HUB_CX, cy: HUB_CY, r: HUB_R, region: 'hub_circle', fill: 'var(--primary)' });
+  const hubText = hubLabelBox({ cx: HUB_CX, cy: HUB_CY, r: HUB_R, label: hubLabel, fontSize: 18 });
 
   const listHtml = items.map((item, i) => {
     const rowTop = LIST_TOP + i * rowH;
-    const badgeCX = listArea.left + BADGE_R;
-    const badgeCY = rowTop + Math.round(rowH / 2);
+    const cy = rowTop + Math.round(rowH / 2);
+    const compact = rowH < 60;
+    const rowContent = compact
+      ? `<div style="font-family:var(--font-head);font-size:13px;color:var(--text);font-weight:700;white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${item.heading ?? ''}</div>
+         ${item.body ? `<div style="font-family:var(--font-body);font-size:11px;color:var(--muted);line-height:1.3;white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${item.body}</div>` : ''}`
+      : `<div style="font-family:var(--font-head);font-size:15px;color:var(--text);font-weight:700;line-height:1.3;margin-bottom:3px;white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${item.heading ?? ''}</div>
+         ${item.body ? `<div style="font-family:var(--font-body);font-size:12px;color:var(--muted);line-height:1.4;white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${item.body}</div>` : ''}`;
 
-    // Connector line from hub right edge to badge
-    const hubEdgeX = HUB_CX + HUB_D / 2;
-    const connY = badgeCY;
-
-    const rowContent = rowH < 56
-      ? `<div style="font-family:var(--font-head);font-size:13px;color:var(--text);font-weight:600;white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${item.heading ?? ''}</div>`
-      : `<div style="font-family:var(--font-head);font-size:14px;color:var(--text);font-weight:600;line-height:1.3;margin-bottom:3px;white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${item.heading ?? ''}</div>
-      ${item.body ? `<div style="font-family:var(--font-body);font-size:11px;color:var(--muted);line-height:1.4;white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${item.body}</div>` : ''}`;
-
-    return `<svg data-region="item_conn_${i + 1}" class="ts-region" style="
-  left:0px; top:0px; width:1280px; height:720px;
-  pointer-events:none; overflow:visible; position:absolute;
-" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
-  <line x1="${Math.round(hubEdgeX)}" y1="${connY}" x2="${badgeCX + BADGE_R}" y2="${connY}" stroke="var(--muted)" stroke-width="1" opacity="0.4"/>
-</svg>
-<div data-region="item_badge_${i + 1}" class="ts-region" style="
-  left:${listArea.left}px; top:${badgeCY - BADGE_R}px;
+    return `<div data-region="item_badge_${i + 1}" class="ts-region" style="
+  left:${listArea.left}px; top:${cy - BADGE_R}px;
   width:${BADGE_R * 2}px; height:${BADGE_R * 2}px;
-  border-radius:50%;
-  background:var(--surface);
-  border:1.5px solid var(--muted);
+  border-radius:50%; background:var(--primary);
   display:flex; align-items:center; justify-content:center;
-  font-family:var(--font-body);
-  font-size:9px;
-  color:var(--muted);
-  font-weight:600;
+  font-family:var(--font-body); font-size:10px; color:var(--bg); font-weight:700;
 ">${String(i + 1).padStart(2, '0')}</div>
 <div data-region="item_text_${i + 1}" class="ts-region" style="
   left:${listArea.left + BADGE_R * 2 + BADGE_GAP}px;
@@ -656,8 +496,7 @@ definePattern('circle-hub-list-right', (c) => {
   box-sizing:border-box;
   display:flex; flex-direction:column; justify-content:center;
   overflow:hidden;
-  border-bottom:${i < itemCount - 1 ? '1px solid var(--muted)' : 'none'};
-  opacity:0.9;
+  border-bottom:${i < itemCount - 1 ? '1px solid var(--surface)' : 'none'};
 ">
   ${rowContent}
 </div>`;
@@ -665,18 +504,9 @@ definePattern('circle-hub-list-right', (c) => {
 
   return `
 ${titleHtml(title)}
-
-<div data-region="hub_area" class="ts-region" style="
-  left:${hubArea.left}px; top:152px; width:${hubArea.width}px; height:464px;
-  overflow:hidden;
-"></div>
-
-<div data-region="list_area" class="ts-region" style="
-  left:${listArea.left}px; top:152px; width:${listArea.width}px; height:464px;
-  overflow:hidden;
-"></div>
-
-${hubSvg}
+${overlay}
+${hubShape}
+${hubText}
 ${listHtml}
 ${sourceHtml(source)}
 `.trim();
@@ -684,20 +514,10 @@ ${sourceHtml(source)}
 
 // ── Pattern: center-illustration-spoke ───────────────────────────────────────
 /**
- * content: {
- *   title: string,
- *   center_label: string,
- *   spokes: Array<{ label, sub? }>,   // 4–6 spokes
- *   source?: string
- * }
- *
- * Structure:
- *   title_bar    col 1-12  offset 56   height 80
- *   diagram_area col 1-12  offset 152  height 480
- *   source_bar   col 1-12  offset 640  height 24
- *
- * Center placeholder: 280×280, center at x=640, y=392 (152+240)
- * diagram_area: y 152..632
+ * Central plate (platform). N source nodes on a circle; each node is a circle
+ * sized to fit its label OR carries the label outside. Arrows point INWARD
+ * (node → center) to express aggregation, oriented along the connector via a
+ * <marker orient="auto">.
  */
 definePattern('center-illustration-spoke', (c) => {
   const title = c.title ?? '';
@@ -706,116 +526,85 @@ definePattern('center-illustration-spoke', (c) => {
   const source = c.source ?? '';
 
   const N = spokes.length || 5;
-
   const CX = 640;
   const CY = 392; // 152 + 240
 
-  const PLATE_W = 240;
-  const PLATE_H = 200;
-  const PLATE_R = Math.max(PLATE_W, PLATE_H) / 2; // effective collision radius
+  const PLATE_W = 236;
+  const PLATE_H = 188;
+  const PLATE_R = Math.hypot(PLATE_W, PLATE_H) / 2; // collision radius for arrow target
 
-  const NODE_R = 28;
-  const R_SPOKE = 280; // distance from center to spoke node center
+  const NODE_R = 26;          // small index node; label sits OUTSIDE it
+  const R_SPOKE = 250;        // node center radius from center
 
-  // Spoke angles: standard top/top-left/top-right/bottom-left/bottom-right for 5 spokes
-  // For N spokes: evenly spaced starting from top-left (-120deg for 5)
-  const startAngle = N === 5 ? -Math.PI * 0.85 : -Math.PI / 2;
-  const angleStep = (2 * Math.PI) / N;
+  const LABEL_W = 168;
+  const LABEL_H = 52;
 
-  const LABEL_W = 140;
-  const LABEL_H = 48;
+  const bounds = { left: SAFE_LEFT, right: SAFE_RIGHT, top: 156, bottom: 628 };
 
-  // Center placeholder
-  const plateLeft = CX - PLATE_W / 2;
-  const plateTop = CY - PLATE_H / 2;
+  // Use top as the start so 5 spokes read top / upper-sides / lower-sides.
+  const { nodes } = radialLayout({
+    cx: CX, cy: CY, n: N, radius: R_SPOKE,
+    hubR: PLATE_R, nodeR: NODE_R, startAngle: -Math.PI / 2,
+  });
 
-  const centerHtml = `<div data-region="center_placeholder" class="ts-region" style="
-  left:${Math.round(plateLeft)}px; top:${Math.round(plateTop)}px;
+  // Inward aggregation arrows: from node edge → plate edge, arrowhead at plate.
+  const arrow = arrowMarker({ id: 'cis-arrow', color: 'var(--secondary)', size: 11 });
+  let body = '';
+  for (const node of nodes) {
+    // connIn already runs node-edge → hub-edge (inward). Trim the hub end to the
+    // plate's elliptical edge along the node direction so the head meets the plate.
+    const px = CX - node.ux * (PLATE_R * 0.7 + 6);
+    const py = CY - node.uy * (PLATE_R * 0.62 + 6);
+    body += svgLine({
+      x1: node.connIn.x1, y1: node.connIn.y1, x2: px, y2: py,
+      markerEnd: arrow.id, width: 2, opacity: 0.75, color: 'var(--secondary)',
+    });
+  }
+  const overlay = overlaySvg({ defs: arrow.def, body, region: 'center_spoke' });
+
+  // Center plate (rounded rect).
+  const plate = `<div data-region="center_placeholder" class="ts-region" style="
+  left:${Math.round(CX - PLATE_W / 2)}px; top:${Math.round(CY - PLATE_H / 2)}px;
   width:${PLATE_W}px; height:${PLATE_H}px;
-  background:var(--surface);
-  border-radius:8px;
-  border:2px solid var(--muted);
+  background:var(--primary); border-radius:10px;
   display:flex; align-items:center; justify-content:center;
-  box-sizing:border-box; padding:8px;
-  overflow:hidden;
+  box-sizing:border-box; padding:12px; overflow:hidden;
 ">
   <div style="
     font-family:var(--font-head);
-    font-size:var(--h3, 18px);
-    color:var(--text);
-    font-weight:700;
-    text-align:center;
-    line-height:1.3;
+    font-size:var(--h3, 18px); color:var(--bg); font-weight:700;
+    text-align:center; line-height:1.3;
     white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-  ">${centerLabel}</div>
+  ">${brs(centerLabel)}</div>
 </div>`;
 
-  const spokesHtml = spokes.map((spoke, i) => {
-    const angle = startAngle + i * angleStep;
-    const nx = Math.round(CX + Math.cos(angle) * R_SPOKE);
-    const ny = Math.round(CY + Math.sin(angle) * R_SPOKE);
-
-    // Arrow: from node edge toward center placeholder edge
-    const dx = CX - nx;
-    const dy = CY - ny;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    const ux = dx / dist;
-    const uy = dy / dist;
-
-    const arrowStartX = Math.round(nx + ux * NODE_R);
-    const arrowStartY = Math.round(ny + uy * NODE_R);
-    const arrowEndX = Math.round(CX - ux * (PLATE_R + 4));
-    const arrowEndY = Math.round(CY - uy * (PLATE_R + 4));
-
-    // Clamp node within diagram_area (y 152..632)
-    const safeNY = Math.max(152 + NODE_R, Math.min(632 - NODE_R, ny));
-    const safeNX = Math.max(SAFE_LEFT + NODE_R, Math.min(1208 - NODE_R, nx));
-
-    // Label position: outward from node
-    const labelX = Math.round(safeNX + Math.cos(angle) * (NODE_R + 8));
-    const labelY = Math.round(safeNY + Math.sin(angle) * (NODE_R + 8));
-    const labelLeft = Math.max(SAFE_LEFT, Math.min(1208 - LABEL_W, labelX - LABEL_W / 2));
-    const labelTop = Math.max(152, Math.min(632 - LABEL_H, labelY - LABEL_H / 2));
-
-    return `<svg data-region="spoke_arrow_${i + 1}" class="ts-region" style="
-  left:0px; top:0px; width:1280px; height:720px;
-  pointer-events:none; overflow:visible; position:absolute;
-" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
-  <line x1="${arrowStartX}" y1="${arrowStartY}" x2="${arrowEndX}" y2="${arrowEndY}"
-    stroke="var(--muted)" stroke-width="1.5" opacity="0.6"/>
-  <polygon points="
-    ${arrowEndX + ux * 8 - uy * 4},${arrowEndY + uy * 8 + ux * 4}
-    ${arrowEndX},${arrowEndY}
-    ${arrowEndX + ux * 8 + uy * 4},${arrowEndY + uy * 8 - ux * 4}
-  " fill="var(--muted)" opacity="0.7"/>
-</svg>
-<div data-region="spoke_node_${i + 1}" class="ts-region" style="
-  left:${safeNX - NODE_R}px; top:${safeNY - NODE_R}px;
+  const spokesHtml = nodes.map((node, i) => {
+    const spoke = spokes[i] ?? {};
+    const place = labelPlacement(node, { nodeR: NODE_R, gap: 8, width: LABEL_W, height: LABEL_H, bounds });
+    return `<div data-region="spoke_node_${i + 1}" class="ts-region" style="
+  left:${Math.round(node.x - NODE_R)}px; top:${Math.round(node.y - NODE_R)}px;
   width:${NODE_R * 2}px; height:${NODE_R * 2}px;
-  border-radius:50%;
-  background:var(--surface);
-  border:1.5px solid var(--muted);
+  border-radius:50%; background:var(--surface);
+  border:1.5px solid var(--secondary);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-body); font-size:11px; color:var(--primary); font-weight:700;
   box-sizing:border-box;
-"></div>
+">${String(i + 1).padStart(2, '0')}</div>
 <div data-region="spoke_label_${i + 1}" class="ts-region" style="
-  left:${Math.round(labelLeft)}px; top:${Math.round(labelTop)}px;
-  width:${LABEL_W}px; height:${LABEL_H}px;
-  box-sizing:border-box; padding:2px 4px;
-  overflow:hidden; text-align:center;
+  left:${place.left}px; top:${place.top}px;
+  width:${place.width}px; height:${place.height}px;
+  box-sizing:border-box; padding:0 4px;
+  overflow:hidden; text-align:${place.align};
+  display:flex; flex-direction:column; justify-content:center;
 ">
   <div style="
     font-family:var(--font-head);
-    font-size:13px;
-    color:var(--text);
-    font-weight:600;
-    line-height:1.3;
+    font-size:13px; color:var(--text); font-weight:700; line-height:1.25;
     white-space:normal; overflow-wrap:break-word; word-break:keep-all;
   ">${spoke.label ?? ''}</div>
   ${spoke.sub ? `<div style="
     font-family:var(--font-body);
-    font-size:10px;
-    color:var(--muted);
-    line-height:1.2;
+    font-size:10px; color:var(--muted); line-height:1.2;
     white-space:normal; overflow-wrap:break-word; word-break:keep-all;
   ">${spoke.sub}</div>` : ''}
 </div>`;
@@ -823,13 +612,8 @@ definePattern('center-illustration-spoke', (c) => {
 
   return `
 ${titleHtml(title)}
-
-<div data-region="diagram_area" class="ts-region" style="
-  left:${SAFE_LEFT}px; top:152px; width:${Math.round(colW(12))}px; height:480px;
-  overflow:hidden;
-"></div>
-
-${centerHtml}
+${overlay}
+${plate}
 ${spokesHtml}
 ${sourceHtml(source)}
 `.trim();
@@ -837,24 +621,10 @@ ${sourceHtml(source)}
 
 // ── Pattern: org-chart-tree ───────────────────────────────────────────────────
 /**
- * content: {
- *   title: string,
- *   top_nodes: string[],              // 1–2 top nodes
- *   departments: Array<{
- *     name: string,
- *     roles: string[]                 // 4–6 items
- *   }>,                               // 3–5 departments
- *   source?: string
- * }
- *
- * Structure (from spec):
- *   title_bar   col 1-12  offset 56   height 72
- *   level_1_row col 1-12  offset 144  height 64
- *   connector_v1 col 1-12 offset 208  height 24
- *   level_2_row col 1-12  offset 256  height 64
- *   connector_v2 col 1-12 offset 320  height 24
- *   level_3_row col 1-12  offset 360  height 264
- *   source_bar  col 1-12  offset 640  height 24
+ * 3-level org chart. d3-hierarchy tree() positions the dept nodes; d3-shape
+ * linkVertical() draws connectors whose endpoints sit on the BOX EDGES (bottom
+ * of parent → top of child), so every connector visibly joins its boxes.
+ * Role lists hang under each dept node.
  */
 definePattern('org-chart-tree', (c) => {
   const title = c.title ?? '';
@@ -863,174 +633,129 @@ definePattern('org-chart-tree', (c) => {
   const source = c.source ?? '';
 
   const full = colRange(1, 12);
-  const FULL_W = full.width;
   const FULL_L = full.left;
+  const FULL_W = full.width;
 
-  // Level 1: top nodes centered
-  const L1_TOP = 144;
-  const L1_H = 64;
-  const NODE_W = 180;
   const NODE_H = 44;
-
-  const topCount = topNodes.length || 1;
-  const topSpacing = Math.round(FULL_W / topCount);
-
-  const topNodesHtml = topNodes.map((label, i) => {
-    const nodeLeft = FULL_L + i * topSpacing + Math.round((topSpacing - NODE_W) / 2);
-    return `<div data-region="top_node_${i + 1}" class="ts-region" style="
-  left:${nodeLeft}px; top:${L1_TOP + Math.round((L1_H - NODE_H) / 2)}px;
-  width:${NODE_W}px; height:${NODE_H}px;
-  background:var(--text);
-  border-radius:4px;
-  display:flex; align-items:center; justify-content:center;
-  box-sizing:border-box; padding:4px 8px;
-  overflow:hidden;
-">
-  <div style="
-    font-family:var(--font-head);
-    font-size:13px;
-    color:#fff;
-    font-weight:700;
-    text-align:center;
-    line-height:1.3;
-    white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-  ">${label}</div>
-</div>`;
-  }).join('\n');
-
-  // Connector V1: from top nodes down to horizontal branch line
-  // Level 2 starts at 256; connector at y=208, height 24
-  const V1_MID_X = FULL_L + Math.round(FULL_W / 2);
-  const V1_TOP_Y = L1_TOP + L1_H; // 208
-  const V1_BOT_Y = 256;
-
-  // Level 2: department nodes
-  const L2_TOP = 256;
-  const L2_H = 64;
-  const DEPT_COUNT = departments.length;
-  const DEPT_W = DEPT_COUNT > 0 ? Math.min(180, Math.floor((FULL_W - (DEPT_COUNT - 1) * 16) / DEPT_COUNT)) : 180;
-  const DEPT_TOTAL_W = DEPT_COUNT * DEPT_W + (DEPT_COUNT - 1) * 16;
-  const DEPT_LEFT_START = FULL_L + Math.round((FULL_W - DEPT_TOTAL_W) / 2);
-
-  const deptCenters = departments.map((_, i) => DEPT_LEFT_START + i * (DEPT_W + 16) + Math.round(DEPT_W / 2));
-
-  const deptNodesHtml = departments.map((dept, i) => {
-    const dLeft = DEPT_LEFT_START + i * (DEPT_W + 16);
-    return `<div data-region="dept_node_${i + 1}" class="ts-region" style="
-  left:${dLeft}px; top:${L2_TOP + Math.round((L2_H - 44) / 2)}px;
-  width:${DEPT_W}px; height:44px;
-  background:var(--surface);
-  border-radius:4px;
-  border:1.5px solid var(--muted);
-  display:flex; align-items:center; justify-content:center;
-  box-sizing:border-box; padding:4px 8px;
-  overflow:hidden;
-">
-  <div style="
-    font-family:var(--font-head);
-    font-size:12px;
-    color:var(--text);
-    font-weight:600;
-    text-align:center;
-    line-height:1.3;
-    white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-  ">${dept.name ?? ''}</div>
-</div>`;
-  }).join('\n');
-
-  // Level 3: role list boxes
+  const TOP_W = 176;
+  const L1_CY = 144 + 32;   // top node row center
+  const L2_CY = 256 + 32;   // dept node row center
   const L3_TOP = 360;
   const L3_H = 264;
 
-  const roleBoxes = departments.map((dept, i) => {
-    const roles = (dept.roles ?? []).slice(0, 6);
-    const boxLeft = DEPT_LEFT_START + i * (DEPT_W + 16);
-    const ROW_H = Math.floor(L3_H / Math.max(roles.length, 1));
-    const rowsHtml = roles.map((role, j) => `
-  <div style="
-    height:${ROW_H}px;
-    display:flex; align-items:center;
-    border-bottom:${j < roles.length - 1 ? '1px solid var(--muted)' : 'none'};
-    padding:0 8px;
-    overflow:hidden;
-  ">
-    <div style="
-      font-family:var(--font-body);
-      font-size:11px;
-      color:var(--muted);
-      line-height:1.3;
-      white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-    ">${role}</div>
-  </div>`).join('');
+  // Dept node sizing (equal width across the row).
+  const DEPT_COUNT = departments.length || 1;
+  const DEPT_GAP = 16;
+  const DEPT_W = Math.min(184, Math.floor((FULL_W - (DEPT_COUNT - 1) * DEPT_GAP) / DEPT_COUNT));
+  const DEPT_TOTAL_W = DEPT_COUNT * DEPT_W + (DEPT_COUNT - 1) * DEPT_GAP;
+  const DEPT_LEFT_START = FULL_L + Math.round((FULL_W - DEPT_TOTAL_W) / 2);
+  const deptCX = departments.map((_, i) => DEPT_LEFT_START + i * (DEPT_W + DEPT_GAP) + Math.round(DEPT_W / 2));
 
-    return `<div data-region="role_box_${i + 1}" class="ts-region" style="
-  left:${boxLeft}px; top:${L3_TOP}px; width:${DEPT_W}px; height:${L3_H}px;
-  background:var(--surface);
-  border-radius:4px;
-  border:1px solid var(--muted);
-  box-sizing:border-box;
-  overflow:hidden;
+  // Primary root = first top node; the tree hangs from it.
+  const topCount = topNodes.length || 1;
+  const topSpacing = Math.round(FULL_W / topCount);
+  const topCX = topNodes.map((_, i) => FULL_L + i * topSpacing + Math.round(topSpacing / 2));
+  const rootCX = topCX.length ? topCX[0] : FULL_L + Math.round(FULL_W / 2);
+
+  // Build a d3 hierarchy: root (primary top node) → departments.
+  const rootData = { name: topNodes[0] ?? '', children: departments.map((d) => ({ name: d.name })) };
+  const root = d3hierarchy(rootData);
+  // Lay out only to get the parent→children link STRUCTURE; we override x/y with
+  // our grid-fixed positions so connectors attach exactly to the box edges.
+  d3tree().size([FULL_W, 1])(root);
+
+  // Assign fixed positions (box edges) to root + each child.
+  root.x = rootCX;
+  root.y = L1_CY + NODE_H / 2;          // bottom edge of the top node
+  root.children?.forEach((child, i) => {
+    child.x = deptCX[i];
+    child.y = L2_CY - NODE_H / 2;        // top edge of the dept node
+  });
+
+  // linkVertical with accessors reading our (x = horizontal, y = vertical).
+  const linkV = linkVertical().x((d) => d.x).y((d) => d.y);
+
+  let body = '';
+
+  // Peer bridge between the two top nodes (board ↔ audit committee).
+  if (topCX.length > 1) {
+    const node0Right = topCX[0] + TOP_W / 2;
+    const node1Left = topCX[1] - TOP_W / 2;
+    body += svgLine({ x1: node0Right, y1: L1_CY, x2: node1Left, y2: L1_CY, width: 1.5, opacity: 0.7 });
+  }
+
+  // Top node bottom → each dept node top (d3 linkVertical, attaches to edges).
+  root.links().forEach((lnk) => {
+    body += pathEl({ d: linkV(lnk), width: 1.5, opacity: 0.55 });
+  });
+
+  // Dept node bottom → role box top (straight short connector to the box edge).
+  deptCX.forEach((cx) => {
+    body += svgLine({ x1: cx, y1: L2_CY + NODE_H / 2, x2: cx, y2: L3_TOP, width: 1.5, opacity: 0.55 });
+  });
+
+  const overlay = overlaySvg({ body, region: 'org_connectors' });
+
+  // Top nodes (filled).
+  const topNodesHtml = topNodes.map((label, i) => {
+    const left = topCX[i] - TOP_W / 2;
+    return `<div data-region="top_node_${i + 1}" class="ts-region" style="
+  left:${Math.round(left)}px; top:${L1_CY - NODE_H / 2}px;
+  width:${TOP_W}px; height:${NODE_H}px;
+  background:var(--primary); border-radius:4px;
+  display:flex; align-items:center; justify-content:center;
+  box-sizing:border-box; padding:4px 10px; overflow:hidden;
 ">
-  ${rowsHtml}
+  <div style="font-family:var(--font-head);font-size:14px;color:var(--bg);font-weight:700;
+    text-align:center;line-height:1.25;white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${label}</div>
 </div>`;
   }).join('\n');
 
-  // SVG connectors
-  // V1: from each top node center down to branch line, then branch line to dept nodes
-  const topNodeCenters = topNodes.map((_, i) => FULL_L + i * topSpacing + Math.round(topSpacing / 2));
-  // branch Y at midpoint of connector_v1
-  const BRANCH_Y = 232;
+  // Dept nodes (outlined).
+  const deptNodesHtml = departments.map((dept, i) => {
+    const left = DEPT_LEFT_START + i * (DEPT_W + DEPT_GAP);
+    return `<div data-region="dept_node_${i + 1}" class="ts-region" style="
+  left:${left}px; top:${L2_CY - NODE_H / 2}px;
+  width:${DEPT_W}px; height:${NODE_H}px;
+  background:var(--surface); border-radius:4px;
+  border:1.5px solid var(--secondary);
+  display:flex; align-items:center; justify-content:center;
+  box-sizing:border-box; padding:4px 8px; overflow:hidden;
+">
+  <div style="font-family:var(--font-head);font-size:13px;color:var(--text);font-weight:700;
+    text-align:center;line-height:1.25;white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${dept.name ?? ''}</div>
+</div>`;
+  }).join('\n');
 
-  // Vertical mid Y of the top node boxes (used for direct horizontal bridge)
-  const TOP_NODE_MID_Y = L1_TOP + Math.round(L1_H / 2);
+  // Role boxes.
+  const roleBoxes = departments.map((dept, i) => {
+    const roles = (dept.roles ?? []).slice(0, 6);
+    const left = DEPT_LEFT_START + i * (DEPT_W + DEPT_GAP);
+    const rowH = Math.floor(L3_H / Math.max(roles.length, 1));
+    const rows = roles.map((role, j) => `
+  <div style="
+    height:${rowH}px; display:flex; align-items:center;
+    border-bottom:${j < roles.length - 1 ? '1px solid var(--bg)' : 'none'};
+    padding:0 10px; overflow:hidden;
+  ">
+    <div style="font-family:var(--font-body);font-size:11px;color:var(--text);line-height:1.3;opacity:0.85;
+      white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${role}</div>
+  </div>`).join('');
 
-  let svgLines = '';
-
-  // Direct horizontal bridge between the two top nodes at their vertical midpoint.
-  // This makes the peer relationship (board ↔ audit committee) visually explicit.
-  if (topNodeCenters.length > 1) {
-    // Right edge of node 0 → left edge of node 1
-    const node0Right = FULL_L + Math.round((topSpacing - NODE_W) / 2) + NODE_W;
-    const node1Left  = FULL_L + topSpacing + Math.round((topSpacing - NODE_W) / 2);
-    svgLines += `<line x1="${node0Right}" y1="${TOP_NODE_MID_Y}" x2="${node1Left}" y2="${TOP_NODE_MID_Y}" stroke="var(--muted)" stroke-width="1.5" opacity="0.8"/>`;
-  }
-
-  // Primary root: descend from the first top node (取締役会, the board) down through the tree.
-  // Use the first node's center as the trunk origin so the tree hangs from the board.
-  const trunkX = topNodeCenters.length > 0 ? topNodeCenters[0] : V1_MID_X;
-  const trunkBottomOfNode = L1_TOP + Math.round((L1_H - NODE_H) / 2) + NODE_H;
-
-  // Vertical line from bottom of primary root node down to BRANCH_Y
-  svgLines += `<line x1="${trunkX}" y1="${trunkBottomOfNode}" x2="${trunkX}" y2="${BRANCH_Y}" stroke="var(--muted)" stroke-width="1.5" opacity="0.6"/>`;
-  // Horizontal junction at BRANCH_Y from trunkX to dept-span midpoint (V1_MID_X)
-  if (trunkX !== V1_MID_X) {
-    svgLines += `<line x1="${trunkX}" y1="${BRANCH_Y}" x2="${V1_MID_X}" y2="${BRANCH_Y}" stroke="var(--muted)" stroke-width="1.5" opacity="0.6"/>`;
-  }
-  // Single vertical from branch to dept horizontal
-  svgLines += `<line x1="${V1_MID_X}" y1="${BRANCH_Y}" x2="${V1_MID_X}" y2="${L2_TOP}" stroke="var(--muted)" stroke-width="1.5" opacity="0.6"/>`;
-
-  // Horizontal at L2_TOP spanning dept nodes
-  if (deptCenters.length > 1) {
-    svgLines += `<line x1="${deptCenters[0]}" y1="${L2_TOP}" x2="${deptCenters[deptCenters.length - 1]}" y2="${L2_TOP}" stroke="var(--muted)" stroke-width="1.5" opacity="0.6"/>`;
-  }
-
-  // Dept nodes down to connector_v2 → L3
-  deptCenters.forEach(cx => {
-    svgLines += `<line x1="${cx}" y1="${L2_TOP + L2_H}" x2="${cx}" y2="${L3_TOP}" stroke="var(--muted)" stroke-width="1.5" opacity="0.6"/>`;
-  });
-
-  const connSvg = `<svg data-region="org_connectors" class="ts-region" style="
-  left:0px; top:0px; width:1280px; height:720px;
-  pointer-events:none; overflow:visible; position:absolute;
-" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
-  ${svgLines}
-</svg>`;
+    return `<div data-region="role_box_${i + 1}" class="ts-region" style="
+  left:${left}px; top:${L3_TOP}px; width:${DEPT_W}px; height:${L3_H}px;
+  background:var(--surface); border-radius:4px;
+  border:1px solid var(--secondary);
+  box-sizing:border-box; overflow:hidden;
+">
+  ${rows}
+</div>`;
+  }).join('\n');
 
   return `
 ${titleHtml(title, 72)}
-
+${overlay}
 ${topNodesHtml}
-${connSvg}
 ${deptNodesHtml}
 ${roleBoxes}
 ${sourceHtml(source)}
@@ -1039,23 +764,9 @@ ${sourceHtml(source)}
 
 // ── Pattern: bilateral-flow ───────────────────────────────────────────────────
 /**
- * content: {
- *   title: string,
- *   left_label: string,
- *   left_sub: string[],               // 2–4 items
- *   right_label: string,
- *   right_sub: string[],              // 2–4 items
- *   flow_right: string,               // left→right flow label
- *   flow_left: string,                // right→left flow label
- *   source?: string
- * }
- *
- * Structure:
- *   title_bar         col 1-12  offset 56   height 80
- *   left_circle_area  col 1-4   offset 152  height 480
- *   center_arrow_area col 5-8   offset 152  height 480
- *   right_circle_area col 9-12  offset 152  height 480
- *   source_bar        col 1-12  offset 640  height 24
+ * Two large circles (subjects) with sub-tags inside, joined by two horizontal
+ * arrows in the center (→ on top, ← on bottom) drawn with <marker orient="auto">,
+ * each with a flow label. Sub-tags are sized to stay inside the circles.
  */
 definePattern('bilateral-flow', (c) => {
   const title = c.title ?? '';
@@ -1075,177 +786,82 @@ definePattern('bilateral-flow', (c) => {
   const AREA_H = 480;
   const AREA_CY = AREA_TOP + Math.round(AREA_H / 2); // 392
 
-  // Circle diameters: fit within each area
-  const L_CIRC_D = Math.min(leftArea.width, AREA_H) - 16; // ~288
-  const R_CIRC_D = Math.min(rightArea.width, AREA_H) - 16;
-
+  const CIRC_D = Math.min(leftArea.width, AREA_H) - 8; // ~288
+  const CIRC_R = CIRC_D / 2;
   const L_CX = leftArea.left + Math.round(leftArea.width / 2);
   const R_CX = rightArea.left + Math.round(rightArea.width / 2);
 
-  // Left circle
-  const leftCircle = `<svg data-region="left_circle" class="ts-region" style="
-  left:${L_CX - L_CIRC_D / 2}px; top:${AREA_CY - L_CIRC_D / 2}px;
-  width:${L_CIRC_D}px; height:${L_CIRC_D}px;
-  border-radius:50%; overflow:visible;
-" viewBox="${-L_CIRC_D / 2} ${-L_CIRC_D / 2} ${L_CIRC_D} ${L_CIRC_D}" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="0" cy="0" r="${L_CIRC_D / 2}" fill="var(--text)"/>
-</svg>`;
-
-  // Left circle label + subs
-  const subTagH = 28;
-  const totalSubH = leftSub.length * (subTagH + 6);
-  const subStartY = AREA_CY + 16;
-
-  const leftContent = `<div data-region="left_label" class="ts-region" style="
-  left:${L_CX - L_CIRC_D / 2}px; top:${AREA_CY - L_CIRC_D / 2 + 16}px;
-  width:${L_CIRC_D}px; height:${Math.round(L_CIRC_D / 3)}px;
+  // Sub-tag layout inside each circle (kept within the inscribed width).
+  const subTagH = 26;
+  const subTagW = Math.round(CIRC_D * 0.62);
+  function circleContent(side, label, subs, labelColor, tagBg, tagColor) {
+    const labelTop = AREA_CY - CIRC_R + Math.round(CIRC_R * 0.42);
+    const cx = side === 'left' ? L_CX : R_CX;
+    const subStartY = AREA_CY - 4;
+    const tags = subs.map((sub, i) => `<div data-region="${side}_sub_${i + 1}" class="ts-region" style="
+  left:${cx - Math.round(subTagW / 2)}px; top:${subStartY + i * (subTagH + 5)}px;
+  width:${subTagW}px; height:${subTagH}px;
+  background:${tagBg}; border-radius:4px;
   display:flex; align-items:center; justify-content:center;
-  pointer-events:none;
+  box-sizing:border-box; padding:2px 8px; overflow:hidden;
 ">
-  <div style="
-    font-family:var(--font-head);
-    font-size:16px;
-    color:#fff;
-    font-weight:700;
-    text-align:center;
-    line-height:1.2;
-    white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-    padding:0 8px;
-    box-sizing:border-box;
-  ">${leftLabel}</div>
-</div>
-${leftSub.map((sub, i) => `<div data-region="left_sub_${i + 1}" class="ts-region" style="
-  left:${L_CX - Math.round(L_CIRC_D * 0.35)}px;
-  top:${subStartY + i * (subTagH + 4)}px;
-  width:${Math.round(L_CIRC_D * 0.7)}px; height:${subTagH}px;
-  background:rgba(255,255,255,0.15);
-  border-radius:3px;
-  display:flex; align-items:center; justify-content:center;
-  box-sizing:border-box; padding:2px 6px;
-  overflow:hidden;
-">
-  <div style="
-    font-family:var(--font-body);
-    font-size:11px;
-    color:#fff;
-    text-align:center;
-    line-height:1.2;
-    white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-  ">${sub}</div>
-</div>`).join('\n')}`;
+  <div style="font-family:var(--font-body);font-size:11px;color:${tagColor};text-align:center;line-height:1.2;
+    white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${sub}</div>
+</div>`).join('\n');
 
-  // Right circle
-  const rightCircle = `<svg data-region="right_circle" class="ts-region" style="
-  left:${R_CX - R_CIRC_D / 2}px; top:${AREA_CY - R_CIRC_D / 2}px;
-  width:${R_CIRC_D}px; height:${R_CIRC_D}px;
-  border-radius:50%; overflow:visible;
-" viewBox="${-R_CIRC_D / 2} ${-R_CIRC_D / 2} ${R_CIRC_D} ${R_CIRC_D}" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="0" cy="0" r="${R_CIRC_D / 2}" fill="var(--surface)"/>
-</svg>`;
-
-  const rightSubStartY = AREA_CY + 16;
-  const rightContent = `<div data-region="right_label" class="ts-region" style="
-  left:${R_CX - R_CIRC_D / 2}px; top:${AREA_CY - R_CIRC_D / 2 + 16}px;
-  width:${R_CIRC_D}px; height:${Math.round(R_CIRC_D / 3)}px;
-  display:flex; align-items:center; justify-content:center;
-  pointer-events:none;
+    const labelHtml = `<div data-region="${side}_label" class="ts-region" style="
+  left:${cx - CIRC_R}px; top:${labelTop}px;
+  width:${CIRC_D}px; height:36px;
+  display:flex; align-items:center; justify-content:center; pointer-events:none;
 ">
-  <div style="
-    font-family:var(--font-head);
-    font-size:16px;
-    color:var(--text);
-    font-weight:700;
-    text-align:center;
-    line-height:1.2;
-    white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-    padding:0 8px;
-    box-sizing:border-box;
-  ">${rightLabel}</div>
-</div>
-${rightSub.map((sub, i) => `<div data-region="right_sub_${i + 1}" class="ts-region" style="
-  left:${R_CX - Math.round(R_CIRC_D * 0.35)}px;
-  top:${rightSubStartY + i * (subTagH + 4)}px;
-  width:${Math.round(R_CIRC_D * 0.7)}px; height:${subTagH}px;
-  background:var(--muted);
-  border-radius:3px;
-  display:flex; align-items:center; justify-content:center;
-  box-sizing:border-box; padding:2px 6px;
-  opacity:0.4;
-  overflow:hidden;
-">
-  <div style="
-    font-family:var(--font-body);
-    font-size:11px;
-    color:var(--text);
-    text-align:center;
-    line-height:1.2;
-    white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-  ">${sub}</div>
-</div>`).join('\n')}`;
+  <div style="font-family:var(--font-head);font-size:18px;color:${labelColor};font-weight:700;
+    text-align:center;line-height:1.2;white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${label}</div>
+</div>`;
+    return labelHtml + '\n' + tags;
+  }
 
-  // Arrows in center area
+  const leftCircle = hubCircle({ cx: L_CX, cy: AREA_CY, r: CIRC_R, region: 'left_circle', fill: 'var(--primary)' });
+  const rightCircle = hubCircle({ cx: R_CX, cy: AREA_CY, r: CIRC_R, region: 'right_circle', fill: 'var(--surface)' });
+  const leftContent = circleContent('left', leftLabel, leftSub, 'var(--bg)', 'rgba(255,255,255,0.18)', 'var(--bg)');
+  const rightContent = circleContent('right', rightLabel, rightSub, 'var(--text)', 'var(--bg)', 'var(--text)');
+
+  // Center arrows: between the two circle edges, in the center column.
+  const gapStart = L_CX + CIRC_R + 8;
+  const gapEnd = R_CX - CIRC_R - 8;
+  const arrowR = arrowMarker({ id: 'bf-arrow-r', color: 'var(--secondary)', size: 12 });
+  const arrowL = arrowMarker({ id: 'bf-arrow-l', color: 'var(--secondary)', size: 12 });
+  const topY = AREA_CY - 26;
+  const botY = AREA_CY + 26;
+  let body = '';
+  body += svgLine({ x1: gapStart, y1: topY, x2: gapEnd, y2: topY, markerEnd: arrowR.id, width: 3, opacity: 0.85, color: 'var(--secondary)' });
+  body += svgLine({ x1: gapEnd, y1: botY, x2: gapStart, y2: botY, markerEnd: arrowL.id, width: 3, opacity: 0.85, color: 'var(--secondary)' });
+  const overlay = overlaySvg({ defs: arrowR.def + arrowL.def, body, region: 'bilateral_arrows' });
+
   const cLeft = centerArea.left;
   const cW = centerArea.width;
-  const ARR_MID_Y = AREA_CY;
-  const ARR_GAP = 24;
-  const ARR_TOP_Y = ARR_MID_Y - ARR_GAP;
-  const ARR_BOT_Y = ARR_MID_Y + ARR_GAP;
-  const ARR_H = 16;
-
-  const arrowHtml = `<div data-region="center_arrows" class="ts-region" style="
-  left:${cLeft}px; top:${AREA_TOP}px; width:${cW}px; height:${AREA_H}px;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:16px;
-  box-sizing:border-box; padding:0 8px;
-  overflow:hidden;
+  const flowLabels = `<div data-region="flow_right_label" class="ts-region" style="
+  left:${cLeft}px; top:${topY - 34}px; width:${cW}px; height:24px;
+  display:flex; align-items:center; justify-content:center;
 ">
-  <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:8px;">
-    <div style="
-      font-family:var(--font-body);
-      font-size:11px;
-      color:var(--muted);
-      text-align:center;
-      line-height:1.2;
-      white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-      margin-bottom:4px;
-    ">${flowRight}</div>
-    <svg viewBox="0 0 ${cW - 16} 16" width="${cW - 16}" height="16" xmlns="http://www.w3.org/2000/svg" style="display:block;">
-      <line x1="0" y1="8" x2="${cW - 28}" y2="8" stroke="var(--muted)" stroke-width="2.5" opacity="0.7"/>
-      <polygon points="${cW - 28},4 ${cW - 16},8 ${cW - 28},12" fill="var(--muted)" opacity="0.8"/>
-    </svg>
-    <svg viewBox="0 0 ${cW - 16} 16" width="${cW - 16}" height="16" xmlns="http://www.w3.org/2000/svg" style="display:block;">
-      <line x1="${cW - 16}" y1="8" x2="12" y2="8" stroke="var(--muted)" stroke-width="2.5" opacity="0.7"/>
-      <polygon points="12,4 0,8 12,12" fill="var(--muted)" opacity="0.8"/>
-    </svg>
-    <div style="
-      font-family:var(--font-body);
-      font-size:11px;
-      color:var(--muted);
-      text-align:center;
-      line-height:1.2;
-      white-space:normal; overflow-wrap:break-word; word-break:keep-all;
-      margin-top:4px;
-    ">${flowLeft}</div>
-  </div>
+  <div style="font-family:var(--font-body);font-size:11px;color:var(--muted);text-align:center;line-height:1.2;
+    white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${flowRight}</div>
+</div>
+<div data-region="flow_left_label" class="ts-region" style="
+  left:${cLeft}px; top:${botY + 12}px; width:${cW}px; height:24px;
+  display:flex; align-items:center; justify-content:center;
+">
+  <div style="font-family:var(--font-body);font-size:11px;color:var(--muted);text-align:center;line-height:1.2;
+    white-space:normal;overflow-wrap:break-word;word-break:keep-all;">${flowLeft}</div>
 </div>`;
 
   return `
 ${titleHtml(title)}
-
-<div data-region="left_circle_area" class="ts-region" style="
-  left:${leftArea.left}px; top:${AREA_TOP}px; width:${leftArea.width}px; height:${AREA_H}px;
-  overflow:hidden;
-"></div>
-<div data-region="right_circle_area" class="ts-region" style="
-  left:${rightArea.left}px; top:${AREA_TOP}px; width:${rightArea.width}px; height:${AREA_H}px;
-  overflow:hidden;
-"></div>
-
+${overlay}
 ${leftCircle}
-${leftContent}
 ${rightCircle}
+${leftContent}
 ${rightContent}
-${arrowHtml}
+${flowLabels}
 ${sourceHtml(source)}
 `.trim();
 });

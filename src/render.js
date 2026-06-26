@@ -63,7 +63,11 @@ export function renderDeck(spec) {
     const pageHtml = slide.page
       ? `<div class="ts-pageno">${slide.page}</div>`
       : '';
-    return `    <section id="${slide._id}" class="ts-slide theme-${theme}" data-pattern="${pattern}">\n${inner}\n${sourceHtml}${pageHtml}\n    </section>`;
+    // Inject pattern-name badge for pattern slides only (not _intro / _divider)
+    const badgeHtml = !pattern.startsWith('_')
+      ? `<div class="ts-pattern-badge">pattern: ${pattern}</div>`
+      : '';
+    return `    <section id="${slide._id}" class="ts-slide theme-${theme}" data-pattern="${pattern}">\n${inner}\n${sourceHtml}${pageHtml}\n${badgeHtml}\n    </section>`;
   }).join('\n');
 
   return `<!DOCTYPE html>
@@ -83,22 +87,7 @@ export function renderDeck(spec) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    #ts-back-to-catalog {
-      position: fixed;
-      top: 12px;
-      left: 12px;
-      z-index: 9999;
-      background: rgba(0,0,0,0.55);
-      color: #fff;
-      text-decoration: none;
-      font-family: 'Noto Sans JP', sans-serif;
-      font-size: 13px;
-      padding: 5px 10px;
-      border-radius: 4px;
-      opacity: 0.7;
-      transition: opacity 0.15s;
-    }
-    #ts-back-to-catalog:hover { opacity: 1; }
+    /* Styled via base.css — this block intentionally left minimal */
   </style>
 </head>
 <body>
