@@ -234,34 +234,60 @@
   <main class="usage-wrap">
     <div class="usage-body">
 <h1>thrive-slides 使い方マニュアル</h1>
-<p>thrive-slides は、<strong>使う環境によって呼び出し方が異なります</strong>。以下の3通りです。まず下の早見表で自分の環境を確認してください。</p>
+<p>thrive-slides は <strong>AIエージェント非依存</strong>のスライド・デザインシステムです。特定のベンダーや環境に縛られず、ファイルを読めてシェルを実行できるエージェントであれば、どれでも利用できます。呼び出し方は使う環境によって異なります。まず下の早見表で自分の環境を確認してください。</p>
+<hr>
 <h2>早見表（環境別の呼び出し方）</h2>
 <table>
 <thead>
 <tr>
 <th>環境</th>
-<th>呼び出し方</th>
-<th>スラッシュコマンド</th>
+<th>使い方</th>
+<th>入口ファイル</th>
 </tr>
 </thead>
 <tbody><tr>
 <td><strong>Claude Code</strong>（ターミナル / VS Code・JetBrains 拡張）</td>
-<td><code>/thrive-slides</code> で明示的に呼び出す、または依頼内容から自動起動</td>
-<td>✅ あり（<code>/thrive-slides</code>）</td>
+<td><code>/thrive-slides</code> で明示起動、または依頼内容から自動起動</td>
+<td><code>SKILL.md</code></td>
 </tr>
 <tr>
 <td><strong>claude.ai チャット</strong>（ブラウザ）</td>
-<td>「スライドを作って」等と伝えると、スキルの説明文に基づき<strong>自動起動</strong></td>
-<td>❌ なし（自動起動のみ）</td>
+<td>「スライドを作って」等と伝えると、スキルの説明文に基づき自動起動</td>
+<td><code>SKILL.md</code>（スキルとして配布）</td>
 </tr>
 <tr>
 <td><strong>Claude Design</strong>（claude.ai の Design タブ）</td>
-<td>スキルではなく<strong>ファイル添付</strong>で使う</td>
-<td>❌ なし</td>
+<td>スキルではなくファイル添付で使う</td>
+<td><code>design/CLAUDE-DESIGN-GUIDE.md</code></td>
+</tr>
+<tr>
+<td><strong>Codex CLI</strong>（OpenAI Codex CLI）</td>
+<td><code>AGENTS.md</code> を自動読み込み → <code>references/</code> を文脈に → 仕様準拠生成またはレンダラ実行</td>
+<td><code>AGENTS.md</code></td>
+</tr>
+<tr>
+<td><strong>Cursor</strong></td>
+<td><code>.cursor/rules/thrive-slides.mdc</code> が自動ロード → 同様に利用</td>
+<td><code>.cursor/rules/thrive-slides.mdc</code></td>
+</tr>
+<tr>
+<td><strong>ChatGPT（Custom GPT / Projects）</strong></td>
+<td><code>chatgpt/</code> バンドルをアップロードして使う（シェル不要）</td>
+<td><code>chatgpt/SYSTEM-PROMPT.md</code> + <code>chatgpt/knowledge/</code></td>
+</tr>
+<tr>
+<td><strong>MCP 対応ホスト全般</strong>（Claude Desktop / Claude Code / Cursor / Cline 等）</td>
+<td><code>mcp/</code> の MCP サーバを登録し、仕様取得＋HTML/PPTX レンダリングをツールとして呼び出す</td>
+<td><code>mcp/README.md</code></td>
+</tr>
+<tr>
+<td><strong>汎用（どんなエージェントでも）</strong></td>
+<td><code>references/</code> を読んで仕様準拠生成</td>
+<td><code>references/generation-guide.md</code></td>
 </tr>
 </tbody></table>
 <blockquote>
-<p>パターン名（例: <code>three-kpi-big-number</code>）を指示に使うと、狙ったレイアウトを指定できます。全83パターンの名前とサムネイルは <strong>公開カタログ</strong> で一覧確認できます → <strong><a href="https://ry-from-garage.github.io/thrive-slides-page/">https://ry-from-garage.github.io/thrive-slides-page/</a></strong> （各スライドの左上に <code>pattern: 名前</code> が表示されます）。</p>
+<p>パターン名（例: <code>three-kpi-big-number</code>）を指示に使うと、狙ったレイアウトを指定できます。全83パターンの名前とサムネイルは<strong>公開カタログ</strong>で一覧確認できます → <strong><a href="https://ry-from-garage.github.io/thrive-slides-page/">https://ry-from-garage.github.io/thrive-slides-page/</a></strong> （各スライドの左上に <code>pattern: 名前</code> が表示されます）。</p>
 </blockquote>
 <hr>
 <h2>1. Claude Code（ターミナル / IDE 拡張）</h2>
@@ -271,7 +297,7 @@
 <pre><code class="language-bash">git clone https://github.com/ry-from-garage/thrive-slides.git
 cp -R thrive-slides ~/.claude/skills/thrive-slides
 </code></pre>
-<p><code>~/.claude/skills/thrive-slides/SKILL.md</code> がある状態になればOKです（VS Code / JetBrains の Claude Code 拡張でも同じ場所を参照します）。</p>
+<p><code>~/.claude/skills/thrive-slides/SKILL.md</code> がある状態になれば OK です（VS Code / JetBrains の Claude Code 拡張でも同じ場所を参照します）。</p>
 <h3>呼び出し方（2通り）</h3>
 <ul>
 <li><strong>スラッシュコマンド（明示）:</strong> メッセージの先頭で <code>/thrive-slides</code> と入力し、続けて内容・テーマを書きます。</li>
@@ -311,10 +337,10 @@ cp -R thrive-slides ~/.claude/skills/thrive-slides
 </tr>
 </tbody></table>
 <hr>
-<h2>2. claude.ai（ブラウザのチャット）</h2>
-<p>claude.ai のチャットには <strong>スラッシュコマンドはありません</strong>。スキルは、依頼内容が<strong>スキルの説明文に一致したときに自動起動</strong>します。</p>
+<h2>2. claude.ai チャット（ブラウザ）</h2>
+<p>claude.ai のチャットには<strong>スラッシュコマンドはありません</strong>。スキルは、依頼内容がスキルの説明文に一致したときに自動起動します。</p>
 <ul>
-<li><strong>スキルの用意:</strong> カスタムスキルの追加方法は契約形態により異なります（組織で配布されている場合は自動で利用可能になります）。個人で確実に試したい場合は、<strong>Claude Code（方法1）が最も簡単</strong>です。</li>
+<li><strong>スキルの用意:</strong> カスタムスキルの追加方法は契約形態により異なります（組織で配布されている場合は自動で利用可能になります）。個人で確実に試したい場合は、<strong>Claude Code（上の方法）が最も簡単</strong>です。</li>
 <li><strong>使い方:</strong> テーマ名・パターン名・内容を文章で伝えるだけです。</li>
 </ul>
 <pre><code>thrive-slides の strategy-consulting テーマで、次のメモからスライドを作ってください。
@@ -322,7 +348,7 @@ cp -R thrive-slides ~/.claude/skills/thrive-slides
 </code></pre>
 <hr>
 <h2>3. Claude Design（claude.ai の Design タブ）</h2>
-<p>Claude Design は <strong>スキルを使いません</strong>（チャット側で有効化したスキルは Design には引き継がれません）。<strong>ファイルを添付</strong>して使います。</p>
+<p>Claude Design はスキルを使いません（チャット側で有効化したスキルは Design には引き継がれません）。<strong>ファイルを添付</strong>して使います。</p>
 <h3>添付するファイル</h3>
 <table>
 <thead>
@@ -359,9 +385,166 @@ cp -R thrive-slides ~/.claude/skills/thrive-slides
 </code></pre>
 <p>詳しい手順は <a href="design/CLAUDE-DESIGN-GUIDE.md">Claude Design ガイド</a> を参照してください。</p>
 <hr>
+<h2>4. Codex CLI（OpenAI Codex CLI）</h2>
+<p>Codex CLI はプロジェクトルートの <code>AGENTS.md</code> を自動的に読み込みます。追加設定なしで thrive-slides の使い方が文脈に入ります。</p>
+<h3>使い方</h3>
+<p><code>AGENTS.md</code> の「起動手順（Codex / Cursor — MCP なし）」に従ってスライドを生成します。</p>
+<ol>
+<li><code>AGENTS.md</code>（このリポジトリの <code>/AGENTS.md</code>）を確認する（Codex が自動で読み込む）</li>
+<li><code>references/generation-guide.md</code> を読む（生成規範・品質ルール）</li>
+<li><code>references/themes/THEME-INDEX.md</code> でテーマを選び、対応する <code>theme-*.md</code> を読む</li>
+<li><code>references/layouts/LAYOUT-INDEX.md</code> でレイアウトを選び、対応する <code>layout-*.md</code> を読む</li>
+<li>仕様に従ってスライドを生成するか、レンダラを実行する</li>
+</ol>
+<h3>レンダラ実行（任意）</h3>
+<pre><code class="language-bash"># HTML デッキ
+cd renderer &amp;&amp; npm install &amp;&amp; node build.js &lt;spec.json&gt; &lt;out&gt;
+
+# PowerPoint
+cd pptx &amp;&amp; pip install -r requirements.txt &amp;&amp; python build.py &lt;spec.json&gt; &lt;out.pptx&gt;
+</code></pre>
+<p>spec フォーマットは <code>renderer/specs/gallery.json</code> を参照してください。</p>
+<hr>
+<h2>5. Cursor</h2>
+<p><code>.cursor/rules/thrive-slides.mdc</code> がプロジェクト内に存在する場合、Cursor が自動的にこのルールをロードします。スライド/デッキ生成を依頼すると、このルールに基づいて thrive-slides の仕様に沿った生成が行われます。</p>
+<h3>使い方</h3>
+<p>Cursor のチャットまたはエディタ内で、スライド生成を依頼するだけです。</p>
+<ul>
+<li>ルールが自動ロードされるため、特別な設定なしに <code>references/</code> を参照した仕様準拠生成が実行されます。</li>
+<li>レンダラの実行（<code>renderer/build.js</code> や <code>pptx/build.py</code>）も Cursor のターミナルから行えます。</li>
+<li>MCP サーバを登録することで、ツールとしての呼び出しも可能です（→ 後述の「MCP 対応ホスト」を参照）。</li>
+</ul>
+<hr>
+<h2>6. ChatGPT（Custom GPT / Projects）</h2>
+<p>ChatGPT はローカルのレンダラを実行できません。<code>chatgpt/</code> バンドルをアップロードすることで、ChatGPT 上で thrive-slides のデザイン規範に沿ったスライドを生成できます。</p>
+<h3>セットアップ</h3>
+<p>詳細な手順は <code>chatgpt/README.md</code> を参照してください。概要:</p>
+<p><strong>Custom GPT を作る場合:</strong></p>
+<ol>
+<li>ChatGPT を開く → 左サイドバーの「GPTs」→「+ 作成」をクリック</li>
+<li>「構成 (Configure)」タブを選択</li>
+<li><strong>Instructions（指示）</strong> に <code>chatgpt/SYSTEM-PROMPT.md</code> の内容を貼り付ける</li>
+<li><strong>「知識 (Knowledge)」</strong> に以下の4ファイルをアップロードする:<ul>
+<li><code>chatgpt/knowledge/00-core.md</code></li>
+<li><code>chatgpt/knowledge/01-themes.md</code></li>
+<li><code>chatgpt/knowledge/02-layouts.md</code></li>
+<li><code>chatgpt/knowledge/03-brand.md</code></li>
+</ul>
+</li>
+<li>保存して完成</li>
+</ol>
+<p><strong>ChatGPT Projects を使う場合:</strong></p>
+<ol>
+<li>左サイドバーの「Projects」→「+ 新しいプロジェクト」をクリック</li>
+<li>プロジェクト指示に <code>chatgpt/SYSTEM-PROMPT.md</code> の内容を貼り付ける</li>
+<li><code>chatgpt/knowledge/</code> 内の4ファイルをアップロードする</li>
+</ol>
+<h3>出力</h3>
+<p>ChatGPT は以下の2つを出力します。</p>
+<ul>
+<li><strong>自己完結 HTML デッキ</strong> — ブラウザで直接開いてプレゼンできる HTML ファイル（テーマカラーをインライン CSS で再現）</li>
+<li><strong>デッキ仕様 JSON</strong> — <code>{title, theme, slides: [{page, pattern, action_title, content}]}</code> 形式。この JSON を MCP サーバや <code>pptx/build.py</code>・<code>renderer/build.js</code> に渡すと、ピクセル精度のデッキを生成できます。</li>
+</ul>
+<hr>
+<h2>7. MCP 対応ホスト全般</h2>
+<p>thrive-slides は <strong>MCP（Model Context Protocol）サーバとしても使えます</strong>。<code>mcp/</code> に stdio の MCP サーバを同梱しており、Claude Desktop / Claude Code / Cursor / Cline / ChatGPT デスクトップコネクタなど <strong>任意の MCP 対応ホスト</strong>から first-class なツールとして利用できます。</p>
+<h3>MCP サーバが提供するツール（全9つ）</h3>
+<p><strong>仕様ツール（7つ）</strong> — 設計仕様をホストの文脈に取り込む</p>
+<table>
+<thead>
+<tr>
+<th>ツール</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>list_themes</code></td>
+<td>5テーマの名前と概要、<code>THEME-INDEX.md</code> を返す</td>
+</tr>
+<tr>
+<td><code>list_patterns</code></td>
+<td>14カテゴリ・全パターン名を返す</td>
+</tr>
+<tr>
+<td><code>get_generation_guide</code></td>
+<td>生成規範・品質ルール（<code>references/generation-guide.md</code>）を返す</td>
+</tr>
+<tr>
+<td><code>get_grid_system</code></td>
+<td>グリッドシステム定義（12カラム・8px・1280×720px）を返す</td>
+</tr>
+<tr>
+<td><code>get_theme</code></td>
+<td>指定テーマの定義ファイル（<code>theme-&lt;name&gt;.md</code>）を返す</td>
+</tr>
+<tr>
+<td><code>get_layout</code></td>
+<td>指定カテゴリのレイアウト定義（<code>layout-&lt;category&gt;.md</code>）を返す</td>
+</tr>
+<tr>
+<td><code>get_brand_template</code></td>
+<td>ブランドテンプレート＋融合規則を返す</td>
+</tr>
+</tbody></table>
+<p><strong>レンダリングツール（2つ）</strong> — デッキ spec から完成品を生成</p>
+<table>
+<thead>
+<tr>
+<th>ツール</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>render_html</code></td>
+<td>spec オブジェクトを受け取り、HTML デッキを生成して絶対パスを返す</td>
+</tr>
+<tr>
+<td><code>render_pptx</code></td>
+<td>spec オブジェクトを受け取り、PowerPoint ファイルを生成して絶対パスを返す（デフォルトでフォント埋め込み済み）</td>
+</tr>
+</tbody></table>
+<h3>セットアップ</h3>
+<pre><code class="language-bash">cd mcp &amp;&amp; npm install
+</code></pre>
+<p>spec ツール（7つ）はこれだけで使えます。レンダリングツールを使う場合は renderer / pptx の依存関係も別途インストールしてください（詳細は <code>mcp/README.md</code>）。</p>
+<h3>ホストへの登録方法</h3>
+<p><strong>Claude Code:</strong></p>
+<pre><code class="language-bash">claude mcp add thrive-slides -- node /絶対パス/thrive-slides/mcp/server.js
+</code></pre>
+<p>（<code>-s user</code> でユーザーグローバル登録、<code>-s project</code> でプロジェクト共有）</p>
+<p><strong>Claude Desktop</strong> — <code>claude_desktop_config.json</code> に追加:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;thrive-slides&quot;: {
+      &quot;command&quot;: &quot;node&quot;,
+      &quot;args&quot;: [&quot;/絶対パス/thrive-slides/mcp/server.js&quot;]
+    }
+  }
+}
+</code></pre>
+<p><strong>Cursor / Cline / その他</strong> — ホスト別の設定ファイルへの追記方法は <code>mcp/README.md</code> を参照してください。</p>
+<h3>使用の流れ（例）</h3>
+<ol>
+<li><code>list_patterns</code> を呼び出してパターン一覧を確認する</li>
+<li><code>get_theme</code> で使用するテーマの定義を取得する</li>
+<li><code>get_layout</code> で必要なレイアウトカテゴリの定義を取得する</li>
+<li>spec JSON を組み立てる（<code>renderer/specs/gallery.json</code> 参照）</li>
+<li><code>render_pptx</code> に spec を渡して PowerPoint を生成する</li>
+</ol>
+<hr>
+<h2>8. 汎用（どんなエージェントでも使える）</h2>
+<p>シェルさえ実行できれば、任意のエージェントで thrive-slides を利用できます。</p>
+<ol>
+<li><code>references/generation-guide.md</code> を読む（生成規範・品質ルール）</li>
+<li><code>references/themes/THEME-INDEX.md</code> でテーマを選び、対応する <code>theme-*.md</code> を読む</li>
+<li><code>references/layouts/LAYOUT-INDEX.md</code> でレイアウトを選び、対応する <code>layout-*.md</code> を読む</li>
+<li>仕様に従ってスライドを生成する（レンダラ実行は任意）</li>
+</ol>
+<p>詳しくは <code>AGENTS.md</code>（リポジトリルート）を参照してください。</p>
+<hr>
 <h2>PPTX（PowerPoint）として出力する</h2>
 <h3>これは何か</h3>
-<p><code>pptx/</code> チャネルは <code>renderer/specs/</code> の仕様に基づき、同じ83パターンを <strong>ネイティブ PowerPoint (.pptx)</strong> として出力する Python パイプラインです。HTML レンダラと同じ <code>gallery.json</code> を入力に使います。</p>
+<p><code>pptx/</code> チャネルは <code>renderer/specs/</code> の仕様に基づき、同じ83パターンを<strong>ネイティブ PowerPoint (.pptx)</strong> として出力する Python パイプラインです。HTML レンダラと同じ <code>gallery.json</code> を入力に使います。</p>
 <h3>ダウンロード（すぐ試す）</h3>
 <p>全98スライドの見本デッキを直接ダウンロードできます。</p>
 <ul>
@@ -383,58 +566,12 @@ python3 -m venv .venv &amp;&amp; .venv/bin/pip install -r requirements.txt
 <h3>自分のスライドを作る</h3>
 <p>入力スペックは <code>renderer/specs/gallery.json</code> と同じ形式（<code>slides: [{theme, pattern, content, page}]</code>）です。<code>theme</code> は5種から、<code>pattern</code> は全83パターン名（公開カタログで確認）から選びます。</p>
 <hr>
-<h2>AIエージェント別の使い方</h2>
-<p>thrive-slides は <strong>AIエージェント非依存</strong>です。Claude 以外のエージェントでも同じ仕様・レンダラを利用できます。</p>
-<h3>早見表（AIエージェント別）</h3>
-<table>
-<thead>
-<tr>
-<th>エージェント</th>
-<th>使い方</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><strong>Claude Code</strong>（ターミナル / IDE 拡張）</td>
-<td><code>SKILL.md</code> が自動読み込み。<code>/thrive-slides</code> で明示起動 or 自動起動</td>
-</tr>
-<tr>
-<td><strong>claude.ai チャット</strong></td>
-<td>依頼内容からスキルが自動起動（スラッシュコマンドなし）</td>
-</tr>
-<tr>
-<td><strong>Claude Design</strong></td>
-<td>ファイル添付方式（<code>design/CLAUDE-DESIGN-GUIDE.md</code> 参照）</td>
-</tr>
-<tr>
-<td><strong>Codex</strong>（OpenAI Codex CLI）</td>
-<td><code>AGENTS.md</code> を自動読み込み。<code>references/</code> を文脈に入れてレンダラ実行 or 仕様準拠生成</td>
-</tr>
-<tr>
-<td><strong>Cursor / Aider / その他のコーディングエージェント</strong></td>
-<td><code>AGENTS.md</code> をプロジェクトルールとして読み込み、同様に利用</td>
-</tr>
-<tr>
-<td><strong>汎用（どんなエージェントでも）</strong></td>
-<td><code>references/generation-guide.md</code> → テーマ → レイアウトの順に読み、仕様に従って生成</td>
-</tr>
-</tbody></table>
-<h3>汎用（どんなエージェントでも使える）パス</h3>
-<ol>
-<li><code>references/generation-guide.md</code> を読む（生成規範・品質ルール）</li>
-<li><code>references/themes/THEME-INDEX.md</code> でテーマを選び、対応する <code>theme-*.md</code> を読む</li>
-<li><code>references/layouts/LAYOUT-INDEX.md</code> で使うレイアウトを選び、対応する <code>layout-*.md</code> を読む</li>
-<li>仕様に従ってスライドを生成する（レンダラ実行は任意）</li>
-</ol>
-<p>詳しくは <code>AGENTS.md</code>（リポジトリルート）を参照してください。</p>
-<hr>
-<h2>出力形式</h2>
-<p>デフォルトの出力は <strong>HTML（ブラウザ表示）</strong> ですが、<strong>PowerPoint（.pptx）でも出力できます</strong>。<code>pptx/</code> フォルダで <code>python build.py</code> を実行すると、全83パターンをネイティブ .pptx として書き出せます。詳しい手順は <a href="README.md">README の「PowerPoint 出力（pptx/）」</a> を参照してください。</p>
-<hr>
 <h2>困ったときは</h2>
 <ul>
 <li><strong>どのレイアウトがあるか分からない</strong> → 公開カタログ（<a href="https://ry-from-garage.github.io/thrive-slides-page/">https://ry-from-garage.github.io/thrive-slides-page/</a> ）でサムネイルとパターン名を確認。</li>
 <li><strong>用語が分からない</strong> → <a href="README.md">README</a> 最下部の用語集。</li>
-<li><strong>スラッシュコマンドが出てこない</strong> → claude.ai チャット / Claude Design にはありません（Claude Code のみ）。上の早見表で環境を確認してください。</li>
+<li><strong>スラッシュコマンドが出てこない</strong> → claude.ai チャット / Claude Design / Codex / Cursor / ChatGPT にはありません（Claude Code のみ）。上の早見表で環境を確認してください。</li>
+<li><strong>MCP サーバが接続できない</strong> → <code>mcp/README.md</code> のトラブルシューティングを参照してください。サーバは stderr のみにログを出力します（stdout は JSON-RPC チャンネルです）。</li>
 </ul>
 
     </div>
