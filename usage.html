@@ -273,7 +273,7 @@
 <tr>
 <td><strong>ChatGPT（Custom GPT / Projects）</strong></td>
 <td><code>chatgpt/</code> バンドルをアップロードして使う（シェル不要）</td>
-<td><code>chatgpt/SYSTEM-PROMPT.md</code> + <code>chatgpt/knowledge/</code></td>
+<td><code>chatgpt/SYSTEM-PROMPT.md</code> + <code>chatgpt/knowledge-split/</code>（推奨）または <code>knowledge/</code></td>
 </tr>
 <tr>
 <td><strong>MCP 対応ホスト全般</strong>（Claude Desktop / Claude Code / Cursor / Cline 等）</td>
@@ -424,11 +424,10 @@ cd pptx &amp;&amp; pip install -r requirements.txt &amp;&amp; python build.py &l
 <li>ChatGPT を開く → 左サイドバーの「GPTs」→「+ 作成」をクリック</li>
 <li>「構成 (Configure)」タブを選択</li>
 <li><strong>Instructions（指示）</strong> に <code>chatgpt/SYSTEM-PROMPT.md</code> の内容を貼り付ける</li>
-<li><strong>「知識 (Knowledge)」</strong> に以下の4ファイルをアップロードする:<ul>
-<li><code>chatgpt/knowledge/00-core.md</code></li>
-<li><code>chatgpt/knowledge/01-themes.md</code></li>
-<li><code>chatgpt/knowledge/02-layouts.md</code></li>
-<li><code>chatgpt/knowledge/03-brand.md</code></li>
+<li><strong>「知識 (Knowledge)」</strong> に、次の<strong>いずれか一方</strong>のフォルダのファイル一式をアップロードする:<ul>
+<li><strong>分割版（推奨）:</strong> <code>chatgpt/knowledge-split/</code> の18ファイル（各 &lt; 256KB・検索精度が高い）</li>
+<li><strong>統合版:</strong> <code>chatgpt/knowledge/</code> の4ファイル（<code>00-core</code> / <code>01-themes</code> / <code>02-layouts</code>（≈489KB）/ <code>03-brand</code>）
+※ 両方を混ぜないでください。</li>
 </ul>
 </li>
 <li>保存して完成</li>
@@ -437,7 +436,7 @@ cd pptx &amp;&amp; pip install -r requirements.txt &amp;&amp; python build.py &l
 <ol>
 <li>左サイドバーの「Projects」→「+ 新しいプロジェクト」をクリック</li>
 <li>プロジェクト指示に <code>chatgpt/SYSTEM-PROMPT.md</code> の内容を貼り付ける</li>
-<li><code>chatgpt/knowledge/</code> 内の4ファイルをアップロードする</li>
+<li><code>chatgpt/knowledge-split/</code>（推奨・18ファイル）または <code>chatgpt/knowledge/</code>（4ファイル）のいずれか一方を一式アップロードする</li>
 </ol>
 <h3>出力</h3>
 <p>ChatGPT は以下の2つを出力します。</p>
