@@ -359,6 +359,77 @@ cp -R thrive-slides ~/.claude/skills/thrive-slides
 </code></pre>
 <p>詳しい手順は <a href="design/CLAUDE-DESIGN-GUIDE.md">Claude Design ガイド</a> を参照してください。</p>
 <hr>
+<h2>PPTX（PowerPoint）として出力する</h2>
+<h3>これは何か</h3>
+<p><code>pptx/</code> チャネルは <code>renderer/specs/</code> の仕様に基づき、同じ83パターンを <strong>ネイティブ PowerPoint (.pptx)</strong> として出力する Python パイプラインです。HTML レンダラと同じ <code>gallery.json</code> を入力に使います。</p>
+<h3>ダウンロード（すぐ試す）</h3>
+<p>全98スライドの見本デッキを直接ダウンロードできます。</p>
+<ul>
+<li><strong>URL:</strong> <a href="https://ry-from-garage.github.io/thrive-slides-page/thrive-slides-gallery.pptx">https://ry-from-garage.github.io/thrive-slides-page/thrive-slides-gallery.pptx</a></li>
+<li><strong>または:</strong> 公開ギャラリー（<a href="https://ry-from-garage.github.io/thrive-slides-page/%EF%BC%89%E4%B8%8A%E9%83%A8%E3%81%AE%E3%80%8C%E2%AC%87">https://ry-from-garage.github.io/thrive-slides-page/）上部の「⬇</a> PowerPoint版」ボタンから</li>
+</ul>
+<p>日本語フォント（Noto Sans JP / Noto Serif JP）埋め込み済みなので、Noto フォントがインストールされていない環境でも同じ見た目で開けます。</p>
+<h3>自分で生成する手順</h3>
+<pre><code class="language-bash">cd pptx
+python3 -m venv .venv &amp;&amp; .venv/bin/pip install -r requirements.txt
+.venv/bin/python build.py            # renderer/specs/gallery.json → out/gallery.pptx（全98スライド）
+# 任意のスペックから生成する場合:
+.venv/bin/python build.py &lt;spec.json&gt; &lt;out.pptx&gt;
+</code></pre>
+<h3>日本語フォント埋め込み（環境差の解消）</h3>
+<pre><code class="language-bash">.venv/bin/python embed_fonts.py out/gallery.pptx out/gallery-embedded.pptx
+</code></pre>
+<p><code>embed_fonts.py</code> は Noto Sans JP / Noto Serif JP をデッキ使用文字だけにサブセットして OOXML で正規埋め込みします（PowerPoint の「使用文字のみ埋め込み」と同等）。これで Noto 未インストールの PowerPoint でも同じ見た目になります。</p>
+<h3>自分のスライドを作る</h3>
+<p>入力スペックは <code>renderer/specs/gallery.json</code> と同じ形式（<code>slides: [{theme, pattern, content, page}]</code>）です。<code>theme</code> は5種から、<code>pattern</code> は全83パターン名（公開カタログで確認）から選びます。</p>
+<hr>
+<h2>AIエージェント別の使い方</h2>
+<p>thrive-slides は <strong>AIエージェント非依存</strong>です。Claude 以外のエージェントでも同じ仕様・レンダラを利用できます。</p>
+<h3>早見表（AIエージェント別）</h3>
+<table>
+<thead>
+<tr>
+<th>エージェント</th>
+<th>使い方</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Claude Code</strong>（ターミナル / IDE 拡張）</td>
+<td><code>SKILL.md</code> が自動読み込み。<code>/thrive-slides</code> で明示起動 or 自動起動</td>
+</tr>
+<tr>
+<td><strong>claude.ai チャット</strong></td>
+<td>依頼内容からスキルが自動起動（スラッシュコマンドなし）</td>
+</tr>
+<tr>
+<td><strong>Claude Design</strong></td>
+<td>ファイル添付方式（<code>design/CLAUDE-DESIGN-GUIDE.md</code> 参照）</td>
+</tr>
+<tr>
+<td><strong>Codex</strong>（OpenAI Codex CLI）</td>
+<td><code>AGENTS.md</code> を自動読み込み。<code>references/</code> を文脈に入れてレンダラ実行 or 仕様準拠生成</td>
+</tr>
+<tr>
+<td><strong>Cursor / Aider / その他のコーディングエージェント</strong></td>
+<td><code>AGENTS.md</code> をプロジェクトルールとして読み込み、同様に利用</td>
+</tr>
+<tr>
+<td><strong>汎用（どんなエージェントでも）</strong></td>
+<td><code>references/generation-guide.md</code> → テーマ → レイアウトの順に読み、仕様に従って生成</td>
+</tr>
+</tbody></table>
+<h3>汎用（どんなエージェントでも使える）パス</h3>
+<ol>
+<li><code>references/generation-guide.md</code> を読む（生成規範・品質ルール）</li>
+<li><code>references/themes/THEME-INDEX.md</code> でテーマを選び、対応する <code>theme-*.md</code> を読む</li>
+<li><code>references/layouts/LAYOUT-INDEX.md</code> で使うレイアウトを選び、対応する <code>layout-*.md</code> を読む</li>
+<li>仕様に従ってスライドを生成する（レンダラ実行は任意）</li>
+</ol>
+<p>詳しくは <code>AGENTS.md</code>（リポジトリルート）を参照してください。</p>
+<hr>
+<h2>出力形式</h2>
+<p>デフォルトの出力は <strong>HTML（ブラウザ表示）</strong> ですが、<strong>PowerPoint（.pptx）でも出力できます</strong>。<code>pptx/</code> フォルダで <code>python build.py</code> を実行すると、全83パターンをネイティブ .pptx として書き出せます。詳しい手順は <a href="README.md">README の「PowerPoint 出力（pptx/）」</a> を参照してください。</p>
+<hr>
 <h2>困ったときは</h2>
 <ul>
 <li><strong>どのレイアウトがあるか分からない</strong> → 公開カタログ（<a href="https://ry-from-garage.github.io/thrive-slides-page/">https://ry-from-garage.github.io/thrive-slides-page/</a> ）でサムネイルとパターン名を確認。</li>

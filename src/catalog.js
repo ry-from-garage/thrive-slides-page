@@ -165,6 +165,19 @@ export function renderCatalog(spec) {
       transition: border-color 0.15s, color 0.15s;
     }
     .usage-link:hover { border-color: var(--accent); color: var(--accent); }
+    .pptx-link {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 7px 16px;
+      border-radius: 20px;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s;
+    }
+    .pptx-link:hover { background: var(--accent); color: #fff; }
 
     /* ── Jump nav ── */
     .jump-nav {
@@ -287,6 +300,7 @@ export function renderCatalog(spec) {
     <div class="header-top">
       <span class="site-title">thrive-slides — スライドパターンカタログ</span>
       <div class="header-actions">
+        <a class="pptx-link" href="thrive-slides-gallery.pptx" download>⬇ PowerPoint版 (98枚)</a>
         <a class="usage-link" href="usage.html">📖 使い方</a>
         <a class="deck-link" href="deck.html">▶ デッキで通し閲覧</a>
       </div>
