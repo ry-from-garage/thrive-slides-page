@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>thrive-slides — スライドパターンカタログ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #111318;
+      --surface: #1c1f27;
+      --surface2: #252831;
+      --border: #2e3140;
+      --text: #e8eaf0;
+      --text-muted: #8b90a0;
+      --accent: #5b8def;
+      --accent-hover: #7aa3f5;
+      --radius: 8px;
+      --card-radius: 6px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans JP', sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 40px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-top {
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .site-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .site-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .deck-link {
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 7px 16px;
+      border-radius: 20px;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .deck-link:hover { background: var(--accent-hover); }
+    .usage-link {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 7px 16px;
+      border-radius: 20px;
+      white-space: nowrap;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .usage-link:hover { border-color: var(--accent); color: var(--accent); }
+    .pptx-link {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 7px 16px;
+      border-radius: 20px;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s;
+    }
+    .pptx-link:hover { background: var(--accent); color: #fff; }
+
+    /* ── Jump nav ── */
+    .jump-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 16px 40px 0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 14px;
+    }
+    .cat-chip {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      transition: background 0.12s, color 0.12s, border-color 0.12s;
+      white-space: nowrap;
+    }
+    .cat-chip:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ── Main content ── */
+    .main-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 40px 80px;
+    }
+
+    /* ── Category section ── */
+    .cat-section {
+      margin-bottom: 56px;
+      scroll-margin-top: 130px;
+    }
+    .cat-heading {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .cat-theme-tag {
+      font-size: 0.72rem;
+      font-weight: 500;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .cat-count {
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    /* ── Thumbnail grid ── */
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .thumb-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      text-decoration: none;
+      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+    .thumb-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+    .thumb-card img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: var(--surface2);
+      display: block;
+    }
+    .thumb-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      padding: 6px 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      background: var(--surface);
+      transition: color 0.15s;
+    }
+    .thumb-card:hover .thumb-label { color: var(--accent-hover); }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .site-header, .jump-nav { padding-left: 16px; padding-right: 16px; }
+      .main-content { padding: 24px 16px 60px; }
+      .thumb-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-top">
+      <span class="site-title">thrive-slides — スライドパターンカタログ</span>
+      <div class="header-actions">
+        <a class="pptx-link" href="thrive-slides-gallery.pptx" download>⬇ PowerPoint版 (98枚)</a>
+        <a class="usage-link" href="usage.html">📖 使い方</a>
+        <a class="deck-link" href="deck.html">▶ デッキで通し閲覧</a>
+      </div>
+    </div>
+    <div class="site-subtitle">5 テーマ × 21 カテゴリ × 118 パターン</div>
+  </header>
+  <nav class="jump-nav">
+      <a class="cat-chip" href="#cat-cover-section">Cover & Section</a>
+      <a class="cat-chip" href="#cat-table-of-contents-agenda">Table of Contents & Agenda</a>
+      <a class="cat-chip" href="#cat-body-lists">Body Lists</a>
+      <a class="cat-chip" href="#cat-flows-steps">Flows & Steps</a>
+      <a class="cat-chip" href="#cat-diagrams">Diagrams</a>
+      <a class="cat-chip" href="#cat-card-grid">Card Grid</a>
+      <a class="cat-chip" href="#cat-charts-data">Charts & Data</a>
+      <a class="cat-chip" href="#cat-comparison-pricing">Comparison & Pricing</a>
+      <a class="cat-chip" href="#cat-kpis-summary">KPIs & Summary</a>
+      <a class="cat-chip" href="#cat-risks-faq">Risks & FAQ</a>
+      <a class="cat-chip" href="#cat-profiles">Profiles</a>
+      <a class="cat-chip" href="#cat-consulting-classics">Consulting Classics</a>
+      <a class="cat-chip" href="#cat-mba-frameworks">MBA Frameworks</a>
+      <a class="cat-chip" href="#cat-grid-systems">Grid Systems</a>
+      <a class="cat-chip" href="#cat-academic">Academic</a>
+      <a class="cat-chip" href="#cat-warm-narrative">Warm Narrative</a>
+      <a class="cat-chip" href="#cat-strategy-consulting">Strategy Consulting</a>
+      <a class="cat-chip" href="#cat-modern-tech">Modern Tech</a>
+      <a class="cat-chip" href="#cat-editorial-keynote">Editorial Keynote</a>
+      <a class="cat-chip" href="#cat-corporate-trust">Corporate Trust</a>
+      <a class="cat-chip" href="#cat-vibrant-pitch">Vibrant Pitch</a>
+    </nav>
+  <main class="main-content">
+    <section class="cat-section" id="cat-cover-section">
+      <h2 class="cat-heading">Cover & Section<span class="cat-theme-tag">editorial-keynote</span><span class="cat-count">5 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/cover-title">
+          <img src="thumbs/cover-title.png" alt="cover-title" loading="lazy">
+          <span class="thumb-label">cover-title</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/cover-visual-split">
+          <img src="thumbs/cover-visual-split.png" alt="cover-visual-split" loading="lazy">
+          <span class="thumb-label">cover-visual-split</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/section-divider">
+          <img src="thumbs/section-divider.png" alt="section-divider" loading="lazy">
+          <span class="thumb-label">section-divider</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/key-message">
+          <img src="thumbs/key-message.png" alt="key-message" loading="lazy">
+          <span class="thumb-label">key-message</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/quote-statement">
+          <img src="thumbs/quote-statement.png" alt="quote-statement" loading="lazy">
+          <span class="thumb-label">quote-statement</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-table-of-contents-agenda">
+      <h2 class="cat-heading">Table of Contents & Agenda<span class="cat-theme-tag">corporate-trust</span><span class="cat-count">5 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/numbered-agenda">
+          <img src="thumbs/numbered-agenda.png" alt="numbered-agenda" loading="lazy">
+          <span class="thumb-label">numbered-agenda</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/two-column-toc">
+          <img src="thumbs/two-column-toc.png" alt="two-column-toc" loading="lazy">
+          <span class="thumb-label">two-column-toc</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/sidebar-toc-panel">
+          <img src="thumbs/sidebar-toc-panel.png" alt="sidebar-toc-panel" loading="lazy">
+          <span class="thumb-label">sidebar-toc-panel</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/category-toc">
+          <img src="thumbs/category-toc.png" alt="category-toc" loading="lazy">
+          <span class="thumb-label">category-toc</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/section-progress-toc">
+          <img src="thumbs/section-progress-toc.png" alt="section-progress-toc" loading="lazy">
+          <span class="thumb-label">section-progress-toc</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-body-lists">
+      <h2 class="cat-heading">Body Lists<span class="cat-theme-tag">modern-tech</span><span class="cat-count">6 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/numbered-list-body">
+          <img src="thumbs/numbered-list-body.png" alt="numbered-list-body" loading="lazy">
+          <span class="thumb-label">numbered-list-body</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/icon-left-text">
+          <img src="thumbs/icon-left-text.png" alt="icon-left-text" loading="lazy">
+          <span class="thumb-label">icon-left-text</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/numbered-two-col">
+          <img src="thumbs/numbered-two-col.png" alt="numbered-two-col" loading="lazy">
+          <span class="thumb-label">numbered-two-col</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/three-tier-segment">
+          <img src="thumbs/three-tier-segment.png" alt="three-tier-segment" loading="lazy">
+          <span class="thumb-label">three-tier-segment</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/two-section-stacked">
+          <img src="thumbs/two-section-stacked.png" alt="two-section-stacked" loading="lazy">
+          <span class="thumb-label">two-section-stacked</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/image-left-text-right">
+          <img src="thumbs/image-left-text-right.png" alt="image-left-text-right" loading="lazy">
+          <span class="thumb-label">image-left-text-right</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-flows-steps">
+      <h2 class="cat-heading">Flows & Steps<span class="cat-theme-tag">modern-tech</span><span class="cat-count">7 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/horizontal-step-flow">
+          <img src="thumbs/horizontal-step-flow.png" alt="horizontal-step-flow" loading="lazy">
+          <span class="thumb-label">horizontal-step-flow</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/step-card-flow">
+          <img src="thumbs/step-card-flow.png" alt="step-card-flow" loading="lazy">
+          <span class="thumb-label">step-card-flow</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/circle-node-flow">
+          <img src="thumbs/circle-node-flow.png" alt="circle-node-flow" loading="lazy">
+          <span class="thumb-label">circle-node-flow</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/horizontal-milestone-timeline">
+          <img src="thumbs/horizontal-milestone-timeline.png" alt="horizontal-milestone-timeline" loading="lazy">
+          <span class="thumb-label">horizontal-milestone-timeline</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/vertical-step-flow">
+          <img src="thumbs/vertical-step-flow.png" alt="vertical-step-flow" loading="lazy">
+          <span class="thumb-label">vertical-step-flow</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/staircase-roadmap">
+          <img src="thumbs/staircase-roadmap.png" alt="staircase-roadmap" loading="lazy">
+          <span class="thumb-label">staircase-roadmap</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/two-feature-with-result">
+          <img src="thumbs/two-feature-with-result.png" alt="two-feature-with-result" loading="lazy">
+          <span class="thumb-label">two-feature-with-result</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-diagrams">
+      <h2 class="cat-heading">Diagrams<span class="cat-theme-tag">strategy-consulting</span><span class="cat-count">7 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/cycle-diagram">
+          <img src="thumbs/cycle-diagram.png" alt="cycle-diagram" loading="lazy">
+          <span class="thumb-label">cycle-diagram</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/hub-spoke">
+          <img src="thumbs/hub-spoke.png" alt="hub-spoke" loading="lazy">
+          <span class="thumb-label">hub-spoke</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/four-quadrant-center">
+          <img src="thumbs/four-quadrant-center.png" alt="four-quadrant-center" loading="lazy">
+          <span class="thumb-label">four-quadrant-center</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/circle-hub-list-right">
+          <img src="thumbs/circle-hub-list-right.png" alt="circle-hub-list-right" loading="lazy">
+          <span class="thumb-label">circle-hub-list-right</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/center-illustration-spoke">
+          <img src="thumbs/center-illustration-spoke.png" alt="center-illustration-spoke" loading="lazy">
+          <span class="thumb-label">center-illustration-spoke</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/org-chart-tree">
+          <img src="thumbs/org-chart-tree.png" alt="org-chart-tree" loading="lazy">
+          <span class="thumb-label">org-chart-tree</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/bilateral-flow">
+          <img src="thumbs/bilateral-flow.png" alt="bilateral-flow" loading="lazy">
+          <span class="thumb-label">bilateral-flow</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-card-grid">
+      <h2 class="cat-heading">Card Grid<span class="cat-theme-tag">vibrant-pitch</span><span class="cat-count">7 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/cards-2x2">
+          <img src="thumbs/cards-2x2.png" alt="cards-2x2" loading="lazy">
+          <span class="thumb-label">cards-2x2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/cards-2x3">
+          <img src="thumbs/cards-2x3.png" alt="cards-2x3" loading="lazy">
+          <span class="thumb-label">cards-2x3</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/cards-2x4">
+          <img src="thumbs/cards-2x4.png" alt="cards-2x4" loading="lazy">
+          <span class="thumb-label">cards-2x4</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/three-col-icon-card">
+          <img src="thumbs/three-col-icon-card.png" alt="three-col-icon-card" loading="lazy">
+          <span class="thumb-label">three-col-icon-card</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/three-card-icon-subheading">
+          <img src="thumbs/three-card-icon-subheading.png" alt="three-card-icon-subheading" loading="lazy">
+          <span class="thumb-label">three-card-icon-subheading</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/two-column-split-boxes">
+          <img src="thumbs/two-column-split-boxes.png" alt="two-column-split-boxes" loading="lazy">
+          <span class="thumb-label">two-column-split-boxes</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/feature-metrics-cells">
+          <img src="thumbs/feature-metrics-cells.png" alt="feature-metrics-cells" loading="lazy">
+          <span class="thumb-label">feature-metrics-cells</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-charts-data">
+      <h2 class="cat-heading">Charts & Data<span class="cat-theme-tag">strategy-consulting</span><span class="cat-count">7 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/bar-chart-full">
+          <img src="thumbs/bar-chart-full.png" alt="bar-chart-full" loading="lazy">
+          <span class="thumb-label">bar-chart-full</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/chart-left-text-right">
+          <img src="thumbs/chart-left-text-right.png" alt="chart-left-text-right" loading="lazy">
+          <span class="thumb-label">chart-left-text-right</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/pie-donut-left-list-right">
+          <img src="thumbs/pie-donut-left-list-right.png" alt="pie-donut-left-list-right" loading="lazy">
+          <span class="thumb-label">pie-donut-left-list-right</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/three-donut-row">
+          <img src="thumbs/three-donut-row.png" alt="three-donut-row" loading="lazy">
+          <span class="thumb-label">three-donut-row</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/kpi-with-chart">
+          <img src="thumbs/kpi-with-chart.png" alt="kpi-with-chart" loading="lazy">
+          <span class="thumb-label">kpi-with-chart</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/list-and-chart">
+          <img src="thumbs/list-and-chart.png" alt="list-and-chart" loading="lazy">
+          <span class="thumb-label">list-and-chart</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/multi-chart-grid">
+          <img src="thumbs/multi-chart-grid.png" alt="multi-chart-grid" loading="lazy">
+          <span class="thumb-label">multi-chart-grid</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-comparison-pricing">
+      <h2 class="cat-heading">Comparison & Pricing<span class="cat-theme-tag">corporate-trust</span><span class="cat-count">5 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/comparison-matrix">
+          <img src="thumbs/comparison-matrix.png" alt="comparison-matrix" loading="lazy">
+          <span class="thumb-label">comparison-matrix</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/pricing-plan-cards">
+          <img src="thumbs/pricing-plan-cards.png" alt="pricing-plan-cards" loading="lazy">
+          <span class="thumb-label">pricing-plan-cards</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/pricing-comparison-table">
+          <img src="thumbs/pricing-comparison-table.png" alt="pricing-comparison-table" loading="lazy">
+          <span class="thumb-label">pricing-comparison-table</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/status-progress-table">
+          <img src="thumbs/status-progress-table.png" alt="status-progress-table" loading="lazy">
+          <span class="thumb-label">status-progress-table</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/before-after-two-col">
+          <img src="thumbs/before-after-two-col.png" alt="before-after-two-col" loading="lazy">
+          <span class="thumb-label">before-after-two-col</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-kpis-summary">
+      <h2 class="cat-heading">KPIs & Summary<span class="cat-theme-tag">vibrant-pitch</span><span class="cat-count">5 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/three-kpi-big-number">
+          <img src="thumbs/three-kpi-big-number.png" alt="three-kpi-big-number" loading="lazy">
+          <span class="thumb-label">three-kpi-big-number</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/kgi-kpi-dashboard">
+          <img src="thumbs/kgi-kpi-dashboard.png" alt="kgi-kpi-dashboard" loading="lazy">
+          <span class="thumb-label">kgi-kpi-dashboard</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/summary-three-points">
+          <img src="thumbs/summary-three-points.png" alt="summary-three-points" loading="lazy">
+          <span class="thumb-label">summary-three-points</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/action-items-list">
+          <img src="thumbs/action-items-list.png" alt="action-items-list" loading="lazy">
+          <span class="thumb-label">action-items-list</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/key-takeaways">
+          <img src="thumbs/key-takeaways.png" alt="key-takeaways" loading="lazy">
+          <span class="thumb-label">key-takeaways</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-risks-faq">
+      <h2 class="cat-heading">Risks & FAQ<span class="cat-theme-tag">corporate-trust</span><span class="cat-count">5 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/risk-matrix-2x2">
+          <img src="thumbs/risk-matrix-2x2.png" alt="risk-matrix-2x2" loading="lazy">
+          <span class="thumb-label">risk-matrix-2x2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/faq-grid">
+          <img src="thumbs/faq-grid.png" alt="faq-grid" loading="lazy">
+          <span class="thumb-label">faq-grid</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/faq-single-column">
+          <img src="thumbs/faq-single-column.png" alt="faq-single-column" loading="lazy">
+          <span class="thumb-label">faq-single-column</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/faq-stacked-qa-boxes">
+          <img src="thumbs/faq-stacked-qa-boxes.png" alt="faq-stacked-qa-boxes" loading="lazy">
+          <span class="thumb-label">faq-stacked-qa-boxes</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/qa-session-closing">
+          <img src="thumbs/qa-session-closing.png" alt="qa-session-closing" loading="lazy">
+          <span class="thumb-label">qa-session-closing</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-profiles">
+      <h2 class="cat-heading">Profiles<span class="cat-theme-tag">modern-tech</span><span class="cat-count">4 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/profile-bio">
+          <img src="thumbs/profile-bio.png" alt="profile-bio" loading="lazy">
+          <span class="thumb-label">profile-bio</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/team-grid">
+          <img src="thumbs/team-grid.png" alt="team-grid" loading="lazy">
+          <span class="thumb-label">team-grid</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/step-detail-photo-aside">
+          <img src="thumbs/step-detail-photo-aside.png" alt="step-detail-photo-aside" loading="lazy">
+          <span class="thumb-label">step-detail-photo-aside</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/speaker-card">
+          <img src="thumbs/speaker-card.png" alt="speaker-card" loading="lazy">
+          <span class="thumb-label">speaker-card</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-consulting-classics">
+      <h2 class="cat-heading">Consulting Classics<span class="cat-theme-tag">strategy-consulting</span><span class="cat-count">8 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/action-title-pyramid">
+          <img src="thumbs/action-title-pyramid.png" alt="action-title-pyramid" loading="lazy">
+          <span class="thumb-label">action-title-pyramid</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/horizontal-waterfall">
+          <img src="thumbs/horizontal-waterfall.png" alt="horizontal-waterfall" loading="lazy">
+          <span class="thumb-label">horizontal-waterfall</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/marimekko">
+          <img src="thumbs/marimekko.png" alt="marimekko" loading="lazy">
+          <span class="thumb-label">marimekko</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/strategic-2x2-bubble">
+          <img src="thumbs/strategic-2x2-bubble.png" alt="strategic-2x2-bubble" loading="lazy">
+          <span class="thumb-label">strategic-2x2-bubble</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/storyline-ghost-deck">
+          <img src="thumbs/storyline-ghost-deck.png" alt="storyline-ghost-deck" loading="lazy">
+          <span class="thumb-label">storyline-ghost-deck</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/issue-tree-mece">
+          <img src="thumbs/issue-tree-mece.png" alt="issue-tree-mece" loading="lazy">
+          <span class="thumb-label">issue-tree-mece</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/harvey-balls-comparison">
+          <img src="thumbs/harvey-balls-comparison.png" alt="harvey-balls-comparison" loading="lazy">
+          <span class="thumb-label">harvey-balls-comparison</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/executive-summary-sowhat">
+          <img src="thumbs/executive-summary-sowhat.png" alt="executive-summary-sowhat" loading="lazy">
+          <span class="thumb-label">executive-summary-sowhat</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-mba-frameworks">
+      <h2 class="cat-heading">MBA Frameworks<span class="cat-theme-tag">strategy-consulting</span><span class="cat-count">7 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/swot-2x2">
+          <img src="thumbs/swot-2x2.png" alt="swot-2x2" loading="lazy">
+          <span class="thumb-label">swot-2x2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/porter-five-forces">
+          <img src="thumbs/porter-five-forces.png" alt="porter-five-forces" loading="lazy">
+          <span class="thumb-label">porter-five-forces</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/business-model-canvas">
+          <img src="thumbs/business-model-canvas.png" alt="business-model-canvas" loading="lazy">
+          <span class="thumb-label">business-model-canvas</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/value-chain">
+          <img src="thumbs/value-chain.png" alt="value-chain" loading="lazy">
+          <span class="thumb-label">value-chain</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/ansoff-matrix">
+          <img src="thumbs/ansoff-matrix.png" alt="ansoff-matrix" loading="lazy">
+          <span class="thumb-label">ansoff-matrix</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/3c-analysis">
+          <img src="thumbs/3c-analysis.png" alt="3c-analysis" loading="lazy">
+          <span class="thumb-label">3c-analysis</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/pestel">
+          <img src="thumbs/pestel.png" alt="pestel" loading="lazy">
+          <span class="thumb-label">pestel</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-grid-systems">
+      <h2 class="cat-heading">Grid Systems<span class="cat-theme-tag">editorial-keynote</span><span class="cat-count">5 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/bento-grid">
+          <img src="thumbs/bento-grid.png" alt="bento-grid" loading="lazy">
+          <span class="thumb-label">bento-grid</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/modular-3x3">
+          <img src="thumbs/modular-3x3.png" alt="modular-3x3" loading="lazy">
+          <span class="thumb-label">modular-3x3</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/modular-2x3">
+          <img src="thumbs/modular-2x3.png" alt="modular-2x3" loading="lazy">
+          <span class="thumb-label">modular-2x3</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/z-pattern-hero">
+          <img src="thumbs/z-pattern-hero.png" alt="z-pattern-hero" loading="lazy">
+          <span class="thumb-label">z-pattern-hero</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/f-pattern-content">
+          <img src="thumbs/f-pattern-content.png" alt="f-pattern-content" loading="lazy">
+          <span class="thumb-label">f-pattern-content</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-academic">
+      <h2 class="cat-heading">Academic<span class="cat-theme-tag">academic</span><span class="cat-count">5 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/key-message-2">
+          <img src="thumbs/key-message-2.png" alt="key-message-2" loading="lazy">
+          <span class="thumb-label">key-message-2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/bar-chart-full-2">
+          <img src="thumbs/bar-chart-full-2.png" alt="bar-chart-full-2" loading="lazy">
+          <span class="thumb-label">bar-chart-full-2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/comparison-matrix-2">
+          <img src="thumbs/comparison-matrix-2.png" alt="comparison-matrix-2" loading="lazy">
+          <span class="thumb-label">comparison-matrix-2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/numbered-list-body-2">
+          <img src="thumbs/numbered-list-body-2.png" alt="numbered-list-body-2" loading="lazy">
+          <span class="thumb-label">numbered-list-body-2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/three-kpi-big-number-2">
+          <img src="thumbs/three-kpi-big-number-2.png" alt="three-kpi-big-number-2" loading="lazy">
+          <span class="thumb-label">three-kpi-big-number-2</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-warm-narrative">
+      <h2 class="cat-heading">Warm Narrative<span class="cat-theme-tag">warm-narrative</span><span class="cat-count">5 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/cover-visual-split-2">
+          <img src="thumbs/cover-visual-split-2.png" alt="cover-visual-split-2" loading="lazy">
+          <span class="thumb-label">cover-visual-split-2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/hub-spoke-2">
+          <img src="thumbs/hub-spoke-2.png" alt="hub-spoke-2" loading="lazy">
+          <span class="thumb-label">hub-spoke-2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/horizontal-step-flow-2">
+          <img src="thumbs/horizontal-step-flow-2.png" alt="horizontal-step-flow-2" loading="lazy">
+          <span class="thumb-label">horizontal-step-flow-2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/quote-statement-2">
+          <img src="thumbs/quote-statement-2.png" alt="quote-statement-2" loading="lazy">
+          <span class="thumb-label">quote-statement-2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/three-kpi-big-number-3">
+          <img src="thumbs/three-kpi-big-number-3.png" alt="three-kpi-big-number-3" loading="lazy">
+          <span class="thumb-label">three-kpi-big-number-3</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-strategy-consulting">
+      <h2 class="cat-heading">Strategy Consulting<span class="cat-theme-tag">strategy-consulting</span><span class="cat-count">5 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/cover-title-2">
+          <img src="thumbs/cover-title-2.png" alt="cover-title-2" loading="lazy">
+          <span class="thumb-label">cover-title-2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/pricing-plan-cards-2">
+          <img src="thumbs/pricing-plan-cards-2.png" alt="pricing-plan-cards-2" loading="lazy">
+          <span class="thumb-label">pricing-plan-cards-2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/team-grid-2">
+          <img src="thumbs/team-grid-2.png" alt="team-grid-2" loading="lazy">
+          <span class="thumb-label">team-grid-2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/horizontal-step-flow-3">
+          <img src="thumbs/horizontal-step-flow-3.png" alt="horizontal-step-flow-3" loading="lazy">
+          <span class="thumb-label">horizontal-step-flow-3</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/three-kpi-big-number-4">
+          <img src="thumbs/three-kpi-big-number-4.png" alt="three-kpi-big-number-4" loading="lazy">
+          <span class="thumb-label">three-kpi-big-number-4</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-modern-tech">
+      <h2 class="cat-heading">Modern Tech<span class="cat-theme-tag">modern-tech</span><span class="cat-count">5 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/key-message-3">
+          <img src="thumbs/key-message-3.png" alt="key-message-3" loading="lazy">
+          <span class="thumb-label">key-message-3</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/bar-chart-full-3">
+          <img src="thumbs/bar-chart-full-3.png" alt="bar-chart-full-3" loading="lazy">
+          <span class="thumb-label">bar-chart-full-3</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/cards-2x2-2">
+          <img src="thumbs/cards-2x2-2.png" alt="cards-2x2-2" loading="lazy">
+          <span class="thumb-label">cards-2x2-2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/comparison-matrix-3">
+          <img src="thumbs/comparison-matrix-3.png" alt="comparison-matrix-3" loading="lazy">
+          <span class="thumb-label">comparison-matrix-3</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/hub-spoke-3">
+          <img src="thumbs/hub-spoke-3.png" alt="hub-spoke-3" loading="lazy">
+          <span class="thumb-label">hub-spoke-3</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-editorial-keynote">
+      <h2 class="cat-heading">Editorial Keynote<span class="cat-theme-tag">editorial-keynote</span><span class="cat-count">5 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/hub-spoke-4">
+          <img src="thumbs/hub-spoke-4.png" alt="hub-spoke-4" loading="lazy">
+          <span class="thumb-label">hub-spoke-4</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/three-kpi-big-number-5">
+          <img src="thumbs/three-kpi-big-number-5.png" alt="three-kpi-big-number-5" loading="lazy">
+          <span class="thumb-label">three-kpi-big-number-5</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/horizontal-step-flow-4">
+          <img src="thumbs/horizontal-step-flow-4.png" alt="horizontal-step-flow-4" loading="lazy">
+          <span class="thumb-label">horizontal-step-flow-4</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/comparison-matrix-4">
+          <img src="thumbs/comparison-matrix-4.png" alt="comparison-matrix-4" loading="lazy">
+          <span class="thumb-label">comparison-matrix-4</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/cards-2x3-2">
+          <img src="thumbs/cards-2x3-2.png" alt="cards-2x3-2" loading="lazy">
+          <span class="thumb-label">cards-2x3-2</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-corporate-trust">
+      <h2 class="cat-heading">Corporate Trust<span class="cat-theme-tag">corporate-trust</span><span class="cat-count">5 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/cover-title-3">
+          <img src="thumbs/cover-title-3.png" alt="cover-title-3" loading="lazy">
+          <span class="thumb-label">cover-title-3</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/bar-chart-full-4">
+          <img src="thumbs/bar-chart-full-4.png" alt="bar-chart-full-4" loading="lazy">
+          <span class="thumb-label">bar-chart-full-4</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/step-card-flow-2">
+          <img src="thumbs/step-card-flow-2.png" alt="step-card-flow-2" loading="lazy">
+          <span class="thumb-label">step-card-flow-2</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/team-grid-3">
+          <img src="thumbs/team-grid-3.png" alt="team-grid-3" loading="lazy">
+          <span class="thumb-label">team-grid-3</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/key-message-4">
+          <img src="thumbs/key-message-4.png" alt="key-message-4" loading="lazy">
+          <span class="thumb-label">key-message-4</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cat-section" id="cat-vibrant-pitch">
+      <h2 class="cat-heading">Vibrant Pitch<span class="cat-theme-tag">vibrant-pitch</span><span class="cat-count">5 パターン</span></h2>
+      <div class="thumb-grid">
+        <a class="thumb-card" href="deck.html#/cover-title-4">
+          <img src="thumbs/cover-title-4.png" alt="cover-title-4" loading="lazy">
+          <span class="thumb-label">cover-title-4</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/hub-spoke-5">
+          <img src="thumbs/hub-spoke-5.png" alt="hub-spoke-5" loading="lazy">
+          <span class="thumb-label">hub-spoke-5</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/horizontal-step-flow-5">
+          <img src="thumbs/horizontal-step-flow-5.png" alt="horizontal-step-flow-5" loading="lazy">
+          <span class="thumb-label">horizontal-step-flow-5</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/bar-chart-full-5">
+          <img src="thumbs/bar-chart-full-5.png" alt="bar-chart-full-5" loading="lazy">
+          <span class="thumb-label">bar-chart-full-5</span>
+        </a>
+        <a class="thumb-card" href="deck.html#/comparison-matrix-5">
+          <img src="thumbs/comparison-matrix-5.png" alt="comparison-matrix-5" loading="lazy">
+          <span class="thumb-label">comparison-matrix-5</span>
+        </a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

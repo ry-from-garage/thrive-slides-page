@@ -1,0 +1,63 @@
+/* ── Strategy Consulting ─────────────────────────────────────────────────── */
+.theme-strategy-consulting{
+  --primary:#0A2540; --secondary:#3C6E91; --bg:#FFFFFF; --surface:#F4F6F8;
+  --accent:#C8102E; --text:#1A2332; --muted:#5A6675; --positive:#1F7A52; --negative:#B23A2E;
+  --font-head:"Noto Serif JP",Georgia,"Times New Roman",serif;
+  --font-body:"Noto Sans JP","Helvetica Neue",Arial,sans-serif;
+  --display:64px; --h1:40px; --h2:24px; --body:18px; --caption:13px; --radius:2px;
+}
+
+/* ── Modern Tech ─────────────────────────────────────────────────────────── */
+.theme-modern-tech{
+  --primary:#3B4CCA; --secondary:#7C93E8; --bg:#F8F9FB; --surface:#EDEEF2;
+  --accent:#6C63FF; --text:#1C1F26; --muted:#595F6B; --positive:#1A8A5A; --negative:#C0392B;
+  --font-head:"Noto Sans JP",Inter,"Helvetica Neue",Arial,sans-serif;
+  --font-body:"Noto Sans JP",Inter,"Helvetica Neue",Arial,sans-serif;
+  --display:64px; --h1:40px; --h2:26px; --body:18px; --caption:13px; --radius:8px;
+}
+
+/* ── Editorial Keynote ───────────────────────────────────────────────────── */
+.theme-editorial-keynote{
+  --primary:#F0EDEA; --secondary:#5C5856; --bg:#0D0D0D; --surface:#1A1A1A;
+  --accent:#FF4D1C; --text:#F0EDEA; --muted:#8A8480; --positive:#34D66A; --negative:#FF5252;
+  --font-head:"Noto Sans JP","Helvetica Neue","Arial Black",Arial,sans-serif;
+  --font-body:"Noto Sans JP","Helvetica Neue",Arial,sans-serif;
+  --display:88px; --h1:52px; --h2:28px; --body:16px; --caption:12px; --radius:0px;
+}
+
+/* ── Corporate Trust ─────────────────────────────────────────────────────── */
+.theme-corporate-trust{
+  --primary:#1565C0; --secondary:#3B88C3; --bg:#F0F4F9; --surface:#D6E2F0;
+  --accent:#A84300; --text:#0D1B2A; --muted:#4A5568; --positive:#1A6B3C; --negative:#B91C1C;
+  --font-head:"Noto Sans JP","Source Sans 3","Noto Sans",Arial,sans-serif;
+  --font-body:"Noto Sans JP","Source Sans 3","Noto Sans",Arial,sans-serif;
+  --display:60px; --h1:38px; --h2:22px; --body:17px; --caption:13px; --radius:4px;
+}
+
+/* ── Vibrant Pitch ───────────────────────────────────────────────────────── */
+.theme-vibrant-pitch{
+  --primary:#6600FF; --secondary:#CC00AA; --bg:#FFFFFF; --surface:#F5F0FF;
+  --accent:#FF6000; --text:#150A2E; --muted:#4A3D6B; --positive:#0A7A30; --negative:#E02020;
+  --font-head:"Noto Sans JP",Inter,"Helvetica Neue",Arial,sans-serif;
+  --font-body:"Noto Sans JP",Inter,"Helvetica Neue",Arial,sans-serif;
+  --display:72px; --h1:44px; --h2:26px; --body:18px; --caption:13px; --radius:12px;
+  --gradient-hero:linear-gradient(135deg,#6600FF 0%,#CC00AA 100%);
+}
+
+/* ── Academic ────────────────────────────────────────────────────────────── */
+.theme-academic{
+  --primary:#2C3E50; --secondary:#5D7B93; --bg:#FFFFFF; --surface:#F5F5F0;
+  --accent:#34568B; --text:#1A1A2E; --muted:#627181; --positive:#2E7D55; --negative:#A13D3D;
+  --font-head:"Noto Serif JP",Georgia,"Times New Roman",serif;
+  --font-body:"Noto Sans JP","Helvetica Neue",Arial,sans-serif;
+  --display:56px; --h1:36px; --h2:22px; --body:17px; --caption:12px; --radius:0px;
+}
+
+/* ── Warm Narrative ──────────────────────────────────────────────────────── */
+.theme-warm-narrative{
+  --primary:#8B5E3C; --secondary:#8F6A4E; --bg:#FFF8F0; --surface:#F5EDE3;
+  --accent:#227F70; --text:#2D2D2D; --muted:#726861; --positive:#388032; --negative:#B84C4C;
+  --font-head:"Rounded Mplus 1c","M PLUS Rounded 1c","Noto Sans JP",sans-serif;
+  --font-body:"Noto Sans JP","Helvetica Neue",Arial,sans-serif;
+  --display:56px; --h1:36px; --h2:22px; --body:17px; --caption:13px; --radius:8px;
+}
