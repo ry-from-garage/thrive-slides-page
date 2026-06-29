@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>thrive-slides 使い方</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #111318;
+      --surface: #1c1f27;
+      --surface2: #252831;
+      --border: #2e3140;
+      --text: #e8eaf0;
+      --text-muted: #8b90a0;
+      --accent: #5b8def;
+      --accent-hover: #7aa3f5;
+      --radius: 8px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans JP', sans-serif;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 24px 40px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .site-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .header-links {
+      margin-left: auto;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .header-btn {
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 7px 16px;
+      border-radius: 20px;
+      white-space: nowrap;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .header-btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .header-btn-primary:hover { background: var(--accent-hover); }
+    .header-btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .header-btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── Content wrapper ── */
+    .usage-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px 96px;
+    }
+
+    /* ── Prose typography ── */
+    .usage-body h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .usage-body h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 48px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .usage-body h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 32px;
+      margin-bottom: 10px;
+    }
+    .usage-body h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-top: 24px;
+      margin-bottom: 8px;
+    }
+    .usage-body p {
+      margin-bottom: 14px;
+    }
+    .usage-body ul,
+    .usage-body ol {
+      margin: 0 0 14px 1.4em;
+    }
+    .usage-body li {
+      margin-bottom: 5px;
+    }
+    .usage-body a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .usage-body a:hover {
+      color: var(--accent-hover);
+      text-decoration: underline;
+    }
+
+    /* ── Code & pre ── */
+    .usage-body code {
+      font-family: 'Menlo', 'Consolas', 'Monaco', monospace;
+      font-size: 0.85em;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: #c9d1e0;
+    }
+    .usage-body pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+    .usage-body pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: #c9d1e0;
+    }
+
+    /* ── Tables ── */
+    .usage-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 0.875rem;
+    }
+    .usage-body th {
+      background: var(--surface2);
+      color: var(--text);
+      font-weight: 700;
+      text-align: left;
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+    }
+    .usage-body td {
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+    }
+    .usage-body tr:nth-child(even) td {
+      background: var(--surface);
+    }
+    .usage-body tr:nth-child(odd) td {
+      background: transparent;
+    }
+
+    /* ── Blockquote ── */
+    .usage-body blockquote {
+      border-left: 3px solid var(--accent);
+      background: var(--surface);
+      margin: 0 0 16px;
+      padding: 12px 16px;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      color: var(--text-muted);
+    }
+    .usage-body blockquote p {
+      margin-bottom: 0;
+    }
+
+    /* ── HR ── */
+    .usage-body hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 40px 0;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .site-header { padding: 16px; }
+      .usage-wrap { padding: 24px 16px 60px; }
+      .usage-body table { display: block; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-top">
+      <span class="site-title">📖 thrive-slides 使い方</span>
+      <div class="header-links">
+        <a class="header-btn header-btn-outline" href="index.html">← カタログに戻る</a>
+        <a class="header-btn header-btn-primary" href="deck.html">▶ デッキ</a>
+      </div>
+    </div>
+  </header>
+  <main class="usage-wrap">
+    <div class="usage-body">
+<h1>thrive-slides 使い方マニュアル</h1>
+<p>thrive-slides は <strong>AIエージェント非依存</strong>のスライド・デザインシステムです。特定のベンダーや環境に縛られず、ファイルを読めてシェルを実行できるエージェントであれば、どれでも利用できます。呼び出し方は使う環境によって異なります。まず下の早見表で自分の環境を確認してください。</p>
+<hr>
+<h2>早見表（環境別の呼び出し方）</h2>
+<table>
+<thead>
+<tr>
+<th>環境</th>
+<th>使い方</th>
+<th>入口ファイル</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Claude Code</strong>（ターミナル / VS Code・JetBrains 拡張）</td>
+<td><code>/thrive-slides</code> で明示起動、または依頼内容から自動起動</td>
+<td><code>SKILL.md</code></td>
+</tr>
+<tr>
+<td><strong>claude.ai チャット</strong>（ブラウザ）</td>
+<td>「スライドを作って」等と伝えると、スキルの説明文に基づき自動起動</td>
+<td><code>SKILL.md</code>（スキルとして配布）</td>
+</tr>
+<tr>
+<td><strong>Claude Design</strong>（claude.ai の Design タブ）</td>
+<td>スキルではなくファイル添付で使う</td>
+<td><code>design/CLAUDE-DESIGN-GUIDE.md</code></td>
+</tr>
+<tr>
+<td><strong>Codex CLI</strong>（OpenAI Codex CLI）</td>
+<td><code>AGENTS.md</code> を自動読み込み → <code>references/</code> を文脈に → 仕様準拠生成またはレンダラ実行</td>
+<td><code>AGENTS.md</code></td>
+</tr>
+<tr>
+<td><strong>Cursor</strong></td>
+<td><code>.cursor/rules/thrive-slides.mdc</code> が自動ロード → 同様に利用</td>
+<td><code>.cursor/rules/thrive-slides.mdc</code></td>
+</tr>
+<tr>
+<td><strong>ChatGPT（Custom GPT / Projects）</strong></td>
+<td><code>chatgpt/</code> バンドルをアップロードして使う（シェル不要）</td>
+<td><code>chatgpt/SYSTEM-PROMPT.md</code> + <code>chatgpt/knowledge-split/</code>（推奨）または <code>knowledge/</code></td>
+</tr>
+<tr>
+<td><strong>MCP 対応ホスト全般</strong>（Claude Desktop / Claude Code / Cursor / Cline 等）</td>
+<td><code>mcp/</code> の MCP サーバを登録し、仕様取得＋HTML/PPTX レンダリングをツールとして呼び出す</td>
+<td><code>mcp/README.md</code></td>
+</tr>
+<tr>
+<td><strong>汎用（どんなエージェントでも）</strong></td>
+<td><code>references/</code> を読んで仕様準拠生成</td>
+<td><code>references/generation-guide.md</code></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>パターン名（例: <code>three-kpi-big-number</code>）を指示に使うと、狙ったレイアウトを指定できます。全83パターンの名前とサムネイルは<strong>公開カタログ</strong>で一覧確認できます → <strong><a href="https://ry-from-garage.github.io/thrive-slides-page/">https://ry-from-garage.github.io/thrive-slides-page/</a></strong> （各スライドの左上に <code>pattern: 名前</code> が表示されます）。</p>
+</blockquote>
+<hr>
+<h2>1. Claude Code（ターミナル / IDE 拡張）</h2>
+<p>スラッシュコマンドが使えるのはこの環境です。</p>
+<h3>インストール</h3>
+<p>スキルフォルダを <code>~/.claude/skills/</code> に置きます。</p>
+<pre><code class="language-bash">git clone https://github.com/ry-from-garage/thrive-slides.git
+cp -R thrive-slides ~/.claude/skills/thrive-slides
+</code></pre>
+<p><code>~/.claude/skills/thrive-slides/SKILL.md</code> がある状態になれば OK です（VS Code / JetBrains の Claude Code 拡張でも同じ場所を参照します）。</p>
+<h3>呼び出し方（2通り）</h3>
+<ul>
+<li><strong>スラッシュコマンド（明示）:</strong> メッセージの先頭で <code>/thrive-slides</code> と入力し、続けて内容・テーマを書きます。</li>
+<li><strong>自動起動:</strong> 「スライドを作って」「このメモでデッキを作って」のように、スキルの説明文に合う依頼をすると、Claude が自動で thrive-slides を使います（スラッシュ不要）。</li>
+</ul>
+<h3>指定の例</h3>
+<pre><code>/thrive-slides strategy-consulting テーマで、以下の内容から提案スライドを作ってください。
+
+# 国内SaaS参入戦略
+- 市場規模は4.2兆円（2030年予測）
+- 競合は freee / マネーフォワード / 弥生
+- 18か月で黒字化を目指す
+</code></pre>
+<p>指示の中で次を自由に指定できます。</p>
+<table>
+<thead>
+<tr>
+<th>指定したいこと</th>
+<th>書き方の例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>テーマ</strong>（5つから1つ）</td>
+<td>「strategy-consulting テーマで」「modern-tech で」 ※省略すると内容・目的から自動選択</td>
+</tr>
+<tr>
+<td><strong>レイアウト/パターン</strong></td>
+<td>「KPIは three-kpi-big-number で」「比較は harvey-balls-comparison で」 ※名前はカタログで確認</td>
+</tr>
+<tr>
+<td><strong>内容</strong></td>
+<td>箇条書き・文章・Markdown をそのまま貼り付け。<code>.md</code> / <code>.pdf</code> ファイルを渡してもOK</td>
+</tr>
+<tr>
+<td><strong>ブランド適用</strong></td>
+<td>記入済みの <code>brand-&lt;会社名&gt;.md</code> を渡して「このブランドを適用して」</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>2. claude.ai チャット（ブラウザ）</h2>
+<p>claude.ai のチャットには<strong>スラッシュコマンドはありません</strong>。スキルは、依頼内容がスキルの説明文に一致したときに自動起動します。</p>
+<ul>
+<li><strong>スキルの用意:</strong> カスタムスキルの追加方法は契約形態により異なります（組織で配布されている場合は自動で利用可能になります）。個人で確実に試したい場合は、<strong>Claude Code（上の方法）が最も簡単</strong>です。</li>
+<li><strong>使い方:</strong> テーマ名・パターン名・内容を文章で伝えるだけです。</li>
+</ul>
+<pre><code>thrive-slides の strategy-consulting テーマで、次のメモからスライドを作ってください。
+（内容を貼り付け、または .md / .pdf を添付）
+</code></pre>
+<hr>
+<h2>3. Claude Design（claude.ai の Design タブ）</h2>
+<p>Claude Design はスキルを使いません（チャット側で有効化したスキルは Design には引き継がれません）。<strong>ファイルを添付</strong>して使います。</p>
+<h3>添付するファイル</h3>
+<table>
+<thead>
+<tr>
+<th>ファイル</th>
+<th>場所</th>
+<th>必須/任意</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CORE（生成手順＋グリッド＋品質ルール）</td>
+<td><code>design/00-CORE-thrive-slides.md</code></td>
+<td>必須</td>
+</tr>
+<tr>
+<td>テーマ（5つから1つ）</td>
+<td><code>references/themes/theme-&lt;選択&gt;.md</code></td>
+<td>必須</td>
+</tr>
+<tr>
+<td>レイアウト（使うカテゴリ分）</td>
+<td><code>references/layouts/layout-&lt;カテゴリ&gt;.md</code></td>
+<td>必須</td>
+</tr>
+<tr>
+<td>ブランド</td>
+<td><code>references/brand/BRAND-TEMPLATE.md</code> をコピーして記入</td>
+<td>任意</td>
+</tr>
+</tbody></table>
+<h3>指示の例</h3>
+<pre><code>添付のファイルに従って strategy-consulting テーマでスライドを生成してください。
+内容: …（メモ・箇条書き・Markdown など）
+</code></pre>
+<p>詳しい手順は <a href="design/CLAUDE-DESIGN-GUIDE.md">Claude Design ガイド</a> を参照してください。</p>
+<hr>
+<h2>4. Codex CLI（OpenAI Codex CLI）</h2>
+<p>Codex CLI はプロジェクトルートの <code>AGENTS.md</code> を自動的に読み込みます。追加設定なしで thrive-slides の使い方が文脈に入ります。</p>
+<h3>使い方</h3>
+<p><code>AGENTS.md</code> の「起動手順（Codex / Cursor — MCP なし）」に従ってスライドを生成します。</p>
+<ol>
+<li><code>AGENTS.md</code>（このリポジトリの <code>/AGENTS.md</code>）を確認する（Codex が自動で読み込む）</li>
+<li><code>references/generation-guide.md</code> を読む（生成規範・品質ルール）</li>
+<li><code>references/themes/THEME-INDEX.md</code> でテーマを選び、対応する <code>theme-*.md</code> を読む</li>
+<li><code>references/layouts/LAYOUT-INDEX.md</code> でレイアウトを選び、対応する <code>layout-*.md</code> を読む</li>
+<li>仕様に従ってスライドを生成するか、レンダラを実行する</li>
+</ol>
+<h3>レンダラ実行（任意）</h3>
+<pre><code class="language-bash"># HTML デッキ
+cd renderer &amp;&amp; npm install &amp;&amp; node build.js &lt;spec.json&gt; &lt;out&gt;
+
+# PowerPoint
+cd pptx &amp;&amp; pip install -r requirements.txt &amp;&amp; python build.py &lt;spec.json&gt; &lt;out.pptx&gt;
+</code></pre>
+<p>spec フォーマットは <code>renderer/specs/gallery.json</code> を参照してください。</p>
+<hr>
+<h2>5. Cursor</h2>
+<p><code>.cursor/rules/thrive-slides.mdc</code> がプロジェクト内に存在する場合、Cursor が自動的にこのルールをロードします。スライド/デッキ生成を依頼すると、このルールに基づいて thrive-slides の仕様に沿った生成が行われます。</p>
+<h3>使い方</h3>
+<p>Cursor のチャットまたはエディタ内で、スライド生成を依頼するだけです。</p>
+<ul>
+<li>ルールが自動ロードされるため、特別な設定なしに <code>references/</code> を参照した仕様準拠生成が実行されます。</li>
+<li>レンダラの実行（<code>renderer/build.js</code> や <code>pptx/build.py</code>）も Cursor のターミナルから行えます。</li>
+<li>MCP サーバを登録することで、ツールとしての呼び出しも可能です（→ 後述の「MCP 対応ホスト」を参照）。</li>
+</ul>
+<hr>
+<h2>6. ChatGPT（Custom GPT / Projects）</h2>
+<p>ChatGPT はローカルのレンダラを実行できません。<code>chatgpt/</code> バンドルをアップロードすることで、ChatGPT 上で thrive-slides のデザイン規範に沿ったスライドを生成できます。</p>
+<h3>セットアップ</h3>
+<p>詳細な手順は <code>chatgpt/README.md</code> を参照してください。概要:</p>
+<p><strong>Custom GPT を作る場合:</strong></p>
+<ol>
+<li>ChatGPT を開く → 左サイドバーの「GPTs」→「+ 作成」をクリック</li>
+<li>「構成 (Configure)」タブを選択</li>
+<li><strong>Instructions（指示）</strong> に <code>chatgpt/SYSTEM-PROMPT.md</code> の内容を貼り付ける</li>
+<li><strong>「知識 (Knowledge)」</strong> に、次の<strong>いずれか一方</strong>のフォルダのファイル一式をアップロードする:<ul>
+<li><strong>分割版（推奨）:</strong> <code>chatgpt/knowledge-split/</code> の18ファイル（各 &lt; 256KB・検索精度が高い）</li>
+<li><strong>統合版:</strong> <code>chatgpt/knowledge/</code> の4ファイル（<code>00-core</code> / <code>01-themes</code> / <code>02-layouts</code>（≈489KB）/ <code>03-brand</code>）
+※ 両方を混ぜないでください。</li>
+</ul>
+</li>
+<li>保存して完成</li>
+</ol>
+<p><strong>ChatGPT Projects を使う場合:</strong></p>
+<ol>
+<li>左サイドバーの「Projects」→「+ 新しいプロジェクト」をクリック</li>
+<li>プロジェクト指示に <code>chatgpt/SYSTEM-PROMPT.md</code> の内容を貼り付ける</li>
+<li><code>chatgpt/knowledge-split/</code>（推奨・18ファイル）または <code>chatgpt/knowledge/</code>（4ファイル）のいずれか一方を一式アップロードする</li>
+</ol>
+<h3>出力</h3>
+<p>ChatGPT は以下の2つを出力します。</p>
+<ul>
+<li><strong>自己完結 HTML デッキ</strong> — ブラウザで直接開いてプレゼンできる HTML ファイル（テーマカラーをインライン CSS で再現）</li>
+<li><strong>デッキ仕様 JSON</strong> — <code>{title, theme, slides: [{page, pattern, action_title, content}]}</code> 形式。この JSON を MCP サーバや <code>pptx/build.py</code>・<code>renderer/build.js</code> に渡すと、ピクセル精度のデッキを生成できます。</li>
+</ul>
+<hr>
+<h2>7. MCP 対応ホスト全般</h2>
+<p>thrive-slides は <strong>MCP（Model Context Protocol）サーバとしても使えます</strong>。<code>mcp/</code> に stdio の MCP サーバを同梱しており、Claude Desktop / Claude Code / Cursor / Cline / ChatGPT デスクトップコネクタなど <strong>任意の MCP 対応ホスト</strong>から first-class なツールとして利用できます。</p>
+<h3>MCP サーバが提供するツール（全9つ）</h3>
+<p><strong>仕様ツール（7つ）</strong> — 設計仕様をホストの文脈に取り込む</p>
+<table>
+<thead>
+<tr>
+<th>ツール</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>list_themes</code></td>
+<td>5テーマの名前と概要、<code>THEME-INDEX.md</code> を返す</td>
+</tr>
+<tr>
+<td><code>list_patterns</code></td>
+<td>14カテゴリ・全パターン名を返す</td>
+</tr>
+<tr>
+<td><code>get_generation_guide</code></td>
+<td>生成規範・品質ルール（<code>references/generation-guide.md</code>）を返す</td>
+</tr>
+<tr>
+<td><code>get_grid_system</code></td>
+<td>グリッドシステム定義（12カラム・8px・1280×720px）を返す</td>
+</tr>
+<tr>
+<td><code>get_theme</code></td>
+<td>指定テーマの定義ファイル（<code>theme-&lt;name&gt;.md</code>）を返す</td>
+</tr>
+<tr>
+<td><code>get_layout</code></td>
+<td>指定カテゴリのレイアウト定義（<code>layout-&lt;category&gt;.md</code>）を返す</td>
+</tr>
+<tr>
+<td><code>get_brand_template</code></td>
+<td>ブランドテンプレート＋融合規則を返す</td>
+</tr>
+</tbody></table>
+<p><strong>レンダリングツール（2つ）</strong> — デッキ spec から完成品を生成</p>
+<table>
+<thead>
+<tr>
+<th>ツール</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>render_html</code></td>
+<td>spec オブジェクトを受け取り、HTML デッキを生成して絶対パスを返す</td>
+</tr>
+<tr>
+<td><code>render_pptx</code></td>
+<td>spec オブジェクトを受け取り、PowerPoint ファイルを生成して絶対パスを返す（デフォルトでフォント埋め込み済み）</td>
+</tr>
+</tbody></table>
+<h3>セットアップ</h3>
+<pre><code class="language-bash">cd mcp &amp;&amp; npm install
+</code></pre>
+<p>spec ツール（7つ）はこれだけで使えます。レンダリングツールを使う場合は renderer / pptx の依存関係も別途インストールしてください（詳細は <code>mcp/README.md</code>）。</p>
+<h3>ホストへの登録方法</h3>
+<p><strong>Claude Code:</strong></p>
+<pre><code class="language-bash">claude mcp add thrive-slides -- node /絶対パス/thrive-slides/mcp/server.js
+</code></pre>
+<p>（<code>-s user</code> でユーザーグローバル登録、<code>-s project</code> でプロジェクト共有）</p>
+<p><strong>Claude Desktop</strong> — <code>claude_desktop_config.json</code> に追加:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;thrive-slides&quot;: {
+      &quot;command&quot;: &quot;node&quot;,
+      &quot;args&quot;: [&quot;/絶対パス/thrive-slides/mcp/server.js&quot;]
+    }
+  }
+}
+</code></pre>
+<p><strong>Cursor / Cline / その他</strong> — ホスト別の設定ファイルへの追記方法は <code>mcp/README.md</code> を参照してください。</p>
+<h3>使用の流れ（例）</h3>
+<ol>
+<li><code>list_patterns</code> を呼び出してパターン一覧を確認する</li>
+<li><code>get_theme</code> で使用するテーマの定義を取得する</li>
+<li><code>get_layout</code> で必要なレイアウトカテゴリの定義を取得する</li>
+<li>spec JSON を組み立てる（<code>renderer/specs/gallery.json</code> 参照）</li>
+<li><code>render_pptx</code> に spec を渡して PowerPoint を生成する</li>
+</ol>
+<hr>
+<h2>8. 汎用（どんなエージェントでも使える）</h2>
+<p>シェルさえ実行できれば、任意のエージェントで thrive-slides を利用できます。</p>
+<ol>
+<li><code>references/generation-guide.md</code> を読む（生成規範・品質ルール）</li>
+<li><code>references/themes/THEME-INDEX.md</code> でテーマを選び、対応する <code>theme-*.md</code> を読む</li>
+<li><code>references/layouts/LAYOUT-INDEX.md</code> でレイアウトを選び、対応する <code>layout-*.md</code> を読む</li>
+<li>仕様に従ってスライドを生成する（レンダラ実行は任意）</li>
+</ol>
+<p>詳しくは <code>AGENTS.md</code>（リポジトリルート）を参照してください。</p>
+<hr>
+<h2>PPTX（PowerPoint）として出力する</h2>
+<h3>これは何か</h3>
+<p><code>pptx/</code> チャネルは <code>renderer/specs/</code> の仕様に基づき、同じ83パターンを<strong>ネイティブ PowerPoint (.pptx)</strong> として出力する Python パイプラインです。HTML レンダラと同じ <code>gallery.json</code> を入力に使います。</p>
+<h3>ダウンロード（すぐ試す）</h3>
+<p>全98スライドの見本デッキを直接ダウンロードできます。</p>
+<ul>
+<li><strong>URL:</strong> <a href="https://ry-from-garage.github.io/thrive-slides-page/thrive-slides-gallery.pptx">https://ry-from-garage.github.io/thrive-slides-page/thrive-slides-gallery.pptx</a></li>
+<li><strong>または:</strong> 公開ギャラリー（<a href="https://ry-from-garage.github.io/thrive-slides-page/%EF%BC%89%E4%B8%8A%E9%83%A8%E3%81%AE%E3%80%8C%E2%AC%87">https://ry-from-garage.github.io/thrive-slides-page/）上部の「⬇</a> PowerPoint版」ボタンから</li>
+</ul>
+<p>日本語フォント（Noto Sans JP / Noto Serif JP）埋め込み済みなので、Noto フォントがインストールされていない環境でも同じ見た目で開けます。</p>
+<h3>自分で生成する手順</h3>
+<pre><code class="language-bash">cd pptx
+python3 -m venv .venv &amp;&amp; .venv/bin/pip install -r requirements.txt
+.venv/bin/python build.py            # renderer/specs/gallery.json → out/gallery.pptx（全98スライド）
+# 任意のスペックから生成する場合:
+.venv/bin/python build.py &lt;spec.json&gt; &lt;out.pptx&gt;
+</code></pre>
+<h3>日本語フォント埋め込み（環境差の解消）</h3>
+<pre><code class="language-bash">.venv/bin/python embed_fonts.py out/gallery.pptx out/gallery-embedded.pptx
+</code></pre>
+<p><code>embed_fonts.py</code> は Noto Sans JP / Noto Serif JP をデッキ使用文字だけにサブセットして OOXML で正規埋め込みします（PowerPoint の「使用文字のみ埋め込み」と同等）。これで Noto 未インストールの PowerPoint でも同じ見た目になります。</p>
+<h3>自分のスライドを作る</h3>
+<p>入力スペックは <code>renderer/specs/gallery.json</code> と同じ形式（<code>slides: [{theme, pattern, content, page}]</code>）です。<code>theme</code> は5種から、<code>pattern</code> は全83パターン名（公開カタログで確認）から選びます。</p>
+<hr>
+<h2>困ったときは</h2>
+<ul>
+<li><strong>どのレイアウトがあるか分からない</strong> → 公開カタログ（<a href="https://ry-from-garage.github.io/thrive-slides-page/">https://ry-from-garage.github.io/thrive-slides-page/</a> ）でサムネイルとパターン名を確認。</li>
+<li><strong>用語が分からない</strong> → <a href="README.md">README</a> 最下部の用語集。</li>
+<li><strong>スラッシュコマンドが出てこない</strong> → claude.ai チャット / Claude Design / Codex / Cursor / ChatGPT にはありません（Claude Code のみ）。上の早見表で環境を確認してください。</li>
+<li><strong>MCP サーバが接続できない</strong> → <code>mcp/README.md</code> のトラブルシューティングを参照してください。サーバは stderr のみにログを出力します（stdout は JSON-RPC チャンネルです）。</li>
+</ul>
+
+    </div>
+  </main>
+</body>
+</html>
