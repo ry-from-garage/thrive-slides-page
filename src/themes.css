@@ -43,3 +43,21 @@
   --display:72px; --h1:44px; --h2:26px; --body:18px; --caption:13px; --radius:12px;
   --gradient-hero:linear-gradient(135deg,#6600FF 0%,#CC00AA 100%);
 }
+
+/* ── Academic ────────────────────────────────────────────────────────────── */
+.theme-academic{
+  --primary:#2C3E50; --secondary:#5D7B93; --bg:#FFFFFF; --surface:#F5F5F0;
+  --accent:#34568B; --text:#1A1A2E; --muted:#627181; --positive:#2E7D55; --negative:#A13D3D;
+  --font-head:"Noto Serif JP",Georgia,"Times New Roman",serif;
+  --font-body:"Noto Sans JP","Helvetica Neue",Arial,sans-serif;
+  --display:56px; --h1:36px; --h2:22px; --body:17px; --caption:12px; --radius:0px;
+}
+
+/* ── Warm Narrative ──────────────────────────────────────────────────────── */
+.theme-warm-narrative{
+  --primary:#8B5E3C; --secondary:#8F6A4E; --bg:#FFF8F0; --surface:#F5EDE3;
+  --accent:#227F70; --text:#2D2D2D; --muted:#726861; --positive:#388032; --negative:#B84C4C;
+  --font-head:"Rounded Mplus 1c","M PLUS Rounded 1c","Noto Sans JP",sans-serif;
+  --font-body:"Noto Sans JP","Helvetica Neue",Arial,sans-serif;
+  --display:56px; --h1:36px; --h2:22px; --body:17px; --caption:13px; --radius:8px;
+}

@@ -41,7 +41,12 @@ function assignSlideIds(slides) {
       }
       id = candidate;
     } else {
-      id = pattern;
+      let candidate = pattern;
+      let n = 2;
+      while (usedIds.has(candidate)) {
+        candidate = `${pattern}-${n++}`;
+      }
+      id = candidate;
     }
 
     usedIds.add(id);
