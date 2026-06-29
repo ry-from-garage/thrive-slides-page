@@ -1,4 +1,0 @@
-:root{ --canvas-w:1280px; --canvas-h:720px; --safe-x:72px; --safe-y:56px;
-  --content-w:1136px; --content-h:608px; --col:72.6667px; --gutter:24px; --baseline:8px; }
-.ts-slide *{box-sizing:border-box;}
-.ts-region{position:absolute;}
