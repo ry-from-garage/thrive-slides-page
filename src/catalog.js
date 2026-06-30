@@ -42,7 +42,7 @@ function renderJumpNav(categories) {
 /**
  * Render one category section with a heading + card grid.
  */
-function renderCategorySection(cat) {
+function renderCategorySection(cat, locale) {
   const cards = cat.patterns.map(slide => {
     const id = slide._id;
     return `        <a class="thumb-card" href="deck.html#/${id}">
@@ -54,7 +54,7 @@ function renderCategorySection(cat) {
   const themeTag = cat.themeName
     ? `<span class="cat-theme-tag">${cat.themeName}</span>`
     : '';
-  const countTag = `<span class="cat-count">${cat.patterns.length} パターン</span>`;
+  const countTag = `<span class="cat-count">${cat.patterns.length} ${locale === 'en' ? 'patterns' : 'パターン'}</span>`;
 
   return `    <section class="cat-section" id="${cat.catId}">
       <h2 class="cat-heading">${cat.title}${themeTag}${countTag}</h2>
@@ -65,21 +65,37 @@ ${cards}
 }
 
 export function renderCatalog(spec) {
+  const locale = spec._locale ?? 'ja';
+  const en = locale === 'en';
+
   const slidesWithIds = assignSlideIds(spec.slides ?? []);
   const categories = buildCategories(slidesWithIds);
 
   const totalPatterns = categories.reduce((n, c) => n + c.patterns.length, 0);
   const catCount = categories.length;
+  const themeCount = new Set((spec.slides ?? []).map(s => s.theme).filter(Boolean)).size;
 
   const jumpNav = renderJumpNav(categories);
-  const sections = categories.map(renderCategorySection).join('\n\n');
+  const sections = categories.map(c => renderCategorySection(c, locale)).join('\n\n');
+
+  const title = en
+    ? 'thrive-slides — Slide Pattern Catalog'
+    : 'thrive-slides — スライドパターンカタログ';
+  const pptxLabel = en
+    ? `Download PowerPoint (${totalPatterns} slides)`
+    : `PowerPoint版 (${totalPatterns}枚)`;
+  const usageLabel = en ? 'How to Use' : '使い方';
+  const deckLabel = en ? 'View Full Deck' : 'デッキで通し閲覧';
+  const subtitle = en
+    ? `${themeCount} themes × ${catCount} categories × ${totalPatterns} patterns`
+    : `${themeCount} テーマ × ${catCount} カテゴリ × ${totalPatterns} パターン`;
 
   return `<!DOCTYPE html>
-<html lang="ja">
+<html lang="${locale}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>thrive-slides — スライドパターンカタログ</title>
+  <title>${title}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -298,14 +314,14 @@ export function renderCatalog(spec) {
 <body>
   <header class="site-header">
     <div class="header-top">
-      <span class="site-title">thrive-slides — スライドパターンカタログ</span>
+      <span class="site-title">${title}</span>
       <div class="header-actions">
-        <a class="pptx-link" href="thrive-slides-gallery.pptx" download>⬇ PowerPoint版 (98枚)</a>
-        <a class="usage-link" href="usage.html">📖 使い方</a>
-        <a class="deck-link" href="deck.html">▶ デッキで通し閲覧</a>
+        <a class="pptx-link" href="thrive-slides-gallery.pptx" download>⬇ ${pptxLabel}</a>
+        <a class="usage-link" href="usage.html">📖 ${usageLabel}</a>
+        <a class="deck-link" href="deck.html">▶ ${deckLabel}</a>
       </div>
     </div>
-    <div class="site-subtitle">5 テーマ × ${catCount} カテゴリ × ${totalPatterns} パターン</div>
+    <div class="site-subtitle">${subtitle}</div>
   </header>
   ${jumpNav}
   <main class="main-content">
