@@ -94,9 +94,15 @@ export function renderCatalog(spec) {
   const title = en
     ? 'thrive-slides — Slide Pattern Catalog'
     : 'thrive-slides — スライドパターンカタログ';
+  // The downloadable .pptx mirrors the full deck (intro + dividers + pattern
+  // slides), not just the unique pattern count — use the actual slide total.
+  const totalSlideCount = slidesWithIds.length;
   const pptxLabel = en
-    ? `Download PowerPoint (${totalPatterns} slides)`
-    : `PowerPoint版 (${totalPatterns}枚)`;
+    ? `Download PowerPoint (${totalSlideCount} slides)`
+    : `PowerPoint版 (${totalSlideCount}枚)`;
+  // The single shared thrive-slides-gallery.pptx lives at the site root;
+  // locale pages under /en/ need one extra "../" hop to reach it.
+  const pptxHref = en ? '../thrive-slides-gallery.pptx' : 'thrive-slides-gallery.pptx';
   const usageLabel = en ? 'How to Use' : '使い方';
   const deckLabel = en ? 'View Full Deck' : 'デッキで通し閲覧';
   const subtitle = en
@@ -329,7 +335,7 @@ export function renderCatalog(spec) {
     <div class="header-top">
       <span class="site-title">${title}</span>
       <div class="header-actions">
-        <a class="pptx-link" href="thrive-slides-gallery.pptx" download>⬇ ${pptxLabel}</a>
+        <a class="pptx-link" href="${pptxHref}" download>⬇ ${pptxLabel}</a>
         <a class="usage-link" href="usage.html">📖 ${usageLabel}</a>
         <a class="deck-link" href="deck.html">▶ ${deckLabel}</a>
       </div>
