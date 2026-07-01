@@ -18,6 +18,11 @@ function buildCategories(slidesWithIds) {
         catId: slide._id,          // e.g. "cat-表紙・セクション" → stable id from render.js
         themeName: slide.content?.theme_name ?? slide.theme ?? '',
         count: slide.content?.count ?? 0,
+        // 'layout-category' = one of the true pattern categories (layout-*.md).
+        // 'theme-showcase' = a per-theme recap section that re-displays patterns
+        // already counted under their layout category — excluded from catCount/
+        // totalPatterns below so the header subtitle isn't inflated/double-counted.
+        kind: slide.content?.kind ?? 'layout-category',
         patterns: [],
       };
       categories.push(current);
@@ -71,8 +76,16 @@ export function renderCatalog(spec) {
   const slidesWithIds = assignSlideIds(spec.slides ?? []);
   const categories = buildCategories(slidesWithIds);
 
-  const totalPatterns = categories.reduce((n, c) => n + c.patterns.length, 0);
-  const catCount = categories.length;
+  // totalPatterns = unique pattern names across the whole spec (a pattern can
+  // appear twice: once under its layout category, once under a theme-showcase
+  // recap section — count it once). catCount excludes theme-showcase sections
+  // since they aren't a distinct layout category, just an alternate browse view.
+  const totalPatterns = new Set(
+    (spec.slides ?? [])
+      .filter(s => s.pattern && s.pattern !== '_intro' && s.pattern !== '_divider')
+      .map(s => s.pattern)
+  ).size;
+  const catCount = categories.filter(c => c.kind !== 'theme-showcase').length;
   const themeCount = new Set((spec.slides ?? []).map(s => s.theme).filter(Boolean)).size;
 
   const jumpNav = renderJumpNav(categories);

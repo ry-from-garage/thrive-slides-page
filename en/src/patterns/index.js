@@ -24,3 +24,5 @@ import './profile.js';
 import './consulting.js';
 import './framework-mba.js';
 import './grid-system.js';
+import './cx-ux.js';
+import './financial.js';
